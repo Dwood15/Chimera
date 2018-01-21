@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "../../version.h"
 #include "lua/lua.hpp"
 #include "../hooks/event.h"
 #include "../messaging/messaging.h"
@@ -24,6 +25,8 @@ struct LuaScript {
     lua_State *state = nullptr;
 
     std::vector<LuaScriptTimer> timers;
+
+    double version = CHIMERA_LUA_INTERPRETER;
 
     std::string name;
     bool loaded = false;

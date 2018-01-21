@@ -48,10 +48,10 @@ static void read_command() {
         case CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND: {
             extern bool on_command_lua(const char *command);
             if(on_command_lua(console_text)) {
-                console_text[0] = 0;
+                unblock_error();
             }
             else {
-                unblock_error();
+                console_text[0] = 0;
             }
             break;
         }

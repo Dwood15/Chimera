@@ -145,6 +145,9 @@ static void load_lua_script(const char *script_name, const char *lua_script_data
             console_out_warning(std::string(script_name) + " was made for a much older version of Chimera.");
             console_out_warning("It may possibly not work as intended.");
         }
+        else {
+            script_from_state(state).version = version;
+        }
     }
     else {
         console_out_warning(std::string(script_name) + " does not have clua_version defined.");

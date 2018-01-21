@@ -57,18 +57,18 @@ static inline void call_in_order(std::vector<Event<T>> events, Args&& ... args) 
 ///
 /// Functions in the same priority are called based on their order in the events vector.
 template<typename T, typename ... Args>
-static inline void call_in_order_deny(std::vector<Event<T>> events, bool &deny, Args&& ... args) {
+static inline void call_in_order_allow(std::vector<Event<T>> events, bool &allow, Args&& ... args) {
     auto count = events.size();
-    for(typename std::vector<Event<T>>::size_type i=0;i<count && !deny;i++) {
-        if(events[i].priority == EVENT_PRIORITY_BEFORE) deny = events[i].function(std::forward<Args>(args) ...);
+    for(typename std::vector<Event<T>>::size_type i=0;i<count && allow;i++) {
+        if(events[i].priority == EVENT_PRIORITY_BEFORE) allow = events[i].function(std::forward<Args>(args) ...);
     }
-    for(typename std::vector<Event<T>>::size_type i=0;i<count && !deny;i++) {
-        if(events[i].priority == EVENT_PRIORITY_DEFAULT) deny = events[i].function(std::forward<Args>(args) ...);
+    for(typename std::vector<Event<T>>::size_type i=0;i<count && allow;i++) {
+        if(events[i].priority == EVENT_PRIORITY_DEFAULT) allow = events[i].function(std::forward<Args>(args) ...);
     }
-    for(typename std::vector<Event<T>>::size_type i=0;i<count && !deny;i++) {
-        if(events[i].priority == EVENT_PRIORITY_AFTER) deny = events[i].function(std::forward<Args>(args) ...);
+    for(typename std::vector<Event<T>>::size_type i=0;i<count && allow;i++) {
+        if(events[i].priority == EVENT_PRIORITY_AFTER) allow = events[i].function(std::forward<Args>(args) ...);
     }
-    for(typename std::vector<Event<T>>::size_type i=0;i<count && !deny;i++) {
-        if(events[i].priority == EVENT_PRIORITY_FINAL) deny = events[i].function(std::forward<Args>(args) ...);
+    for(typename std::vector<Event<T>>::size_type i=0;i<count && allow;i++) {
+        if(events[i].priority == EVENT_PRIORITY_FINAL) allow = events[i].function(std::forward<Args>(args) ...);
     }
 }

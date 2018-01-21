@@ -128,37 +128,37 @@ static void frame_callback() noexcept {
     call_all_priorities(x);
 }
 
-#define deny_string_callback(callback) [](EventPriority priority, const char *string, bool &deny) noexcept {\
-    for(size_t i=0;i<scripts.size() && !deny;i++) {\
+#define allow_string_callback(callback) [](EventPriority priority, const char *string, bool &allow) noexcept {\
+    for(size_t i=0;i<scripts.size() && allow;i++) {\
         auto &script = *scripts[i].get();\
         auto &script_callback = script.callback;\
         if(script_callback.callback_function != "" && script_callback.priority == priority) {\
             auto *&state = script.state;\
             lua_getglobal(state, script_callback.callback_function.data());\
             lua_pushstring(state, string);\
-            lua_pushboolean(state, deny);\
-            pcall(state, 2, 1);\
+            pcall(state, 1, 1);\
             if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {\
-                deny = lua_toboolean(state,-1);\
+                allow = lua_toboolean(state,-1);\
+                if(script.version < 2.02) allow = !allow;\
             }\
             lua_pop(state,1);\
         }\
     }\
 };
-#define call_all_priorities_deny_str(function,str,deny) function(EVENT_PRIORITY_BEFORE,str,deny); function(EVENT_PRIORITY_DEFAULT,str,deny); function(EVENT_PRIORITY_AFTER,str,deny); function(EVENT_PRIORITY_FINAL,str,deny)
+#define call_all_priorities_allow_str(function,str,allow) function(EVENT_PRIORITY_BEFORE,str,allow); function(EVENT_PRIORITY_DEFAULT,str,allow); function(EVENT_PRIORITY_AFTER,str,allow); function(EVENT_PRIORITY_FINAL,str,allow)
 
 bool on_command_lua(const char *command) noexcept {
-    bool deny = false;
-    auto x = deny_string_callback(c_command);
-    call_all_priorities_deny_str(x, command, deny);
-    return deny;
+    bool allow = true;
+    auto x = allow_string_callback(c_command);
+    call_all_priorities_allow_str(x, command, allow);
+    return allow;
 }
 
 bool rcon_message_callback(const char *message) noexcept {
-    bool deny = false;
-    auto x = deny_string_callback(c_rcon_message);
-    call_all_priorities_deny_str(x, message, deny);
-    return deny;
+    bool allow = true;
+    auto x = allow_string_callback(c_rcon_message);
+    call_all_priorities_allow_str(x, message, allow);
+    return allow;
 }
 
 struct UnderscoreSpaceThing {

@@ -29,9 +29,9 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
     char *text = *(d + 1);
     size_t len = strlen(text);
 
-    bool deny = false;
-    call_in_order_deny(events, deny, text);
-    if(deny) return;
+    bool allow = true;
+    call_in_order_allow(events, allow, text);
+    if(!allow) return;
 
     if(len > 4 && text[len - 4] == '|' && text[len - 3] == 'n' && text[len - 2] == 'c') {
         char color = text[len - 1];
@@ -119,7 +119,7 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
             default: break;
         }
         console_out(text, ColorARGB(a,r,g,b));
-        deny = true;
+        allow = false;
     }
     else if(len > 6 && text[len - 6] == '|' && text[len - 5] == 'n' && text[len - 4] == 'c') {
         ColorARGB ncolor;
@@ -128,7 +128,7 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
         ncolor.green = ((p >> 4) & 0xF) / 15.0;
         ncolor.blue = (p & 0xF) / 15.0;
         console_out(text, ncolor);
-        deny = true;
+        allow = false;
     }
     else if(len > 7 && text[len - 7] == '|' && text[len - 6] == 'n' && text[len - 5] == 'c') {
         ColorARGB ncolor;
@@ -138,7 +138,7 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
         ncolor.green = ((p >> 4) & 0xF) / 15.0;
         ncolor.blue = (p & 0xF) / 15.0;
         console_out(text, ncolor);
-        deny = true;
+        allow = false;
     }
     else if(len > 9 && text[len - 9] == '|' && text[len - 8] == 'n' && text[len - 7] == 'c') {
         ColorARGB ncolor;
@@ -147,7 +147,7 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
         ncolor.green = ((p >> 8) & 0xFF) / 255.0;
         ncolor.blue = (p & 0xFF) / 255.0;
         console_out(text, ncolor);
-        deny = true;
+        allow = false;
     }
     else if(len > 11 && text[len - 11] == '|' && text[len - 10] == 'n' && text[len - 9] == 'c') {
         ColorARGB ncolor;
@@ -157,13 +157,10 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
         ncolor.green = ((p >> 8) & 0xFF) / 255.0;
         ncolor.blue = (p & 0xFF) / 255.0;
         console_out(text, ncolor);
-        deny = true;
-    }
-    else {
-        deny = false;
+        allow = false;
     }
 
-    if(!deny) {
+    if(allow) {
         console_out(text, ColorARGB(1.0,1.0,1.0,1.0));
     }
 }
