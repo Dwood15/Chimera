@@ -46,8 +46,8 @@ std::vector<ChimeraCommand> *commands;
 
 bool initial_tick = true;
 
+// workaround for wine users - disable the update notifier because it crashes
 static bool wine_used() {
-    //static const char * (CDECL *pwine_get_version)(void);
     HMODULE hntdll = GetModuleHandle("ntdll.dll");
     if(!hntdll) {
         return false;

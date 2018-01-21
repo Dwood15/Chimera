@@ -1,6 +1,6 @@
 @echo OFF
 
-if exist client\lua\lua\bin\liblua.a (goto CHIMERA)
+if exist client\lua\lua\bin\liblua.a (goto UPDATE_NOTIFIER)
 
 :LUA
 
@@ -15,6 +15,16 @@ move liblua.a bin
 echo Done building Lua
 
 cd ..\..\..
+
+:UPDATE_NOTIFIER
+
+if exist client\update_notifier\target\release\update_notifier.lib (goto CHIMERA)
+
+echo Building update notifier...
+cd client\update_notifier
+cargo build --release
+cd ..\..
+echo Done building update notifier
 
 :CHIMERA
 
