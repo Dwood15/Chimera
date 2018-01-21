@@ -8,6 +8,7 @@ static struct timespec last_time;
 #include "../messaging/messaging.h"
 #include "../hooks/frame.h"
 #include "../hooks/map_load.h"
+#include "../hooks/rcon_message.h"
 #include "../hooks/tick.h"
 
 extern std::vector<std::unique_ptr<LuaScript>> scripts;
@@ -147,6 +148,29 @@ bool on_command_lua(const char *command) noexcept {
     return deny;
 }
 
+bool rcon_message_callback(const char *message) noexcept {
+    bool deny = false;
+    auto x = [message, &deny](EventPriority priority) noexcept {
+        for(size_t i=0;i<scripts.size() && !deny;i++) {
+            auto &script = *scripts[i].get();
+            auto &script_callback = script.c_rcon_message;
+            if(script_callback.callback_function != "" && script_callback.priority == priority) {
+                auto *&state = script.state;
+                lua_getglobal(state, script_callback.callback_function.data());
+                lua_pushstring(state, message);
+                lua_pushboolean(state, deny);
+                pcall(state, 2, 1);
+                if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {
+                    deny = lua_toboolean(state,-1);
+                }
+                lua_pop(state,1);
+            }
+        }
+    };
+    call_all_priorities(x);
+    return deny;
+}
+
 struct UnderscoreSpaceThing {
     std::string i_text;
 
@@ -225,5 +249,6 @@ void setup_callbacks() noexcept {
     add_tick_event(tick_callback, EVENT_PRIORITY_BEFORE);
     add_frame_event(frame_callback, EVENT_PRIORITY_BEFORE);
     add_preframe_event(preframe_callback, EVENT_PRIORITY_BEFORE);
+    add_rcon_message_event(rcon_message_callback, EVENT_PRIORITY_BEFORE);
     clock_gettime(CLOCK_MONOTONIC, &last_time);
 }

@@ -5,21 +5,18 @@
 #include "../client_signature.h"
 #include "../messaging/messaging.h"
 
-static bool rcon_message_initialized;
 static BasicCodecave rcon_message_code;
 
-static std::vector<Event<event_rcon_message>> events;
+static std::vector<Event<rcon_message_event>> events;
 
-static char five[5] = {};
-
-void add_event_rcon_message(event_rcon_message event_function, EventPriority priority) noexcept {
+void add_rcon_message_event(rcon_message_event event_function, EventPriority priority) noexcept {
     for(size_t i=0;i<events.size();i++) {
         if(events[i].function == event_function) return;
     }
     events.emplace_back(event_function, priority);
 }
 
-void remove_event_rcon_message(event_rcon_message event_function) noexcept {
+void remove_rcon_message_event(rcon_message_event event_function) noexcept {
     for(size_t i=0;i<events.size();i++) {
         if(events[i].function == event_function) {
             events.erase(events.begin() + i);
