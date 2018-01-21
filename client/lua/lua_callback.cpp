@@ -125,49 +125,36 @@ static void frame_callback() noexcept {
     call_all_priorities(x);
 }
 
+#define deny_string_callback(callback) [](EventPriority priority, const char *string, bool &deny) noexcept {\
+    for(size_t i=0;i<scripts.size() && !deny;i++) {\
+        auto &script = *scripts[i].get();\
+        auto &script_callback = script.callback;\
+        if(script_callback.callback_function != "" && script_callback.priority == priority) {\
+            auto *&state = script.state;\
+            lua_getglobal(state, script_callback.callback_function.data());\
+            lua_pushstring(state, string);\
+            lua_pushboolean(state, deny);\
+            pcall(state, 2, 1);\
+            if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {\
+                deny = lua_toboolean(state,-1);\
+            }\
+            lua_pop(state,1);\
+        }\
+    }\
+};
+#define call_all_priorities_deny_str(function,str,deny) function(EVENT_PRIORITY_BEFORE,str,deny); function(EVENT_PRIORITY_DEFAULT,str,deny); function(EVENT_PRIORITY_AFTER,str,deny); function(EVENT_PRIORITY_FINAL,str,deny)
+
 bool on_command_lua(const char *command) noexcept {
     bool deny = false;
-    auto x = [command, &deny](EventPriority priority) noexcept {
-        for(size_t i=0;i<scripts.size() && !deny;i++) {
-            auto &script = *scripts[i].get();
-            auto &script_callback = script.c_command;
-            if(script_callback.callback_function != "" && script_callback.priority == priority) {
-                auto *&state = script.state;
-                lua_getglobal(state, script_callback.callback_function.data());
-                lua_pushstring(state, command);
-                lua_pushboolean(state, deny);
-                pcall(state, 2, 1);
-                if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {
-                    deny = lua_toboolean(state,-1);
-                }
-                lua_pop(state,1);
-            }
-        }
-    };
-    call_all_priorities(x);
+    auto x = deny_string_callback(c_command);
+    call_all_priorities_deny_str(x, command, deny);
     return deny;
 }
 
 bool rcon_message_callback(const char *message) noexcept {
     bool deny = false;
-    auto x = [message, &deny](EventPriority priority) noexcept {
-        for(size_t i=0;i<scripts.size() && !deny;i++) {
-            auto &script = *scripts[i].get();
-            auto &script_callback = script.c_rcon_message;
-            if(script_callback.callback_function != "" && script_callback.priority == priority) {
-                auto *&state = script.state;
-                lua_getglobal(state, script_callback.callback_function.data());
-                lua_pushstring(state, message);
-                lua_pushboolean(state, deny);
-                pcall(state, 2, 1);
-                if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {
-                    deny = lua_toboolean(state,-1);
-                }
-                lua_pop(state,1);
-            }
-        }
-    };
-    call_all_priorities(x);
+    auto x = deny_string_callback(c_rcon_message);
+    call_all_priorities_deny_str(x, message, deny);
     return deny;
 }
 

@@ -31,6 +31,7 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
 
     bool deny = false;
     call_in_order_deny(events, deny, text);
+    if(deny) return;
 
     if(len > 4 && text[len - 4] == '|' && text[len - 3] == 'n' && text[len - 2] == 'c') {
         char color = text[len - 1];
