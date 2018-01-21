@@ -177,6 +177,7 @@ static int lua_hud_message(lua_State *state) noexcept {
         else
             string = luaL_checkstring(state,1);
         hud_message(string);
+        return 0;
     }
     return luaL_error(state,"wrong number of arguments in hud_message");
 }
