@@ -54,5 +54,6 @@ struct LuaScript {
 };
 
 LuaScript &script_from_state(lua_State *state) noexcept;
+void refresh_client_index(lua_State *state) noexcept;
 void refresh_variables(lua_State *state) noexcept;
 void print_error(lua_State *state) noexcept;

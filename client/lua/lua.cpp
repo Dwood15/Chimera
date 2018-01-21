@@ -19,9 +19,17 @@ std::vector<std::unique_ptr<LuaScript>> scripts;
 
 bool disable_safeguards = false;
 
-void refresh_variables(lua_State *state) noexcept {
-    lua_pushnumber(state, client_player_index());
+void refresh_client_index(lua_State *state) noexcept {
+    auto index = client_player_index() & 0xFFFF;
+    if(index == 0xFFFF)
+        lua_pushnil(state);
+    else
+        lua_pushinteger(state, index);
     lua_setglobal(state, "local_player_index");
+}
+
+void refresh_variables(lua_State *state) noexcept {
+    refresh_client_index(state);
 
     lua_pushstring(state, get_map_header().name);
     lua_setglobal(state, "map");

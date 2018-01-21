@@ -104,6 +104,9 @@ static void map_load_callback() noexcept {
 }
 
 static void pretick_callback() noexcept {
+    for(size_t i=0;i<scripts.size();i++) {
+        refresh_client_index(scripts[i].get()->state);
+    }
     auto x = basic_callback(c_pretick);
     call_all_priorities(x);
 }
