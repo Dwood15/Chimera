@@ -62,7 +62,7 @@ void refresh_variables(lua_State *state) noexcept {
                 current_gametype = "race";
                 break;
         }
-        lua_pushstring(state, server);
+        lua_pushstring(state, current_gametype);
     }
     else {
         lua_pushnil(state);
@@ -200,7 +200,7 @@ static void open_lua_scripts() {
         }
         ok = FindNextFile(handle, &find_file_data);
     }
-    
+
     load_map_script();
 }
 
