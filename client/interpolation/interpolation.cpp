@@ -292,7 +292,6 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
         }
         chimera_interpolate_setting = new_setting;
     }
-    char s[256] = {};
     if(use_text) {
         const char *what;
         switch(chimera_interpolate_setting) {
@@ -315,12 +314,11 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
             what = "custom";
             break;
         }
-        sprintf(s,"chimera_interpolate: %s", what);
+        console_out(std::string("chimera_interpolate: ") + what);
     }
     else {
-        sprintf(s,"chimera_interpolate: %u", chimera_interpolate_setting);
+        console_out(std::string("chimera_interpolate: ") + std::to_string(chimera_interpolate_setting));
     }
-    console_out(s);
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
 
@@ -329,8 +327,6 @@ ChimeraCommandError interpolate_predict_command(size_t argc, const char **argv) 
         chimera_interpolate_predict = bool_value(argv[0]);
         interpolate_vector_x = chimera_interpolate_predict ? interpolate_vector_predict : interpolate_vector;
     }
-    char s[256] = {};
-    sprintf(s,"chimera_interpolate_predict: %s", chimera_interpolate_predict ? "true" : "false");
-    console_out(s);
+    console_out(std::string("chimera_interpolate_predict: ") + (chimera_interpolate_predict ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -11,4 +11,4 @@ struct Resolution {
 Resolution &get_resolution() noexcept;
 
 /// Function for command chimera_widescreen_scope_fix
-ChimeraCommandError widescreen_scope_fix_command(size_t argc, const char **argv) noexcept;
+ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv) noexcept;

@@ -198,8 +198,6 @@ ChimeraCommandError budget_command(size_t argc, const char **argv) noexcept {
         }
         active = new_value;
     }
-    char x[256] = {};
-    sprintf(x, "chimera_budget: %u", active);
-    console_out(x);
+    console_out(std::string("chimera_budget: ") + std::to_string(active));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -173,10 +173,10 @@ static void apply_safe_zones() {
 }
 
 ChimeraCommandError safe_zones_command(size_t argc, const char **argv) noexcept {
-    static auto enabled = false;
+    static auto active = false;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
-        if(new_value != enabled) {
+        if(new_value != active) {
             if(new_value) {
                 objects = new char[65535]();
                 add_tick_event(apply_safe_zones);
@@ -192,11 +192,9 @@ ChimeraCommandError safe_zones_command(size_t argc, const char **argv) noexcept 
                 remove_tick_event(apply_safe_zones);
                 remove_map_load_event(on_map_load);
             }
-            enabled = new_value;
+            active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_safe_zones: %s", enabled ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_safe_zones: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

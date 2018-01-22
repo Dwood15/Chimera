@@ -43,9 +43,7 @@ ChimeraCommandError throttle_fps_command(size_t argc, const char **argv) noexcep
         console_out("chimera_throttle_fps: off");
     }
     else {
-        char x[256] = {};
-        sprintf(x, "chimera_throttle_fps: %f", throttle_fps);
-        console_out(x);
+        console_out(std::string("chimera_throttle_fps: ") + std::to_string(throttle_fps));
     }
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

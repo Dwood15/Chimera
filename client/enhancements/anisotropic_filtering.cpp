@@ -23,8 +23,6 @@ ChimeraCommandError af_command(size_t argc, const char **argv) noexcept {
             active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_af: %s", active ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_af: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

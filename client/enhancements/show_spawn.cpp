@@ -374,10 +374,10 @@ static void show_spawns() noexcept {
 
 /// Function for command chimera_show_spawns
 ChimeraCommandError show_spawns_command(size_t argc, const char **argv) noexcept {
-    static auto enabled = false;
+    static auto active = false;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
-        if(new_value != enabled) {
+        if(new_value != active) {
             if(new_value) {
                 tickles = -1;
                 total_spawns = 0;
@@ -389,11 +389,9 @@ ChimeraCommandError show_spawns_command(size_t argc, const char **argv) noexcept
                 }
                 remove_tick_event(show_spawns);
             }
-            enabled = new_value;
+            active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_show_spawns: %s", enabled ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_show_spawns: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

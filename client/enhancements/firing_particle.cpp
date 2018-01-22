@@ -54,10 +54,10 @@ static void block_firing_particles() {
 }
 
 ChimeraCommandError block_firing_particles_command(size_t argc, const char **argv) noexcept {
-    static auto enabled = false;
+    static auto active = false;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
-        if(new_value != enabled) {
+        if(new_value != active) {
             if(new_value) {
                 objects = new char[65535]();
                 ticks_old = -1;
@@ -68,11 +68,9 @@ ChimeraCommandError block_firing_particles_command(size_t argc, const char **arg
                 remove_tick_event(block_firing_particles);
                 console_out("chimera_block_firing_particles: Some firing effects may not appear until next game.");
             }
-            enabled = new_value;
+            active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_block_firing_particles: %s", enabled ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_block_firing_particles: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

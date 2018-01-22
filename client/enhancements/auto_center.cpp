@@ -46,8 +46,6 @@ ChimeraCommandError auto_center_command(size_t argc, const char **argv) noexcept
             auto_center = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_auto_center: %u", auto_center);
-    console_out(x);
+    console_out(std::string("chimera_auto_center: ") + std::to_string(auto_center));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

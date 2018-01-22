@@ -34,8 +34,6 @@ ChimeraCommandError block_zoom_blur_command(size_t argc, const char **argv) noex
             active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_block_zoom_blur: %s", active ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_block_zoom_blur: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

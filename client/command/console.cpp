@@ -76,10 +76,10 @@ bool already_set = false;
 
 ChimeraCommandError enable_console_command(size_t argc, const char **argv) noexcept {
     extern bool initial_tick;
-    static bool feature_enabled = true;
+    static bool active = true;
     if(argc == 1) {
         auto new_value = bool_value(argv[0]);
-        if(!already_set && new_value != feature_enabled) {
+        if(!already_set && new_value != active) {
             if(!initial_tick) {
                 console_out("chimera_enable_console: Changes will take effect after you relaunch Halo.");
                 already_set = true;
@@ -88,10 +88,8 @@ ChimeraCommandError enable_console_command(size_t argc, const char **argv) noexc
                 **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1) = new_value;
             }
         }
-        feature_enabled = new_value;
+        active = new_value;
     }
-    char x[256] = {};
-    sprintf(x, "chimera_enable_console: %s", feature_enabled ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_enable_console: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

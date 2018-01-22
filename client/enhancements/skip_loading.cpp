@@ -4,10 +4,10 @@
 #include "../client_signature.h"
 
 ChimeraCommandError skip_loading_command(size_t argc, const char **argv) noexcept {
-    static auto enabled = false;
+    static auto active = false;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
-        if(new_value != enabled) {
+        if(new_value != active) {
             auto &loading_screen_1_s = get_signature("loading_screen_1_sig");
             auto &loading_screen_2_s = get_signature("loading_screen_2_sig");
             auto &loading_screen_3_s = get_signature("loading_screen_3_sig");
@@ -22,11 +22,9 @@ ChimeraCommandError skip_loading_command(size_t argc, const char **argv) noexcep
                 loading_screen_2_s.undo();
                 loading_screen_3_s.undo();
             }
-            enabled = new_value;
+            active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_skip_loading: %s", enabled ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_skip_loading: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -24,12 +24,12 @@ static void apply_fix() {
     }
 }
 
-ChimeraCommandError widescreen_scope_fix_command(size_t argc, const char **argv) noexcept {
-    static bool widescreen_scope_fix = false;
+ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv) noexcept {
+    static bool active = false;
     if(argc == 1) {
         auto &widescreen_scope_sig = get_signature("widescreen_scope_sig");
         bool new_value = bool_value(argv[0]);
-        if(new_value != widescreen_scope_fix) {
+        if(new_value != active) {
             if(new_value) {
                 if(!hac2_present())
                     console_out_warning("chimera_widescreen_scope_mask: HAC2 is not installed, so this function does nothing.");
@@ -40,11 +40,9 @@ ChimeraCommandError widescreen_scope_fix_command(size_t argc, const char **argv)
                 remove_tick_event(apply_fix);
                 widescreen_scope_sig.undo();
             }
-            widescreen_scope_fix = new_value;
+            active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_widescreen_scope_mask: %s", widescreen_scope_fix ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_widescreen_scope_mask: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -3,10 +3,10 @@
 #include "../messaging/messaging.h"
 
 ChimeraCommandError block_mo_command(size_t argc, const char **argv) noexcept {
-    static auto enabled = false;
+    static auto active = false;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
-        if(new_value != enabled) {
+        if(new_value != active) {
             auto &multitexture_overlay_sig = get_signature("multitexture_overlay_sig");
             if(new_value) {
                 const short multitexture_overlay_mod[] = {  -1,   -1, 0x60};
@@ -15,11 +15,9 @@ ChimeraCommandError block_mo_command(size_t argc, const char **argv) noexcept {
             else {
                 multitexture_overlay_sig.undo();
             }
-            enabled = new_value;
+            active = new_value;
         }
     }
-    char x[256] = {};
-    sprintf(x, "chimera_block_mo: %s", enabled ? "true" : "false");
-    console_out(x);
+    console_out(std::string("chimera_block_mo: ") + (active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
