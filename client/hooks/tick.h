@@ -10,6 +10,7 @@ void add_tick_event(event_no_args event_function, EventPriority priority = EVENT
 void remove_tick_event(event_no_args event_function) noexcept;
 
 const float &tick_rate() noexcept;
+void set_tick_rate(float new_rate) noexcept;
 float effective_tick_rate() noexcept;
 int32_t tick_count() noexcept;
 double tick_time() noexcept;

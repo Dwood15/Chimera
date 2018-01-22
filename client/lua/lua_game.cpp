@@ -316,6 +316,17 @@ static int lua_spawn_object(lua_State *state) noexcept {
     }
 }
 
+static int lua_tick_rate(lua_State *state) noexcept {
+    int args = lua_gettop(state);
+    if(args == 1) {
+        auto value = luaL_checknumber(state, 1);
+        if(value < 0.01) return luaL_error(state, "tick rate must be at least 0.01");
+        set_tick_rate(luaL_checknumber(state, 1));
+    }
+    lua_pushnumber(state, tick_rate());
+    return 1;
+}
+
 static int lua_ticks(lua_State *state) noexcept {
     auto progress = tick_progress();
     if(progress > 0.99999) progress = 0.99999;
@@ -339,5 +350,6 @@ void set_game_functions(lua_State *state) noexcept {
     lua_register(state, "set_timer", lua_set_timer);
     lua_register(state, "stop_timer", lua_stop_timer);
     lua_register(state, "spawn_object", lua_spawn_object);
+    lua_register(state, "tick_rate", lua_tick_rate);
     lua_register(state, "ticks", lua_ticks);
 }

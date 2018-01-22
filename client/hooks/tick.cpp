@@ -76,6 +76,14 @@ const float &tick_rate() noexcept {
     static auto *trs = *reinterpret_cast<float **>(get_signature("tick_rate_sig").address() + 2);
     return *trs;
 }
+
+void set_tick_rate(float new_rate) noexcept {
+    static auto &trs = *const_cast<float *>(&tick_rate());
+    DWORD prota, protb;
+    VirtualProtect(&trs, sizeof(trs), PAGE_READWRITE, &prota);
+    trs = new_rate;
+    VirtualProtect(&trs, sizeof(trs), prota, &protb);
+    return;
 }
 
 float effective_tick_rate() noexcept {
