@@ -259,3 +259,48 @@ ChimeraCommandError reload_lua_command(size_t argc, const char **argv) noexcept 
     console_out("chimera_reload_lua: Scripts were reloaded.");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
+
+LuaAmbiguousTypeArgument LuaAmbiguousTypeArgument::check_argument(LuaScript &script, int arg, bool do_lua_error) {
+    LuaAmbiguousTypeArgument argument;
+    if(script.version < 2.03) { // BC
+        argument.argument_type = LuaAmbiguousTypeArgument::ARGUMENT_STRING;
+        argument.string_value = luaL_checkstring(script.state, arg);
+    }
+    else if(lua_isboolean(script.state, arg)) {
+        argument.argument_type = LuaAmbiguousTypeArgument::ARGUMENT_BOOLEAN;
+        argument.bool_value = lua_toboolean(script.state, arg);
+    }
+    else if(lua_isstring(script.state, arg)) {
+        argument.argument_type = LuaAmbiguousTypeArgument::ARGUMENT_STRING;
+        argument.string_value = lua_tostring(script.state, arg);
+    }
+    else if(lua_isnumber(script.state, arg)) {
+        argument.argument_type = LuaAmbiguousTypeArgument::ARGUMENT_NUMBER;
+        argument.number_value = lua_tonumber(script.state, arg);
+    }
+    else if(lua_isnil(script.state, arg)) {
+        argument.argument_type = LuaAmbiguousTypeArgument::ARGUMENT_NIL;
+    }
+    else {
+        if(do_lua_error) luaL_error(script.state, "timer argument must be boolean, string, number, or nil");
+        else throw std::exception();
+    }
+    return argument;
+}
+
+void LuaAmbiguousTypeArgument::push_argument(LuaScript &script) noexcept {
+    switch(this->argument_type) {
+        case LuaAmbiguousTypeArgument::ARGUMENT_BOOLEAN:
+            lua_pushboolean(script.state, this->bool_value);
+            break;
+        case LuaAmbiguousTypeArgument::ARGUMENT_STRING:
+            lua_pushstring(script.state, this->string_value.data());
+            break;
+        case LuaAmbiguousTypeArgument::ARGUMENT_NUMBER:
+            lua_pushnumber(script.state, this->number_value);
+            break;
+        case LuaAmbiguousTypeArgument::ARGUMENT_NIL:
+            lua_pushnil(script.state);
+            break;
+    }
+}

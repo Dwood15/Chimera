@@ -13,12 +13,28 @@ struct LuaScriptCallback {
     EventPriority priority;
 };
 
+struct LuaScript;
+
+struct LuaAmbiguousTypeArgument {
+    enum {
+        ARGUMENT_BOOLEAN,
+        ARGUMENT_STRING,
+        ARGUMENT_NUMBER,
+        ARGUMENT_NIL
+    } argument_type;
+    std::string string_value;
+    double number_value;
+    bool bool_value;
+    static LuaAmbiguousTypeArgument check_argument(LuaScript &script, int arg, bool do_lua_error);
+    void push_argument(LuaScript &script) noexcept;
+};
+
 struct LuaScriptTimer {
     double interval_ms;
     double time_passed = 0;
     std::string function;
     size_t timer_id;
-    std::vector<std::string> arguments;
+    std::vector<LuaAmbiguousTypeArgument> arguments;
 };
 
 struct LuaScript {

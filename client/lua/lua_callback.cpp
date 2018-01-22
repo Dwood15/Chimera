@@ -60,7 +60,7 @@ static void check_timers() noexcept {
                 if(deleted) break;
                 lua_getglobal(script.state, timer.function.data());
                 for(size_t arg=0;arg<timer.arguments.size();arg++) {
-                    lua_pushstring(script.state, timer.arguments[arg].data());
+                    timer.arguments[arg].push_argument(script);
                 }
                 if(pcall(script.state, timer.arguments.size(), 1) == LUA_OK) {
                     if(lua_isboolean(script.state, -1) && !lua_toboolean(script.state, -1)) {
@@ -139,7 +139,7 @@ static void frame_callback() noexcept {
             pcall(state, 1, 1);\
             if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {\
                 allow = lua_toboolean(state,-1);\
-                if(script.version < 2.02) allow = !allow;\
+                if(script.version < 2.02) allow = !allow; /* BC */ \
             }\
             lua_pop(state,1);\
         }\

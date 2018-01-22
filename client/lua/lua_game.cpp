@@ -242,16 +242,13 @@ static int lua_set_timer(lua_State *state) noexcept {
         if(interval < 0.1) {
             return luaL_error(state,"interval must be at least 0.1 millseconds");
         }
-        for(size_t i=3;i<=args;i++) {
-            luaL_checkstring(state, i);
-        }
         auto *function = luaL_checkstring(state, 2);
         LuaScriptTimer timer;
         timer.timer_id = script.next_timer_id++;
         timer.interval_ms = interval;
         timer.function = function;
         for(size_t i=3;i<=args;i++) {
-            timer.arguments.push_back(lua_tostring(state, i));
+            timer.arguments.push_back(LuaAmbiguousTypeArgument::check_argument(script, i, true));
         }
         lua_pushinteger(state, timer.timer_id);
         script.timers.emplace_back(timer);
