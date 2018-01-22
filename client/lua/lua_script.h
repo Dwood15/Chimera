@@ -56,6 +56,8 @@ struct LuaScript {
     LuaScriptCallback c_map_load;
     LuaScriptCallback c_map_preload;
 
+    LuaScriptCallback c_precamera;
+
     LuaScriptCallback c_rcon_message;
 
     LuaScriptCallback c_spawn;

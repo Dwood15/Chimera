@@ -6,10 +6,12 @@
 static struct timespec last_time;
 
 #include "../messaging/messaging.h"
+#include "../hooks/camera.h"
 #include "../hooks/frame.h"
 #include "../hooks/map_load.h"
 #include "../hooks/rcon_message.h"
 #include "../hooks/tick.h"
+#include "../interpolation/camera.h"
 
 extern std::vector<std::unique_ptr<LuaScript>> scripts;
 
@@ -128,6 +130,48 @@ static void frame_callback() noexcept {
     call_all_priorities(x);
 }
 
+static void camera_callback() noexcept {
+    auto &data = camera_data();
+
+    auto x = [&data](EventPriority priority) {
+        for(size_t i=0;i<scripts.size();i++) {
+            auto &script = *scripts[i].get();
+            auto &script_callback = script.c_precamera;
+            if(script_callback.callback_function != "" && script_callback.priority == priority) {
+                auto *&state = script.state;
+                lua_getglobal(state, script_callback.callback_function.data());
+                lua_pushnumber(state, data.position.x);
+                lua_pushnumber(state, data.position.y);
+                lua_pushnumber(state, data.position.z);
+                lua_pushnumber(state, data.fov);
+                lua_pushnumber(state, data.orientation[0].x);
+                lua_pushnumber(state, data.orientation[0].y);
+                lua_pushnumber(state, data.orientation[0].z);
+                lua_pushnumber(state, data.orientation[1].x);
+                lua_pushnumber(state, data.orientation[1].y);
+                lua_pushnumber(state, data.orientation[1].z);
+                if(pcall(state, 10, 10) == LUA_OK) {
+                    if(priority != EVENT_PRIORITY_FINAL) {
+                        #define set_if_possible(val, i) if(lua_isnumber(state, i)) val = lua_tonumber(state, i)
+                        set_if_possible(data.position.x, -10);
+                        set_if_possible(data.position.y, -9);
+                        set_if_possible(data.position.z, -8);
+                        set_if_possible(data.fov, -7);
+                        set_if_possible(data.orientation[0].x, -6);
+                        set_if_possible(data.orientation[0].y, -5);
+                        set_if_possible(data.orientation[0].z, -4);
+                        set_if_possible(data.orientation[1].x, -3);
+                        set_if_possible(data.orientation[1].y, -2);
+                        set_if_possible(data.orientation[1].z, -1);
+                    }
+                    lua_pop(state, 10);
+                }
+            }
+        }
+    };
+    call_all_priorities(x);
+}
+
 #define allow_string_callback(callback) [](EventPriority priority, const char *string, bool &allow) noexcept {\
     for(size_t i=0;i<scripts.size() && allow;i++) {\
         auto &script = *scripts[i].get();\
@@ -136,12 +180,13 @@ static void frame_callback() noexcept {
             auto *&state = script.state;\
             lua_getglobal(state, script_callback.callback_function.data());\
             lua_pushstring(state, string);\
-            pcall(state, 1, 1);\
-            if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {\
-                allow = lua_toboolean(state,-1);\
-                if(script.version < 2.02) allow = !allow; /* BC */ \
+            if(pcall(state, 1, 1) == LUA_OK) {\
+                if(!lua_isnil(state,-1) && priority != EVENT_PRIORITY_FINAL) {\
+                    allow = lua_toboolean(state,-1);\
+                    if(script.version < 2.02) allow = !allow; /* BC */ \
+                }\
+                lua_pop(state,1);\
             }\
-            lua_pop(state,1);\
         }\
     }\
 };
@@ -214,6 +259,8 @@ int lua_set_callback(lua_State *state) noexcept {
         else if_callback_then_set(map_load)
         else if_callback_then_set(map_preload)
 
+        else if_callback_then_set(precamera)
+
         else if_callback_then_set(rcon_message)
 
         else if_callback_then_set(spawn)
@@ -240,5 +287,6 @@ void setup_callbacks() noexcept {
     add_frame_event(frame_callback, EVENT_PRIORITY_BEFORE);
     add_preframe_event(preframe_callback, EVENT_PRIORITY_BEFORE);
     add_rcon_message_event(rcon_message_callback, EVENT_PRIORITY_BEFORE);
+    add_precamera_event(camera_callback, EVENT_PRIORITY_AFTER);
     clock_gettime(CLOCK_MONOTONIC, &last_time);
 }
