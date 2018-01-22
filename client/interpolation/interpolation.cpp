@@ -158,6 +158,7 @@ static void do_interpolation(uint32_t i) noexcept {
 }
 
 static void interpolate_objects() noexcept {
+    if(tick_count() == 0) return;
     interpolation_tick_progress = tick_progress_inaccurate();
     for(uint32_t t=0;t<2048;t++) {
         do_interpolation(t);
@@ -185,6 +186,7 @@ static void reset() noexcept {
 }
 
 static void rollback_interpolation() noexcept {
+    if(tick_count() == 0) return;
     if(chimera_interpolate_setting >= 1) rollback_widget_interpolation();
     for(uint32_t i=0;i<2048;i++) {
         HaloObject o(i);
