@@ -72,9 +72,10 @@ int32_t tick_count() noexcept {
     return *tick_counter;
 }
 
-float tick_rate() noexcept {
-    static auto *trs = get_signature("tick_rate_sig").address();
-    return **reinterpret_cast<float **>(trs + 2);
+const float &tick_rate() noexcept {
+    static auto *trs = *reinterpret_cast<float **>(get_signature("tick_rate_sig").address() + 2);
+    return *trs;
+}
 }
 
 float effective_tick_rate() noexcept {
