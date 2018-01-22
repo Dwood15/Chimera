@@ -3,6 +3,7 @@
 
 #include <string.h>
 
+#include "../command/console.h"
 #include "../halo_data/global.h"
 #include "../halo_data/script.h"
 #include "../halo_data/spawn_object.h"
@@ -10,6 +11,11 @@
 #include "../halo_data/tag_data.h"
 #include "../hooks/tick.h"
 #include "../messaging/messaging.h"
+
+static int lua_console_is_open(lua_State *state) noexcept {
+    lua_pushboolean(state, console_is_out());
+    return 1;
+}
 
 static int lua_console_out(lua_State *state) noexcept {
     int args = lua_gettop(state);
@@ -318,6 +324,7 @@ static int lua_ticks(lua_State *state) noexcept {
 }
 
 void set_game_functions(lua_State *state) noexcept {
+    lua_register(state, "console_is_open", lua_console_is_open);
     lua_register(state, "console_out", lua_console_out);
     lua_register(state, "delete_object", lua_delete_object);
     lua_register(state, "execute_script", lua_execute_script);
