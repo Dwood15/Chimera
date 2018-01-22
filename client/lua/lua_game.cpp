@@ -285,7 +285,7 @@ static int lua_stop_timer(lua_State *state) noexcept {
 
 static int lua_spawn_object(lua_State *state) noexcept {
     int args = lua_gettop(state);
-    if(args < 5) {
+    if(args == 5 || args == 4) {
         int a;
         uint32_t tag_id = 0xFFFFFFFF;
         if(lua_isnumber(state, 1)) {
