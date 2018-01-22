@@ -21,7 +21,6 @@ size_t chimera_interpolate_setting = 0;
 static bool chimera_interpolate_predict = false;
 
 static bool nuked = true;
-static bool frame_ended = false;
 
 struct ModelNode {
     float scale = 1.0;
