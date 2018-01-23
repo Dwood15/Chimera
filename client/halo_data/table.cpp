@@ -71,10 +71,10 @@ uint32_t HaloPlayer::object_id() noexcept {
 }
 
 char *HaloPlayer::player_data() noexcept {
-    if(this->player_index > 16) return NULL;
     GenericTable &pt = get_player_table();
-    if(this->player_index >= pt.count || this->player_index >= pt.max_count) return NULL;
-    char *data = (char *)(pt.first) + this->player_index * pt.index_size;
+    if(this->player_index >= pt.size || this->player_index >= pt.max_count) return nullptr;
+    auto *data = reinterpret_cast<char *>(pt.first) + this->player_index * pt.index_size;
+    if(*reinterpret_cast<uint16_t *>(data) == 0xFFFF) return nullptr;
     return data;
 }
 
