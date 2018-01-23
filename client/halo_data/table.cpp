@@ -51,25 +51,12 @@ uint32_t client_player_index() noexcept {
     return *player_id;
 }
 
-bool unichar_equal(const short *a, const short *b) noexcept {
-    if(a == b) return true;
-    if(a == nullptr || b == nullptr) return false;
-    while(*a == *b) {
-        if(*a == 0) return true;
-        a++;
-        b++;
-    }
-    return false;
-}
-
 bool unichar_equal(const short *a, const short *b, size_t size) noexcept {
     if(a == b) return true;
     if(a == nullptr || b == nullptr) return false;
     size_t i = 0;
     while(i++ < size && *a == *b) {
-        if(*a == 0) return true;
-        a++;
-        b++;
+        if(a[i] == 0) return true;
     }
     return false;
 }
@@ -79,7 +66,7 @@ uint32_t HaloPlayer::index() noexcept {
 }
 
 uint32_t HaloPlayer::object_id() noexcept {
-    if(this->player_data() == NULL) return NULL_ID;
+    if(this->player_data() == nullptr) return NULL_ID;
     return *reinterpret_cast<uint32_t *>(this->player_data() + 0x34);
 }
 
@@ -97,10 +84,10 @@ HaloPlayer::HaloPlayer(uint32_t player_index) noexcept {
 
 HaloPlayer::HaloPlayer(const short *name) noexcept {
     GenericTable &pt = get_player_table();
-    const char *p = (const char *)(pt.first);
+    auto *p = reinterpret_cast<char *>(pt.first);
     for(size_t i=0;i<pt.size;i++) {
-        const char *pl = p + i * 0x200;
-        if(*(uint16_t *)(pl) == 0xFFFF) continue;
+        auto *pl = p + i * pt.index_size;
+        if(*reinterpret_cast<uint16_t *>(pl) == 0xFFFF) continue;
         if(unichar_equal(name,(const short *)(pl + 4), HALO_NAME_LENGTH)) {
             this->player_index = i;
             return;
@@ -115,7 +102,7 @@ uint32_t HaloObject::index() noexcept {
 
 char *HaloObject::object_data() noexcept {
     auto &ot = get_object_table();
-    if((this->object_index & 0xFFFF) > ot.max_count) return NULL;
+    if((this->object_index & 0xFFFF) > ot.max_count) return nullptr;
     return *reinterpret_cast<char **>(reinterpret_cast<char *>(ot.first) + (this->object_index & 0xFFFF) * ot.index_size + 0x8);
 }
 

@@ -201,7 +201,7 @@ static void rollback_interpolation() noexcept {
             if(!model_id.is_null()) node_count = *reinterpret_cast<uint32_t *>(HaloTag::from_id(model_id).data + 0xB8);
 
             const auto &offset = model_node_offset[type];
-            ModelNode *nodes = (ModelNode *)(data + offset);
+            ModelNode *nodes = reinterpret_cast<ModelNode *>(data + offset);
             if(type == 0x4 || type == 0x5) node_count = 1;
 
             *reinterpret_cast<Vector3D *>(data + 0xA0) = objects_buffer_0[i].position_center;

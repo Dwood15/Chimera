@@ -53,7 +53,7 @@ void interpolate_all_cam_after() noexcept {
 }
 
 static char zoom_level() noexcept {
-    static char *z = (**(char ***)(get_signature("zoomed_in_sig").address() + 2) + 0x5E8);
+    static char *z = (**reinterpret_cast<char ***>(get_signature("zoomed_in_sig").address() + 2) + 0x5E8);
     if(*z > 0) return *z;
     else return 0;
 }

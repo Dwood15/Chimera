@@ -83,11 +83,8 @@ GenericTable &get_decal_table() noexcept;
 /// Get the client player index.
 uint32_t client_player_index() noexcept;
 
-/// Check if two wide strings are equal.
-bool unichar_equal(const short *a, const short *b) noexcept;
-
-/// Check if two wide strings are equal up to a length.
-bool unichar_equal(const short *a, const short *b, size_t size) noexcept;
+/// Check if two wide strings are equal, optionally up to a maximum length.
+bool unichar_equal(const short *a, const short *b, size_t size = SIZE_MAX) noexcept;
 
 class HaloPlayer {
 private:
