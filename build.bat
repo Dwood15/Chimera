@@ -59,7 +59,8 @@ g++ -c client/settings.cpp %ARGS% -o bin/client__settings.o
 g++ -c client/command/command.cpp %ARGS% -o bin/client__command__command.o
 g++ -c client/command/console.cpp %ARGS% -o bin/client__command__console.o
 
-g++ -c client/controller_fix/magnetism_fix.cpp %ARGS% -o bin/client__controller_fix__magnetism_fix.o
+g++ -c client/fix/descope_fix.cpp %ARGS% -o bin/client__fix__descope_fix.o
+g++ -c client/fix/magnetism_fix.cpp %ARGS% -o bin/client__fix__magnetism_fix.o
 
 g++ -c client/debug/budget.cpp %ARGS% -o bin/client__debug__budget.o
 g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o

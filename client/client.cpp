@@ -11,7 +11,8 @@
 #include "command/console.h"
 #include "command/command.h"
 
-#include "controller_fix/magnetism_fix.h"
+#include "fix/descope_fix.h"
+#include "fix/magnetism_fix.h"
 
 #include "debug/budget.h"
 #include "debug/wireframe.h"
@@ -99,6 +100,8 @@ void initialize_client() noexcept {
     initialize_rcon_message();
     add_tick_event(init);
     if(!wine_used()) add_tick_event(check_updater);
+
+    enable_descope_fix();
 
     if(find_magnetism_signatures()) {
         fix_magnetism();
