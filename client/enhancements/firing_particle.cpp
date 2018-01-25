@@ -8,10 +8,17 @@
 static char *objects;
 static int32_t ticks_old;
 
+struct FiringParticleMod {
+    uint32_t *address;
+    uint32_t old_value;
+};
+static std::vector<FiringParticleMod> mods;
+
 static void block_firing_particles() {
     auto ticks = tick_count();
     if(ticks < ticks_old) {
         memset(objects, 0, 65535);
+        mods.clear();
     }
     ticks_old = ticks;
     HaloPlayer player;
@@ -42,7 +49,9 @@ static void block_firing_particles() {
                                 auto &events_count = *reinterpret_cast<uint32_t *>(effect_tag_data + 0x34);
                                 auto *&events_data = *reinterpret_cast<char **>(effect_tag_data + 0x34 + 4);
                                 for(auto e=0;e<events_count;e++) {
-                                    *reinterpret_cast<uint32_t *>(events_data + e * 68 + 0x38) = 0;
+                                    auto &data = *reinterpret_cast<uint32_t *>(events_data + e * 68 + 0x38);
+                                    mods.emplace_back(FiringParticleMod {&data, data});
+                                    data = 0;
                                 }
                             }
                         }
@@ -60,13 +69,17 @@ ChimeraCommandError block_firing_particles_command(size_t argc, const char **arg
         if(new_value != active) {
             if(new_value) {
                 objects = new char[65535]();
-                ticks_old = -1;
+                ticks_old = tick_count() + 2;
                 add_tick_event(block_firing_particles);
+                block_firing_particles();
             }
             else {
                 delete[] objects;
                 remove_tick_event(block_firing_particles);
-                console_out("chimera_block_firing_particles: Some firing effects may not appear until next game.");
+                for(size_t i=0;i<mods.size();i++) {
+                    *mods[i].address = mods[i].old_value;
+                }
+                mods.clear();
             }
             active = new_value;
         }
