@@ -90,8 +90,8 @@ static int lua_get_global(lua_State *state) noexcept {
         ScriptingGlobal s = read_global(global_name);
         switch(s.type) {
             case SCRIPTING_GLOBAL_NOT_FOUND:
-                luaL_error(state,"global not found");
-                return 0;
+            case SCRIPTING_GLOBAL_UNIMPLEMENTED:
+                return luaL_error(state,"global not found or not implemented");
             case SCRIPTING_GLOBAL_BOOLEAN:
                 lua_pushboolean(state,s.value.boolean);
                 return 1;
@@ -195,7 +195,8 @@ static int lua_set_global(lua_State *state) noexcept {
         ScriptingGlobal value = read_global(global_name);
         switch(value.type) {
             case SCRIPTING_GLOBAL_NOT_FOUND:
-                return luaL_error(state,"global not found");
+            case SCRIPTING_GLOBAL_UNIMPLEMENTED:
+                return luaL_error(state,"global not found or not implemented");
             case SCRIPTING_GLOBAL_BOOLEAN:
                 if(lua_isboolean(state,2)) {
                     value.value.boolean = lua_toboolean(state,2);

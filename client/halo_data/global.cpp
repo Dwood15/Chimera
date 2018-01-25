@@ -23,22 +23,30 @@ ScriptingGlobal read_global(const char *global_name) noexcept {
                 auto &global_type = *reinterpret_cast<uint16_t *>(global + 0x20);
                 auto *location = hs_table + (i + first_global) * 8;
                 switch(global_type) {
-                    case 5: {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 9:
+                    case 10:
+                        sg.type = SCRIPTING_GLOBAL_UNIMPLEMENTED;
+                        break;
+                    case 5:
                         sg.type = SCRIPTING_GLOBAL_BOOLEAN;
                         break;
-                    }
-                    case 6: {
+                    case 6:
                         sg.type = SCRIPTING_GLOBAL_REAL;
                         break;
-                    }
-                    case 7: {
+                    case 7:
                         sg.type = SCRIPTING_GLOBAL_SHORT;
                         break;
-                    }
-                    case 8: {
+                    case 8:
                         sg.type = SCRIPTING_GLOBAL_LONG;
                         break;
-                    }
+                    default:
+                        sg.type = SCRIPTING_GLOBAL_LONG;
+                        break;
                 }
                 sg.value.long_int = *reinterpret_cast<long *>(location + 4);
             }
@@ -64,22 +72,27 @@ bool set_global(const char *global_name, ScriptingGlobalValue value) noexcept {
                 auto &global_type = *reinterpret_cast<uint16_t *>(global + 0x20);
                 auto *location = hs_table + (i + first_global) * 8;
                 switch(global_type) {
-                    case 5: {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 9:
+                    case 10:
+                        return false;
+                        break;
+                    case 5:
                         *reinterpret_cast<char *>(location + 4) = value.boolean ? 1 : 0;
                         break;
-                    }
-                    case 6: {
+                    case 6:
                         *reinterpret_cast<float *>(location + 4) = value.real;
                         break;
-                    }
-                    case 7: {
+                    case 7:
                         *reinterpret_cast<short *>(location + 4) = value.short_int;
                         break;
-                    }
-                    case 8: {
+                    default:
                         *reinterpret_cast<long *>(location + 4) = value.long_int;
                         break;
-                    }
                 }
                 return true;
             }

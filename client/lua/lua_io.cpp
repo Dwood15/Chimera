@@ -107,18 +107,19 @@ static int lua_write_bit(lua_State *state) {
     if(args == 3) {
         auto address = luaL_checkinteger(state, 1);
         bail_if_not_unlocked
-        uint32_t &address_ptr = *reinterpret_cast<uint32_t *>(address);
+        auto &address_ptr = *reinterpret_cast<uint32_t *>(address);
         uint32_t bit = luaL_checkinteger(state,2);
         if(bit >= (sizeof(address_ptr) * 8)) {
             return luaL_error(state,"invalid argument #2 in write_bit");
         }
-        uint32_t bit_to_set;
+        char bit_to_set;
         if(lua_isboolean(state,3)) bit_to_set = lua_toboolean(state,3) == true;
         else {
-            bit_to_set = luaL_checkinteger(state,3);
-            if(bit_to_set > 1) {
+            auto new_bit = luaL_checkinteger(state,3);
+            if(new_bit > 1) {
                 return luaL_error(state,"invalid argument #3 in write_bit");
             }
+            bit_to_set = new_bit;
         }
         if(bit_to_set != ((address_ptr >> bit) & 1)) {
             switch((address_ptr >> bit) & 1) {
