@@ -47,14 +47,17 @@ std::vector<ChimeraCommand> *commands;
 
 bool initial_tick = true;
 
-// workaround for wine users - disable the update notifier because it crashes
-static bool wine_used() {
-    HMODULE hntdll = GetModuleHandle("ntdll.dll");
-    if(!hntdll) {
-        return false;
-    }
+static bool http_functions() {
+    static int result = -1;
+    if(result == -1) {
+        HMODULE kernel32 = GetModuleHandle("kernel32.dll");
+        if(!kernel32) {
+            return false;
+        }
 
-    return GetProcAddress(hntdll, "wine_get_version") != nullptr;
+        result = (GetProcAddress(kernel32, "GetQueuedCompletionStatusEx") != nullptr) ? 1 : 0;
+    }
+    return result == 1;
 }
 
 static void init() {
@@ -99,7 +102,6 @@ void initialize_client() noexcept {
     initialize_console();
     initialize_rcon_message();
     add_tick_event(init);
-    if(!wine_used()) add_tick_event(check_updater);
 
     enable_descope_fix();
 
@@ -114,12 +116,14 @@ void initialize_client() noexcept {
         "  - chimera <category>\n    Display a list of commands in category.\n"
         "  - chimera <command>\n    Display help for a command.\n"
     , 0, 1, true);
+    
+    if(http_functions()) add_tick_event(check_updater);
 
     (*commands).emplace_back("chimera_block_update_notifier", block_update_notifier_command, nullptr,
         "Get or set whether or not to block update notifications.\n\n"
         "Syntax:\n"
         "  - chimera_block_update_notifier [true/false]"
-    , 0, 1, !wine_used(), true);
+    , 0, 1, http_functions(), true);
 
     (*commands).emplace_back("chimera_verbose_init", verbose_init_command, nullptr,
         "Set whether or not chimerainit.txt commands should output messages.\n\n"
