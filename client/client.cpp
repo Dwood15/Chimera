@@ -56,14 +56,14 @@ static void init() {
     remove_tick_event(init);
     auto settings_before = save_settings;
     save_settings = false;
-    read_init_file("chimerainit.txt");
+    read_init_file("chimerainit.txt", "chimerainit.txt");
     save_settings = true;
     char z[512] = {};
     sprintf(z,"%s\\chimera", halo_path());
     CreateDirectory(z, nullptr);
     sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
     autosave = false;
-    read_init_file(z);
+    read_init_file(z, "chimerasave.txt");
     autosave = true;
     save_all_changes();
     save_settings = settings_before;

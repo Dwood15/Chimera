@@ -64,7 +64,7 @@ void save_all_changes() noexcept {
 
 static bool verbose_init = false;
 
-bool read_init_file(const char *path) noexcept {
+bool read_init_file(const char *path, const char *name) noexcept {
     std::ifstream init(path);
     if(init.is_open()) {
         std::string line;
@@ -96,30 +96,28 @@ bool read_init_file(const char *path) noexcept {
             switch(execute_chimera_command(line2.data(), !verbose_init)) {
                 case CHIMERA_COMMAND_ERROR_TOO_MANY_ARGUMENTS: {
                     auto &command = find_chimera_command(line.data());
-                    sprintf(x, "%u: Function %s takes at least %u arguments.", ln, command.name(), command.max_args());
-                    console_out_error(x);
+                    sprintf(x, "%s:%u: Function %s takes at least %u arguments.", name, ln, command.name(), command.max_args());
+                    console_out_error(std::string());
                     break;
                 }
                 case CHIMERA_COMMAND_ERROR_NOT_ENOUGH_ARGUMENTS: {
                     auto &command = find_chimera_command(line.data());
-                    sprintf(x, "%u: Function %s takes no more than %u arguments.", ln, command.name(), command.min_args());
+                    sprintf(x, "%s:%u: Function %s takes no more than %u arguments.", name, ln, command.name(), command.min_args());
                     console_out_error(x);
                     break;
                 }
                 case CHIMERA_COMMAND_ERROR_FAILURE: {
                     auto &command = find_chimera_command(line.data());
-                    sprintf(x, "%u: An error occurred while running %s.", ln, command.name());
+                    sprintf(x, "%s:%u: An error occurred while running %s.", name, ln, command.name());
                     console_out_error(x);
                     break;
                 }
                 case CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND: {
-                    sprintf(x, "%u: Could not run %s.", ln, line.data());
+                    sprintf(x, "%s:%u: The command was not found.", name, ln);
                     console_out_error(x);
                     break;
                 }
-                default: {
-                    break;
-                }
+                default: break;
             }
         }
         return true;
