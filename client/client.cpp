@@ -3,8 +3,6 @@
 #include "client.h"
 #include "../version.h"
 
-#include "update_notifier/update_notifier.h"
-
 #include "client_signature.h"
 #include "path.h"
 #include "settings.h"
@@ -46,19 +44,6 @@ extern std::vector<std::string> *missing_signatures;
 std::vector<ChimeraCommand> *commands;
 
 bool initial_tick = true;
-
-static bool http_functions() {
-    static int result = -1;
-    if(result == -1) {
-        HMODULE kernel32 = GetModuleHandle("kernel32.dll");
-        if(!kernel32) {
-            return false;
-        }
-
-        result = (GetProcAddress(kernel32, "GetQueuedCompletionStatusEx") != nullptr) ? 1 : 0;
-    }
-    return result == 1;
-}
 
 static void init() {
     extern bool save_settings;
@@ -116,14 +101,6 @@ void initialize_client() noexcept {
         "  - chimera <category>\n    Display a list of commands in category.\n"
         "  - chimera <command>\n    Display help for a command.\n"
     , 0, 1, true);
-    
-    if(http_functions()) add_tick_event(check_updater);
-
-    (*commands).emplace_back("chimera_block_update_notifier", block_update_notifier_command, nullptr,
-        "Get or set whether or not to block update notifications.\n\n"
-        "Syntax:\n"
-        "  - chimera_block_update_notifier [true/false]"
-    , 0, 1, http_functions(), true);
 
     (*commands).emplace_back("chimera_verbose_init", verbose_init_command, nullptr,
         "Set whether or not chimerainit.txt commands should output messages.\n\n"

@@ -159,15 +159,9 @@ bool bool_value(const char *v) noexcept {
 ChimeraCommandError chimera_command(size_t argc, const char **argv) noexcept {
     std::vector<std::string> list;
     if(argc == 0) {
-        extern long latest_build;
         std::vector<std::string> list_a;
         console_out("Chimera build " CHIMERA_BUILD_STRING " by 002");
         console_out("Lua API version (clua_version): " STR(CHIMERA_LUA_INTERPRETER));
-        if(latest_build) {
-            char z[256] = {};
-            sprintf(z, "There is a newer build (%li) of Chimera available at Chimera.OpenCarnage.net", latest_build);
-            console_out_warning(z);
-        }
         for(size_t i=0;i<(*commands).size();i++) {
             auto &command = (*commands)[i];
             if(!command.supported()) continue;

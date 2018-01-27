@@ -1,6 +1,6 @@
 @echo OFF
 
-if exist client\lua\lua\bin\liblua.a (goto UPDATE_NOTIFIER)
+if exist client\lua\lua\bin\liblua.a (goto CHIMERA)
 
 :LUA
 
@@ -15,16 +15,6 @@ move liblua.a bin
 echo Done building Lua
 
 cd ..\..\..
-
-:UPDATE_NOTIFIER
-
-if exist client\update_notifier\target\release\update_notifier.lib (goto CHIMERA)
-
-echo Building update notifier...
-cd client\update_notifier
-cargo build --release
-cd ..\..
-echo Done building update notifier
 
 :CHIMERA
 
@@ -109,10 +99,8 @@ g++ -c client/lua/lua_io.cpp %ARGS% -o bin/client__lua__lua_io.o
 
 g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messaging.o
 
-g++ -c client/update_notifier/update_notifier.cpp %ARGS% -o bin/client__update_notifier__update_notifier.o
-
 g++ -c code_injection/codefinder.cpp %ARGS% -o bin/code_injection__codefinder.o
 g++ -c code_injection/signature.cpp %ARGS% -o bin/code_injection__signature.o
 
 :END
-g++ bin/* %LARGS% -L client/update_notifier/target/release -lupdate_notifier -L client/lua/lua/bin -llua -shared -lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32 -o "C:\Program Files (x86)\Microsoft Games\Halo Custom Edition\controls\chimera.dll"
+g++ bin/* %LARGS% -L client/lua/lua/bin -llua -shared -lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32 -o "C:\Program Files (x86)\Microsoft Games\Halo Custom Edition\controls\chimera.dll"
