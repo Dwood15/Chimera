@@ -10,7 +10,7 @@ static CameraData camera_coords_buffer_1 = {};
 static bool cam_interped = false;
 
 CameraData &camera_data() noexcept {
-    static CameraData *camera_coord_addr = *reinterpret_cast<CameraData **>(get_signature("camera_coord_sig").address() + 2);
+    static auto *camera_coord_addr = *reinterpret_cast<CameraData **>(get_signature("camera_coord_sig").address() + 2);
     return *camera_coord_addr;
 }
 
@@ -63,7 +63,7 @@ float stored_zoom_scale = 0.0;
 float zoom_scale() noexcept {
     if(stored_zoom_scale != 0.0) return stored_zoom_scale;
     stored_zoom_scale = 1.0;
-    char zoom = zoom_level();
+    auto zoom = zoom_level();
     if(zoom) {
         HaloObject po(HaloPlayer().object_id());
         auto *pd = po.object_data();

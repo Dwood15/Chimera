@@ -87,11 +87,11 @@ static void do_interpolation(uint32_t i) noexcept {
         }
     }
     if(data) {
-        const uint16_t &type = data[0xB4];
+        const auto &type = *reinterpret_cast<uint8_t *>(data + 0xB4);
         if(type > 8 || ((*reinterpret_cast<uint32_t *>(data + 0x10) & 1) && type != 5)) {
             return;
         };
-        char ld = ilevels[chimera_interpolate_setting][type];
+        auto ld = ilevels[chimera_interpolate_setting][type];
         if(ld == 0) return;
         uint32_t node_count = 0;
         auto &model_id = *reinterpret_cast<HaloTagID *>(HaloTag::from_id(*reinterpret_cast<HaloTagID *>(data)).data + 0x28 + 0xC);
@@ -99,7 +99,7 @@ static void do_interpolation(uint32_t i) noexcept {
         if(type == 0x4 || type == 0x5) node_count = 1;
         if(node_count == 0 || node_count > MAX_NODES) return;
 
-        const uint32_t &offset = model_node_offset[type];
+        const auto &offset = model_node_offset[type];
         ModelNode *nodes = reinterpret_cast<ModelNode *>(data + offset);
 
         objects_buffer_0[i].position = *reinterpret_cast<Vector3D *>(data + 0x5C);
@@ -190,9 +190,9 @@ static void rollback_interpolation() noexcept {
     if(chimera_interpolate_setting >= 1) rollback_widget_interpolation();
     for(uint32_t i=0;i<2048;i++) {
         HaloObject o(i);
-        char *data = o.object_data();
+        auto *data = o.object_data();
         if(objects_buffer_0[i].interpolation_type != INTERPOLATION_NONE && objects_buffer_1[i].interpolation_type != INTERPOLATION_NONE && data) {
-            const uint16_t &type = data[0xB4];
+            const auto &type = *reinterpret_cast<uint8_t *>(data + 0xB4);
             if((*reinterpret_cast<uint32_t *>(data + 0x10) & 1) && type != 5) continue;
 
             uint32_t node_count = 0;
@@ -201,7 +201,7 @@ static void rollback_interpolation() noexcept {
             if(!model_id.is_null()) node_count = *reinterpret_cast<uint32_t *>(HaloTag::from_id(model_id).data + 0xB8);
 
             const auto &offset = model_node_offset[type];
-            ModelNode *nodes = reinterpret_cast<ModelNode *>(data + offset);
+            auto *nodes = reinterpret_cast<ModelNode *>(data + offset);
             if(type == 0x4 || type == 0x5) node_count = 1;
 
             *reinterpret_cast<Vector3D *>(data + 0xA0) = objects_buffer_0[i].position_center;
