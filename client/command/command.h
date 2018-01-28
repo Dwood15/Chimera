@@ -5,7 +5,7 @@
 
 enum ChimeraCommandError {
     /// The command was executed successfully.
-    CHIMERA_COMMAND_ERROR_SUCCESS = 0,
+    CHIMERA_COMMAND_ERROR_SUCCESS,
 
     /// The command was executed but failed. An error may have been printed to the console.
     CHIMERA_COMMAND_ERROR_FAILURE,

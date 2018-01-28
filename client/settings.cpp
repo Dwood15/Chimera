@@ -117,7 +117,13 @@ bool read_init_file(const char *path, const char *name) noexcept {
                     console_out_error(x);
                     break;
                 }
-                default: break;
+                case CHIMERA_COMMAND_ERROR_UNSUPPORTED: {
+                    sprintf(x, "%s:%u: The command is not supported on your version of Halo.", name, ln);
+                    console_out_error(x);
+                    console_out_error("Make sure you are running Halo Custom Edition version 1.10.");
+                    break;
+                }
+                case CHIMERA_COMMAND_ERROR_SUCCESS: break;
             }
         }
         return true;
