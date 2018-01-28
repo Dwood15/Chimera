@@ -1,5 +1,5 @@
 #include <math.h>
-#include "rotation.h"
+#include "data_types.h"
 
 interpolate_vector_fn interpolate_vector_x = interpolate_vector;
 

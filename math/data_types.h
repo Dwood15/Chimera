@@ -1,5 +1,33 @@
 #pragma once
-#include <stdint.h>
+
+#define CONCAT(x, y) x ## y
+#define CONCAT2(x, y) CONCAT(x, y)
+#define PAD_CHARS(s) char CONCAT2(padding, __LINE__)[s];
+#define PAD_BITS(type,s) type CONCAT2(padding, __LINE__) : s;
+
+struct ColorRGB {
+    float red;
+    float green;
+    float blue;
+};
+
+struct Vector3D {
+    float x;
+    float y;
+    float z;
+};
+
+struct Euler3DPYR {
+    float pitch;
+    float yaw;
+    float roll;
+};
+
+struct Euler3DYPR {
+    float yaw;
+    float pitch;
+    float roll;
+};
 
 struct RotationMatrix;
 struct Quaternion {
@@ -10,12 +38,6 @@ struct Quaternion {
     Quaternion() noexcept;
     Quaternion(const RotationMatrix &matrix) noexcept;
     Quaternion(const Quaternion &copy) noexcept;
-};
-
-struct Vector3D {
-    float x;
-    float y;
-    float z;
 };
 
 struct RotationMatrix {

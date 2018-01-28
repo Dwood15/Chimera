@@ -2,7 +2,7 @@
 #include <string.h>
 #include "../halo_data/table.h"
 #include "../hooks/tick.h"
-#include "rotation.h"
+#include "../../math/data_types.h"
 #include "particle.h"
 
 struct InterParticle {

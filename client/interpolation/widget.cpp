@@ -1,6 +1,6 @@
 #include <math.h>
 #include <string.h>
-#include "rotation.h"
+#include "../../math/data_types.h"
 #include "../halo_data/table.h"
 #include "widget.h"
 

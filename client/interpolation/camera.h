@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rotation.h"
+#include "../../math/data_types.h"
 
 struct CameraData {
     Vector3D position;

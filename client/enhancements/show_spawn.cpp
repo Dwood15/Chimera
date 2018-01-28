@@ -2,7 +2,6 @@
 
 #include <math.h>
 
-#include "../interpolation/rotation.h"
 #include "../halo_data/tag_data.h"
 #include "../halo_data/server.h"
 #include "../messaging/messaging.h"
@@ -87,12 +86,6 @@ struct TagScenarioPlayerStartingLocation {
 struct ObjectEntry {
     uint32_t object_id;
     uint32_t spawn_id;
-};
-
-struct ColorRGB {
-    float red;
-    float green;
-    float blue;
 };
 
 #define max_spawns 256
@@ -199,11 +192,7 @@ static void show_spawns() noexcept {
                 HaloObject object(id);
                 auto *data = object.object_data();
                 if(data) {
-                    if(biped) {
-                        *reinterpret_cast<float *>(data + 0xD8) = 10000000000.0;
-                        *reinterpret_cast<float *>(data + 0xDC) = 10000000000.0;
-                    }
-                    auto &rotation = *reinterpret_cast<Vector3D *>(data + 0x5C + 0xC + 0xC);
+                    auto &rotation = reinterpret_cast<BaseHaloObject *>(data)->orientation[0];
                     rotation.x = cos(spawn.rotation);
                     rotation.y = sin(spawn.rotation);
                     rotation.z = 0;
@@ -229,7 +218,7 @@ static void show_spawns() noexcept {
             auto *oplayer_object_data = player_object.object_data();
             if(oplayer_object_data) {
                 auto &oteam = *reinterpret_cast<uint16_t *>(oplayer_data + 0x20);
-                auto &location = *reinterpret_cast<Vector3D *>(oplayer_object_data + 0xA0);
+                auto &location = reinterpret_cast<BaseHaloObject *>(oplayer_object_data)->position_script;
                 if(oteam == team) {
                     allies[allies_count++] = location;
                 }
@@ -252,15 +241,12 @@ static void show_spawns() noexcept {
             HaloObject obj(stored_spawn.object_id);
             auto *odata = obj.object_data();
             if(odata) {
+                auto &oobject = *reinterpret_cast<BaseHaloObject *>(odata);
                 if(biped) {
-                    *reinterpret_cast<float *>(odata + 0xE0) = 1;
-                    *reinterpret_cast<float *>(odata + 0xE4) = 1;
-                    *reinterpret_cast<float *>(odata + 0x5C) = spawn_data.position.x;
-                    *reinterpret_cast<float *>(odata + 0x5C + 4) = spawn_data.position.y;
-                    *reinterpret_cast<float *>(odata + 0x5C + 8) = spawn_data.position.z;
-                    *reinterpret_cast<float *>(odata + 0x68) = 0;
-                    *reinterpret_cast<float *>(odata + 0x68 + 4) = 0;
-                    *reinterpret_cast<float *>(odata + 0x68 + 8) = 0;
+                    oobject.health = 10000000000.0;
+                    oobject.shield = 10000000000.0;
+                    oobject.position = spawn_data.position;
+                    oobject.velocity = {};
                 }
 
                 float enemy_weight = 1.0;
@@ -328,7 +314,7 @@ static void show_spawns() noexcept {
             if(odata) {
                 //auto spawn_chance = weights[i] / total_weight;
                 auto &spawn_chance = chances[i];
-                auto &scale = *reinterpret_cast<float *>(odata + 0xB0);
+                auto &oobject = *reinterpret_cast<BaseHaloObject *>(odata);
                 auto &invis_if_biped = *reinterpret_cast<float *>(odata + 0x37C);
 
                 ColorRGB color;
@@ -336,7 +322,7 @@ static void show_spawns() noexcept {
                 if(blocked[i]) {
                     color.red = 0;
                     color.green = 0;
-                    scale = 0.25;
+                    oobject.scale = 0.25;
                 }
                 else if(spawn_chance > 0) {
                     color.red = (1 - spawn_chance);
@@ -344,12 +330,12 @@ static void show_spawns() noexcept {
                     if(friend_influenced == 1) {
                         color.blue = color.green * 0.8;
                     }
-                    scale = 0.4 + 0.35 * spawn_chance;
+                    oobject.scale = 0.4 + 0.35 * spawn_chance;
                 }
                 else {
                     color.red = 1.0 + spawn_chance;
                     color.green = 0.0;
-                    scale = 0.4 + spawn_chance * 0.4;
+                    oobject.scale = 0.4 + spawn_chance * 0.4;
                 }
 
                 if(biped) {
@@ -363,8 +349,9 @@ static void show_spawns() noexcept {
                     }
                 }
 
-                for(size_t i=0;i<8;i++) {
-                    reinterpret_cast<ColorRGB *>(odata + 0x188)[i] = color;
+                for(size_t i=0;i<4;i++) {
+                    oobject.color1[i] = color;
+                    oobject.color2[i] = color;
                 }
             }
         }

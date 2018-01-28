@@ -1,7 +1,7 @@
 #include "light.h"
 
 #include <string.h>
-#include "rotation.h"
+#include "../../math/data_types.h"
 #include "camera.h"
 #include "../halo_data/table.h"
 #include "../hooks/tick.h"

@@ -89,7 +89,6 @@ g++ -c client/interpolation/fp.cpp %ARGSFAST% -o bin/client__interpolation__fp.o
 g++ -c client/interpolation/light.cpp %ARGSFAST% -o bin/client__interpolation__light.o
 g++ -c client/interpolation/interpolation.cpp %ARGSFAST% -o bin/client__interpolation__interpolation.o
 g++ -c client/interpolation/particle.cpp %ARGSFAST% -o bin/client__interpolation__particle.o
-g++ -c client/interpolation/rotation.cpp %ARGSFAST% -o bin/client__interpolation__rotation.o
 g++ -c client/interpolation/widget.cpp %ARGS% -o bin/client__interpolation__widget.o
 
 g++ -c client/lua/lua.cpp %ARGS% -o bin/client__lua__lua.o
@@ -101,6 +100,8 @@ g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messa
 
 g++ -c code_injection/codefinder.cpp %ARGS% -o bin/code_injection__codefinder.o
 g++ -c code_injection/signature.cpp %ARGS% -o bin/code_injection__signature.o
+
+g++ -c math/data_types.cpp %ARGSFAST% -o bin/math__data_types.o
 
 :END
 g++ bin/* %LARGS% -L client/lua/lua/bin -llua -shared -lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32 -o "C:\Program Files (x86)\Microsoft Games\Halo Custom Edition\controls\chimera.dll"

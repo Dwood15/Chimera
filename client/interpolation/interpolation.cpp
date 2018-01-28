@@ -12,7 +12,6 @@
 #include "interpolation.h"
 #include "particle.h"
 #include "fp.h"
-#include "rotation.h"
 #include "widget.h"
 #include "camera.h"
 
@@ -81,20 +80,21 @@ static void do_interpolation(uint32_t i) noexcept {
     auto *data = o.object_data();
     if(nuked) {
         objects_buffer_0[i].interpolation_type = INTERPOLATION_NONE;
-        if(data) objects_buffer_0[i].tag_id = *reinterpret_cast<uint32_t *>(data);
+        if(data) objects_buffer_0[i].tag_id = reinterpret_cast<BaseHaloObject *>(data)->tag_id;
         if(objects_buffer_0[i].tag_id != objects_buffer_1[i].tag_id) {
             objects_buffer_1[i].interpolation_type = INTERPOLATION_NONE;
         }
     }
     if(data) {
-        const auto &type = *reinterpret_cast<uint8_t *>(data + 0xB4);
-        if(type > 8 || ((*reinterpret_cast<uint32_t *>(data + 0x10) & 1) && type != 5)) {
+        auto &object = *reinterpret_cast<BaseHaloObject *>(data);
+        const auto &type = object.object_type;
+        if(type > 8 || (object.phased_out && type != 5)) {
             return;
         };
         auto ld = ilevels[chimera_interpolate_setting][type];
         if(ld == 0) return;
         uint32_t node_count = 0;
-        auto &model_id = *reinterpret_cast<HaloTagID *>(HaloTag::from_id(*reinterpret_cast<HaloTagID *>(data)).data + 0x28 + 0xC);
+        auto &model_id = *reinterpret_cast<HaloTagID *>(HaloTag::from_id(object.tag_id).data + 0x28 + 0xC);
         if(!model_id.is_null()) node_count = *reinterpret_cast<uint32_t *>(HaloTag::from_id(model_id).data + 0xB8);
         if(type == 0x4 || type == 0x5) node_count = 1;
         if(node_count == 0 || node_count > MAX_NODES) return;
@@ -102,8 +102,8 @@ static void do_interpolation(uint32_t i) noexcept {
         const auto &offset = model_node_offset[type];
         ModelNode *nodes = reinterpret_cast<ModelNode *>(data + offset);
 
-        objects_buffer_0[i].position = *reinterpret_cast<Vector3D *>(data + 0x5C);
-        auto &position_center = *reinterpret_cast<Vector3D *>(data + 0xA0);
+        objects_buffer_0[i].position = object.position;
+        auto &position_center = object.position_script;
         objects_buffer_0[i].position_center = position_center;
 
         if(nuked) {

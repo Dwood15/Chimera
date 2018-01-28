@@ -2,7 +2,7 @@
 #include "fp.h"
 #include "../hooks/tick.h"
 #include "../halo_data/table.h"
-#include "rotation.h"
+#include "../../math/data_types.h"
 
 struct FirstPersonNode {
     Quaternion rotation_stuff;
