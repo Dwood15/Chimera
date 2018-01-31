@@ -55,7 +55,6 @@ g++ -c client/fix/magnetism_fix.cpp %ARGS% -o bin/client__fix__magnetism_fix.o
 g++ -c client/debug/budget.cpp %ARGS% -o bin/client__debug__budget.o
 g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o
 
-g++ -c client/enhancements/anisotropic_filtering.cpp %ARGS% -o bin/client__enhancements__af.o
 g++ -c client/enhancements/auto_center.cpp %ARGS% -o bin/client__enhancements__auto_center.o
 g++ -c client/enhancements/firing_particle.cpp %ARGS% -o bin/client__enhancements__firing_particle.o
 g++ -c client/enhancements/multitexture_overlay.cpp %ARGS% -o bin/client__enhancements__mo.o
@@ -97,6 +96,10 @@ g++ -c client/lua/lua_game.cpp %ARGS% -o bin/client__lua__lua_game.o
 g++ -c client/lua/lua_io.cpp %ARGS% -o bin/client__lua__lua_io.o
 
 g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messaging.o
+
+g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
+g++ -c client/visuals/force_resolution.cpp -masm=intel -o bin/client__visuals__force_resolution.o
+g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
 g++ -c code_injection/codefinder.cpp %ARGS% -o bin/code_injection__codefinder.o
 g++ -c code_injection/signature.cpp %ARGS% -o bin/code_injection__signature.o

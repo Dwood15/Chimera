@@ -15,7 +15,10 @@
 #include "debug/budget.h"
 #include "debug/wireframe.h"
 
-#include "enhancements/anisotropic_filtering.h"
+#include "visuals/anisotropic_filtering.h"
+#include "visuals/force_resolution.h"
+#include "visuals/vertical_field_of_view.h"
+
 #include "enhancements/auto_center.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
@@ -114,6 +117,26 @@ void initialize_client() noexcept {
         "  - chimera_reload_lua"
     , 0, 0, true);
 
+    // Visuals
+
+    (*commands).emplace_back("chimera_af", af_command, "visuals",
+        "Get or set whether or not to enable anisotropic filtering.\n\n"
+        "Syntax:\n"
+        "  - chimera_af [true/false]"
+    , 0, 1, find_anisotropic_filtering_signature(), true);
+
+    (*commands).emplace_back("chimera_force_resolution", force_resolution_command, "visuals",
+        "Change Halo's resolution.\n\n"
+        "Syntax:\n"
+        "  - chimera_force_resolution <width> <height>"
+    , 2, 2, find_force_resolution_signatures(), true);
+
+    (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
+        "Get or change your FOV by locking to a specific vertical FOV.\n\n"
+        "Syntax:\n"
+        "  - chimera_vfov <FOV>"
+    , 0, 1, find_interpolation_signatures(), true);
+
     // Interpolation
 
     (*commands).emplace_back("chimera_interpolate", interpolate_command, "interpolation",
@@ -133,12 +156,6 @@ void initialize_client() noexcept {
     , 0, 1, find_interpolation_signatures(), true);
 
     // Enhancements
-
-    (*commands).emplace_back("chimera_af", af_command, "enhancements",
-        "Get or set whether or not to enable anisotropic filtering.\n\n"
-        "Syntax:\n"
-        "  - chimera_af [true/false]"
-    , 0, 1, find_anisotropic_filtering_signature(), true);
 
     (*commands).emplace_back("chimera_auto_center", auto_center_command, "enhancements",
         "Get or set how auto centering of vehicle cameras should behave.\n"
