@@ -64,9 +64,13 @@ static void init() {
     char z[512] = {};
     sprintf(z,"%s\\chimera", halo_path());
     CreateDirectory(z, nullptr);
+    save_settings = false;
+    sprintf(z,"%s\\chimera\\chimerainit.txt", halo_path());
+    read_init_file(z, "[-path]/chimerainit.txt");
+    save_settings = true;
     sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
     autosave = false;
-    read_init_file(z, "chimerasave.txt");
+    read_init_file(z, "[-path]/chimerasave.txt");
     autosave = true;
     save_all_changes();
     save_settings = settings_before;
