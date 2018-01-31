@@ -22,7 +22,7 @@
 #include "enhancements/auto_center.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
-#include "enhancements/safe_zone.h"
+#include "xbox/safe_zone.h"
 #include "enhancements/show_spawn.h"
 #include "enhancements/skip_loading.h"
 #include "enhancements/throttle_fps.h"
@@ -147,7 +147,8 @@ void initialize_client() noexcept {
     , 2, 5, find_set_resolution_signatures(), false);
 
     (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
-        "Get or change your FOV by locking to a specific vertical FOV.\n\n"
+        "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
+        "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
         "Syntax:\n"
         "  - chimera_vfov <FOV>"
     , 0, 1, find_interpolation_signatures(), true);
@@ -209,12 +210,6 @@ void initialize_client() noexcept {
         "  - chimera_enable_console [true/false]"
     , 0, 1, true, true);
 
-    (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "enhancements",
-        "Get or set whether or not to emulate Xbox safe zones.\n\n"
-        "Syntax:\n"
-        "  - chimera_safe_zones [true/false]"
-    , 0, 1, true, true);
-
     (*commands).emplace_back("chimera_show_spawns", show_spawns_command, "enhancements",
         "Get or set whether or not to show spawns.\n\n"
         "Syntax:\n"
@@ -240,6 +235,14 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_uncap_cinematic [true/false]"
     , 0, 1, find_uncap_cinematic_signatures(), true);
+
+    // Xbox
+
+    (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
+        "Get or set whether or not to emulate Xbox safe zones.\n\n"
+        "Syntax:\n"
+        "  - chimera_safe_zones [true/false]"
+    , 0, 1, true, true);
 
     // HAC2
 

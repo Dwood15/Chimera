@@ -58,7 +58,6 @@ g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o
 g++ -c client/enhancements/auto_center.cpp %ARGS% -o bin/client__enhancements__auto_center.o
 g++ -c client/enhancements/firing_particle.cpp %ARGS% -o bin/client__enhancements__firing_particle.o
 g++ -c client/enhancements/multitexture_overlay.cpp %ARGS% -o bin/client__enhancements__mo.o
-g++ -c client/enhancements/safe_zone.cpp %ARGS% -o bin/client__enhancements__safe_zone.o
 g++ -c client/enhancements/show_spawn.cpp %ARGS% -o bin/client__enhancements__show_spawn.o
 g++ -c client/enhancements/skip_loading.cpp %ARGS% -o bin/client__enhancements__skip_loading.o
 g++ -c client/enhancements/throttle_fps.cpp %ARGS% -o bin/client__enhancements__throttle_fps.o
@@ -100,6 +99,8 @@ g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messa
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
 g++ -c client/visuals/set_resolution.cpp -masm=intel -o bin/client__visuals__set_resolution.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
+
+g++ -c client/xbox/safe_zone.cpp %ARGS% -o bin/client__xbox__safe_zone.o
 
 g++ -c code_injection/codefinder.cpp %ARGS% -o bin/code_injection__codefinder.o
 g++ -c code_injection/signature.cpp %ARGS% -o bin/code_injection__signature.o
