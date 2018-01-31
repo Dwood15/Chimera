@@ -383,7 +383,7 @@ bool find_multitexture_overlay_signature() noexcept {
     set_result
 }
 
-bool find_force_resolution_signatures() noexcept {
+bool find_set_resolution_signatures() noexcept {
     check_result
 
     const short change_resolution_query_sig[] = {0x55, 0x8B, 0x6C, 0x24, 0x08, 0x56, 0x8B, 0xF0, 0x85, 0xF6, 0x57, 0x8B, 0xFD, 0xB9, 0x0E, 0x00, 0x00, 0x00};

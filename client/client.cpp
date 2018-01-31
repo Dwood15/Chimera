@@ -16,7 +16,7 @@
 #include "debug/wireframe.h"
 
 #include "visuals/anisotropic_filtering.h"
-#include "visuals/force_resolution.h"
+#include "visuals/set_resolution.h"
 #include "visuals/vertical_field_of_view.h"
 
 #include "enhancements/auto_center.h"
@@ -125,11 +125,14 @@ void initialize_client() noexcept {
         "  - chimera_af [true/false]"
     , 0, 1, find_anisotropic_filtering_signature(), true);
 
-    (*commands).emplace_back("chimera_force_resolution", force_resolution_command, "visuals",
-        "Change Halo's resolution.\n\n"
+    (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
+        "Change Halo's resolution.\n"
+        "\n"
+        "Note: Changing this to an invalid value can break video output. For your protection, this\n"
+        "setting is not automatically saved. Please use chimerainit.txt for this setting.\n\n"
         "Syntax:\n"
-        "  - chimera_force_resolution <width> <height>"
-    , 2, 2, find_force_resolution_signatures(), true);
+        "  - chimera_set_resolution <width> <height> [refresh rate=60] [vsync] [windowed]"
+    , 2, 5, find_set_resolution_signatures(), false);
 
     (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
         "Get or change your FOV by locking to a specific vertical FOV.\n\n"

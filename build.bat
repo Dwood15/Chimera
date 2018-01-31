@@ -98,7 +98,7 @@ g++ -c client/lua/lua_io.cpp %ARGS% -o bin/client__lua__lua_io.o
 g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messaging.o
 
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
-g++ -c client/visuals/force_resolution.cpp -masm=intel -o bin/client__visuals__force_resolution.o
+g++ -c client/visuals/set_resolution.cpp -masm=intel -o bin/client__visuals__set_resolution.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
 g++ -c code_injection/codefinder.cpp %ARGS% -o bin/code_injection__codefinder.o
