@@ -82,12 +82,17 @@ static void set_resolution(int width, int height, int refresh_rate=1000, int vsy
         : "m" (height), "m" (width), "m" (change_window_size)
     );
 
+    auto *block_resolution_change = get_signature("block_auto_resolution_change_sig").address();
+    const short nope[] = {0x90, 0x90, 0x90, 0x90, 0x90};
+    write_code(block_resolution_change, nope, 5);
+
     if(repeat && !repeating) {
         repeating = true;
         set_resolution(width, height, refresh_rate, vsync, 1);
         set_resolution(width, height, refresh_rate, vsync, 0);
         repeating = false;
     }
+
 }
 
 /// Function for command chimera_set_resolution
