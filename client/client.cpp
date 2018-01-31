@@ -137,7 +137,8 @@ void initialize_client() noexcept {
     , 0, 1, find_set_resolution_signatures(), true);
 
     (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
-        "Change Halo's resolution.\n"
+        "Change Halo's resolution. Width and height can be either resolution in pixels or an aspect\n"
+        "ratio.\n"
         "\n"
         "Note: Changing this to an invalid value can break video output. For your protection, this\n"
         "setting is not automatically saved. Please use chimerainit.txt for this setting.\n\n"

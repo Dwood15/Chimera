@@ -114,8 +114,23 @@ ChimeraCommandError block_vsync_command(size_t argc, const char **argv) noexcept
 ChimeraCommandError set_resolution_command(size_t argc, const char **argv) noexcept {
     int width = strtol(argv[0], nullptr, 10);
     int height = strtol(argv[1], nullptr, 10);
+    if(width < 32 && height < 32 && width > 0 && height > 0) {
+        auto &resolution = get_resolution();
+        auto width_f = strtod(argv[0], nullptr);
+        auto height_f = strtod(argv[1], nullptr);
+        height = static_cast<double>(resolution.width) / width_f * height_f;
+        width = resolution.width;
+        if(width < 640) {
+            height = 640.0 / width_f * height_f;
+            width = 640;
+        }
+        if(height < 480) {
+            height = 480;
+            width = 480.0 * width_f / height_f;
+        }
+    }
     if(width < 640 || height < 480) {
-        console_out_error("chimera_set_resolution requires a resolution of at least 640 x 480");
+        console_out_error("chimera_set_resolution requires a resolution of at least 640 pixels wide by 480 pixels high");
         return CHIMERA_COMMAND_ERROR_FAILURE;
     }
     int refresh_rate = 1000;
