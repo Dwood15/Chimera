@@ -1,6 +1,7 @@
 #include "set_resolution.h"
 
 #include <stdlib.h>
+#include "../hac2/scope_fix.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
 
@@ -34,10 +35,13 @@ struct ChangeResolutionStructB {
 
 static_assert(sizeof(ChangeResolutionStructB) == 0x38);
 
-static void set_resolution(int width, int height, int refresh_rate, int vsync, int windowed) {
+static void set_resolution(int width, int height, int refresh_rate=1000, int vsync=-1, int windowed=-1) {
+    static bool repeating = false;
     auto *change_resolution_query = get_signature("change_resolution_query_sig").address();
     auto *change_resolution = get_signature("change_resolution_sig").address();
     auto *change_window_size = get_signature("change_window_size_sig").address();
+
+    bool repeat = false;
 
     ChangeResolutionStructA z;
     z.height = height;
@@ -56,6 +60,7 @@ static void set_resolution(int width, int height, int refresh_rate, int vsync, i
         : "r" (&r), "r" (&z), "m" (change_resolution_query)
     );
     if(vsync >= 0) r.no_vsync = vsync ? 0 : 0x80000000;
+    repeat = r.windowed == 0 || windowed == 0;
     if(windowed >= 0) r.windowed = windowed;
     asm (
         "pushad;"
@@ -76,6 +81,28 @@ static void set_resolution(int width, int height, int refresh_rate, int vsync, i
         :
         : "m" (height), "m" (width), "m" (change_window_size)
     );
+
+    if(repeat && !repeating) {
+        repeating = true;
+        set_resolution(width, height, refresh_rate, vsync, 1);
+        set_resolution(width, height, refresh_rate, vsync, 0);
+        repeating = false;
+    }
+}
+
+/// Function for command chimera_set_resolution
+ChimeraCommandError block_vsync_command(size_t argc, const char **argv) noexcept {
+    static bool active = false;
+    if(argc == 1) {
+        bool new_value = bool_value(argv[0]);
+        if(new_value) {
+            auto &resolution = get_resolution();
+            set_resolution(resolution.width, resolution.height, 1000, 0);
+        }
+        active = new_value;
+    }
+    console_out(std::string("chimera_block_vsync: ") + (active ? "true" : "false"));
+    return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
 
 /// Function for command chimera_set_resolution
@@ -86,15 +113,12 @@ ChimeraCommandError set_resolution_command(size_t argc, const char **argv) noexc
         console_out_error("chimera_set_resolution requires a resolution of at least 640 x 480");
         return CHIMERA_COMMAND_ERROR_FAILURE;
     }
-    int refresh_rate = 60;
+    int refresh_rate = 1000;
     if(argc >= 3) refresh_rate = strtol(argv[2], nullptr, 10);
     int vsync = -1;
     if(argc >= 4) vsync = bool_value(argv[3]);
     int windowed = -1;
     if(argc >= 5) windowed = bool_value(argv[4]);
-    if(!windowed) {
-        set_resolution(width, height, refresh_rate, vsync, true);
-    }
     set_resolution(width, height, refresh_rate, vsync, windowed);
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

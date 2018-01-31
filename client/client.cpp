@@ -129,13 +129,20 @@ void initialize_client() noexcept {
         "  - chimera_af [true/false]"
     , 0, 1, find_anisotropic_filtering_signature(), true);
 
+    (*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
+        "Get or set whether or not to turn vSync off startup.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_block_vsync [true/false]"
+    , 0, 1, find_set_resolution_signatures(), true);
+
     (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
         "Change Halo's resolution.\n"
         "\n"
         "Note: Changing this to an invalid value can break video output. For your protection, this\n"
         "setting is not automatically saved. Please use chimerainit.txt for this setting.\n\n"
         "Syntax:\n"
-        "  - chimera_set_resolution <width> <height> [refresh rate=60] [vsync] [windowed]"
+        "  - chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]"
     , 2, 5, find_set_resolution_signatures(), false);
 
     (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
