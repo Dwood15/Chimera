@@ -1,9 +1,72 @@
-#include <math.h>
+#include <cmath>
 #include "data_types.h"
 
 interpolate_vector_fn interpolate_vector_x = interpolate_vector;
 
-Quaternion::Quaternion() noexcept {}
+ColorRGB::ColorRGB() noexcept {}
+ColorRGB::ColorRGB(float r, float g, float b) noexcept :
+    red(r),
+    green(g),
+    blue(b) {};
+ColorRGB::ColorRGB(const ColorByte &other) noexcept :
+    red(static_cast<float>(other.red) / 255),
+    green(static_cast<float>(other.green) / 255),
+    blue(static_cast<float>(other.blue) / 255) {};
+ColorRGB::ColorRGB(const ColorARGB &other) noexcept :
+    red(other.red),
+    green(other.green),
+    blue(other.blue) {}
+ColorRGB::ColorRGB(const ColorRGB &other) noexcept :
+    red(other.red),
+    green(other.green),
+    blue(other.blue) {}
+
+ColorARGB::ColorARGB() noexcept {};
+ColorARGB::ColorARGB(float a, float r, float g, float b) noexcept :
+    alpha(a),
+    red(r),
+    green(g),
+    blue(b) {};
+ColorARGB::ColorARGB(const ColorByte &other) noexcept :
+    alpha(static_cast<float>(other.alpha) / 255),
+    red(static_cast<float>(other.red) / 255),
+    green(static_cast<float>(other.green) / 255),
+    blue(static_cast<float>(other.blue) / 255) {};
+ColorARGB::ColorARGB(const ColorRGB &other) noexcept :
+    red(other.red),
+    green(other.green),
+    blue(other.blue) {}
+ColorARGB::ColorARGB(const ColorARGB &other) noexcept :
+    alpha(other.alpha),
+    red(other.red),
+    green(other.green),
+    blue(other.blue) {}
+
+ColorByte::ColorByte() noexcept {};
+ColorByte::ColorByte(float a, float r, float g, float b) noexcept :
+    blue(b * 255),
+    green(g * 255),
+    red(r * 255),
+    alpha(a * 255) {};
+ColorByte::ColorByte(unsigned char a, unsigned char r, unsigned char g, unsigned char b) noexcept :
+    blue(b),
+    green(g),
+    red(r),
+    alpha(a) {};
+ColorByte::ColorByte(const ColorRGB &other) noexcept :
+    blue(other.blue * 255),
+    green(other.green * 255),
+    red(other.red * 255) {};
+ColorByte::ColorByte(const ColorARGB &other) noexcept :
+    blue(other.blue * 255),
+    green(other.green * 255),
+    red(other.red * 255),
+    alpha(other.alpha * 255) {};
+ColorByte::ColorByte(const ColorByte &other) noexcept :
+    blue(other.blue),
+    green(other.green),
+    red(other.red),
+    alpha(other.alpha) {}
 
 // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 Quaternion::Quaternion(const RotationMatrix &matrix) noexcept {

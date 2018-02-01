@@ -2,16 +2,7 @@
 
 #include <string>
 
-struct ColorARGB {
-    float alpha = 1.0;
-    float red = 1.0;
-    float green = 1.0;
-    float blue = 1.0;
-
-    ColorARGB() {}
-    ColorARGB(float a, float r, float g, float b) : alpha(a), red(r), green(g), blue(b) {}
-    ColorARGB(const ColorARGB &other) : alpha(other.alpha), red(other.red), green(other.green), blue(other.blue) {}
-};
+#include "../../math/data_types.h"
 
 /// Output a C string to the console while optionally using a color.
 void console_out(const char *text, const ColorARGB &color = ColorARGB()) noexcept;

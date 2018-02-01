@@ -14,6 +14,13 @@ union HaloTagID {
     operator unsigned int() const noexcept;
 };
 
+struct HaloTagDependency {
+    uint32_t tag_class;
+    char *tag_path;
+    uint32_t unknown;
+    HaloTagID tag_id;
+};
+
 struct HaloTag {
     uint32_t tag_class;
     uint32_t tag_class_secondary;

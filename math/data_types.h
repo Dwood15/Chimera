@@ -5,10 +5,46 @@
 #define PAD_CHARS(s) char CONCAT2(padding, __LINE__)[s];
 #define PAD_BITS(type,s) type CONCAT2(padding, __LINE__) : s;
 
+struct ColorARGB;
+struct ColorByte;
+
 struct ColorRGB {
     float red;
     float green;
     float blue;
+
+    ColorRGB() noexcept;
+    ColorRGB(float r, float g, float b) noexcept;
+    ColorRGB(const ColorByte &other) noexcept;
+    ColorRGB(const ColorARGB &other) noexcept;
+    ColorRGB(const ColorRGB &other) noexcept;
+};
+
+struct ColorARGB {
+    float alpha = 1.0;
+    float red;
+    float green;
+    float blue;
+
+    ColorARGB() noexcept;
+    ColorARGB(float a, float r, float g, float b) noexcept;
+    ColorARGB(const ColorByte &other) noexcept;
+    ColorARGB(const ColorRGB &other) noexcept;
+    ColorARGB(const ColorARGB &other) noexcept;
+};
+
+struct ColorByte {
+    unsigned char blue;
+    unsigned char green;
+    unsigned char red;
+    unsigned char alpha = 255;
+
+    ColorByte() noexcept;
+    ColorByte(float a, float r, float g, float b) noexcept;
+    ColorByte(unsigned char a, unsigned char r, unsigned char g, unsigned char b) noexcept;
+    ColorByte(const ColorRGB &other) noexcept;
+    ColorByte(const ColorARGB &other) noexcept;
+    ColorByte(const ColorByte &other) noexcept;
 };
 
 struct Vector3D {
