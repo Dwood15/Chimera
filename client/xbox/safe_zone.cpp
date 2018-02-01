@@ -10,7 +10,7 @@ static char *objects;
 
 struct SafeZoneMod {
     short *address;
-    short old_value;
+    short delta;
 };
 static std::vector<SafeZoneMod> mods;
 static void change_xy(void *addr) {
@@ -18,12 +18,12 @@ static void change_xy(void *addr) {
     auto *y = reinterpret_cast<short *>(addr) + 1;
     SafeZoneMod x_mod;
     x_mod.address = x;
-    x_mod.old_value = *x;
     mods.push_back(x_mod);
     SafeZoneMod y_mod;
     y_mod.address = y;
-    y_mod.old_value = *y;
     mods.push_back(y_mod);
+    x_mod.delta = 33;
+    y_mod.delta = 25;
     *x += 33;
     *y += 25;
 }
@@ -107,8 +107,8 @@ static void on_map_load() {
                     auto *addr = reinterpret_cast<short *>(const_cast<char *>(tag.path));
                     SafeZoneMod x_mod;
                     x_mod.address = addr;
-                    x_mod.old_value = *addr;
-                    *addr = 0;
+                    x_mod.delta = 1;
+                    (*addr)++;
                     mods.push_back(x_mod);
                 }
             }
@@ -186,7 +186,7 @@ ChimeraCommandError safe_zones_command(size_t argc, const char **argv) noexcept 
             else {
                 delete[] objects;
                 for(size_t i=0;i<mods.size();i++) {
-                    *mods[i].address= mods[i].old_value;
+                    *mods[i].address -= mods[i].delta;
                 }
                 mods.clear();
                 remove_tick_event(apply_safe_zones);
