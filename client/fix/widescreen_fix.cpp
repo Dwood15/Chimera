@@ -50,6 +50,18 @@ static void set_mod(bool force) {
         write_code_any_value(hud_text_widescreen_sig + 2 + 4, p_scale);
         write_code_any_value(hud_text_widescreen_sig + 0x1E + 2 + 4, adder_negative);
 
+        auto offset_sig = [](ChimeraSignature &signature) {
+            const auto &offset = *reinterpret_cast<const int16_t *>(signature.signature() + 5);
+            write_code_any_value(signature.address() + 5, static_cast<int16_t>(offset - 320 + 320 * width_scale));
+        };
+
+        offset_sig(get_signature("team_icon_ctf_sig"));
+        offset_sig(get_signature("team_icon_slayer_sig"));
+        offset_sig(get_signature("team_icon_king_sig"));
+        offset_sig(get_signature("team_icon_race_sig"));
+        offset_sig(get_signature("team_icon_oddball_sig"));
+        offset_sig(get_signature("team_icon_background_sig"));
+
         offset_undo(mods);
         offset_map_load(objects, mods, 320.0 - 320.0 * width_scale, 0, false);
         apply_scope_fix();
@@ -80,6 +92,12 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 get_signature("hud_element_widescreen_sig").undo();
                 get_signature("hud_element_motion_sensor_blip_widescreen_sig").undo();
                 get_signature("hud_text_widescreen_sig").undo();
+                get_signature("team_icon_ctf_sig").undo();
+                get_signature("team_icon_slayer_sig").undo();
+                get_signature("team_icon_king_sig").undo();
+                get_signature("team_icon_race_sig").undo();
+                get_signature("team_icon_oddball_sig").undo();
+                get_signature("team_icon_background_sig").undo();
                 undo_scope_fix();
                 width_scale = 0;
             }
