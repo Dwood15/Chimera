@@ -197,6 +197,9 @@ bool find_required_signatures() noexcept {
     const short on_rcon_message_sig[] = { 0xE8, -1, -1, -1, -1, 0x83, 0xC4, 0x08, 0x83, 0xC4, 0x58, 0xC3 };
     add_signature_s2(on_rcon_message_sig);
 
+    const short on_map_load_sig[] = { 0xE8, -1, -1, -1, -1, 0xE8, -1, -1, -1, -1, 0xA1, -1, -1, -1, -1, 0x33, 0xD2, 0x8B, 0xC8, 0x89, 0x11 };
+    add_signature_s2(on_map_load_sig);
+
     set_result
 }
 
