@@ -17,12 +17,15 @@ static void set_mod(bool force = false);
 extern void apply_scope_fix();
 extern void undo_scope_fix();
 
+float **letterbox;
+
 static void on_map_load() {
     set_mod(true);
 }
 
 static void apply_offsets() {
     set_mod();
+    **letterbox = -1;
     offset_tick(objects, mods, 320.0 - 320.0 * width_scale, 0);
 }
 
@@ -80,6 +83,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 if(widescreen_scope_mask_active) {
                     execute_chimera_command("chimera_widescreen_scope_mask 0", true);
                 }
+                letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
                 add_tick_event(apply_offsets);
                 add_map_load_event(on_map_load);
                 on_map_load();

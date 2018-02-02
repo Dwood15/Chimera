@@ -117,6 +117,86 @@ struct HUDOverlay {
 
 static_assert(sizeof(HUDOverlay) == 0x88);
 
+enum HUDMultitextureOverlayAnchor : uint16_t {
+    MULTITEXTURE_OVERLAY_ANCHOR_TEXTURE = 0,
+    MULTITEXTURE_OVERLAY_ANCHOR_SCREEN
+};
+
+enum HUDMultitextureBlendingFunction : uint16_t {
+    MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_ADD = 0,
+    MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_SUBTRACT,
+    MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_MULTIPLY,
+    MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_MULTIPLY_2X,
+    MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_DOT
+};
+
+enum HUDMultitextureWrapMode : uint16_t {
+    MULTITEXTURE_OVERLAY_WRAP_CLAMP = 0,
+    MULTITEXTURE_OVERLAY_WRAP_WRAP
+};
+
+struct HUDMultitextureOverlay {
+    PAD_CHARS(2);
+    uint16_t type;
+    enum : uint16_t {
+        FRAMEBUFFER_BLEND_ALPHA_BLEND = 0,
+        FRAMEBUFFER_BLEND_MULTIPLY,
+        FRAMEBUFFER_BLEND_DOUBLE_MULTIPLY,
+        FRAMEBUFFER_BLEND_ADD,
+        FRAMEBUFFER_BLEND_SUBTRACT,
+        FRAMEBUFFER_BLEND_COMPONENT_MINIMUM,
+        FRAMEBUFFER_BLEND_COMPONENT_MAXIMUM,
+        FRAMEBUFFER_BLEND_ALPHA_MULTIPLY_ADD
+    } blend_function;
+    PAD_CHARS(0x22);
+    HUDMultitextureOverlayAnchor primary_anchor;
+    HUDMultitextureOverlayAnchor secondary_anchor;
+    HUDMultitextureOverlayAnchor teritary_anchor;
+    HUDMultitextureBlendingFunction blending_function_0_to_1;
+    HUDMultitextureBlendingFunction blending_function_1_to_2;
+    PAD_CHARS(2);
+
+    struct {
+        float primary_scale_x;
+        float primary_scale_y;
+        float secondary_scale_x;
+        float secondary_scale_y;
+        float tertiary_scale_x;
+        float tertiary_scale_y;
+    } map_scales;
+
+    struct {
+        float primary_offset_x;
+        float primary_offset_y;
+        float secondary_offset_x;
+        float secondary_offset_y;
+        float tertiary_offset_x;
+        float tertiary_offset_y;
+    } map_offsets;
+
+    struct {
+        HaloTagDependency primary;
+        HaloTagDependency secondary;
+        HaloTagDependency tertiary;
+
+        HUDMultitextureWrapMode primary_wrap_mode;
+        HUDMultitextureWrapMode seconday_wrap_mode;
+        HUDMultitextureWrapMode tertiary_wrap_mode;
+
+        PAD_CHARS(2);
+    } map;
+
+    PAD_CHARS(0xB8);
+
+    uint32_t effectors_count;
+    void *effectors;
+    PAD_CHARS(4);
+
+    PAD_CHARS(0x80);
+};
+
+static_assert(sizeof(HUDMultitextureOverlay) == 0x1E0);
+
 struct GrenadeHUDInterfaceS {
     HUDElementPosition position;
     HaloTagDependency bitmap;
@@ -294,7 +374,7 @@ struct WeaponHUDInterfaceCrosshair {
         CROSSHAIR_PRIMARY_TRIGGER_READY,
         CROSSHAIR_SECONDARY_TRIGGER_READY,
         CROSSHAIR_FLASH_WHEN_FIRING_WITH_DEPLETED_BATTERY
-    };
+    } crosshair_type;
     PAD_CHARS(2);
     HUDMapType can_use_on_map_type;
     PAD_CHARS(2);
