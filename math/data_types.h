@@ -9,9 +9,9 @@ struct ColorARGB;
 struct ColorByte;
 
 struct ColorRGB {
-    float red;
-    float green;
-    float blue;
+    float red = 1.0;
+    float green = 1.0;
+    float blue = 1.0;
 
     ColorRGB() noexcept;
     ColorRGB(float r, float g, float b) noexcept;
@@ -22,9 +22,9 @@ struct ColorRGB {
 
 struct ColorARGB {
     float alpha = 1.0;
-    float red;
-    float green;
-    float blue;
+    float red = 1.0;
+    float green = 1.0;
+    float blue = 1.0;
 
     ColorARGB() noexcept;
     ColorARGB(float a, float r, float g, float b) noexcept;

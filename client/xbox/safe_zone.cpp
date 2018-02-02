@@ -1,5 +1,6 @@
 #include "safe_zone.h"
 #include <string.h>
+#include "../halo_data/hud.h"
 #include "../halo_data/table.h"
 #include "../halo_data/tag_data.h"
 #include "../messaging/messaging.h"
@@ -13,19 +14,23 @@ struct SafeZoneMod {
     short delta;
 };
 static std::vector<SafeZoneMod> mods;
-static void change_xy(void *addr) {
-    auto *x = reinterpret_cast<short *>(addr) + 0;
-    auto *y = reinterpret_cast<short *>(addr) + 1;
+
+static void change_xy(AnchorOffset &addr) {
+    auto *x = &addr.x;
+    auto *y = &addr.y;
     SafeZoneMod x_mod;
     x_mod.address = x;
+    x_mod.delta = 33;
     mods.push_back(x_mod);
     SafeZoneMod y_mod;
     y_mod.address = y;
-    mods.push_back(y_mod);
-    x_mod.delta = 33;
     y_mod.delta = 25;
+    mods.push_back(y_mod);
     *x += 33;
     *y += 25;
+}
+static void change_xy(HUDElementPosition &addr) {
+    change_xy(addr.anchor_offset);
 }
 
 #define not_center(addr) *reinterpret_cast<short *>(addr) != 4
@@ -33,31 +38,22 @@ static void change_xy(void *addr) {
 static void do_things_to_wphi_tag(HaloTagID tag_id) {
     if(tag_id.is_valid() && !objects[tag_id.index]) {
         objects[tag_id.index] = true;
-        auto *&tdata = HaloTag::from_id(tag_id).data;
-        do_things_to_wphi_tag(*reinterpret_cast<HaloTagID *>(tdata + 0xC));
-        if(not_center(tdata + 0x3C)) {
-            char *static_elements = *reinterpret_cast<char **>(tdata + 0x60 + 4);
-            for(int k=0;k<*reinterpret_cast<uint32_t *>(tdata + 0x60);k++) {
-                char *static_element = static_elements + k * 180;
-                change_xy(static_element + 0x24);
+        auto &tdata = *reinterpret_cast<WeaponHUDInterface *>(HaloTag::from_id(tag_id).data);
+        do_things_to_wphi_tag(tdata.child.tag_id);
+        if(tdata.anchor != ANCHOR_CENTER) {
+            for(int i=0;i<tdata.static_elements_count;i++) {
+                change_xy(tdata.static_elements[i].prelude.position);
             }
-            char *meter_elements = *reinterpret_cast<char **>(tdata + 0x6C + 4);
-            for(int k=0;k<*reinterpret_cast<uint32_t *>(tdata + 0x6C);k++) {
-                char *meter_element = meter_elements + k * 180;
-                change_xy(meter_element + 0x24);
+            for(int i=0;i<tdata.meter_elements_count;i++) {
+                change_xy(tdata.meter_elements[i].prelude.position);
             }
-            char *number_elements = *reinterpret_cast<char **>(tdata + 0x78 + 4);
-            for(int k=0;k<*reinterpret_cast<uint32_t *>(tdata + 0x78);k++) {
-                char *number_element = number_elements + k * 160;
-                change_xy(number_element + 0x24);
+            for(int i=0;i<tdata.number_elements_count;i++) {
+                change_xy(tdata.number_elements[i].prelude.position);
             }
-            char *overlay_elements = *reinterpret_cast<char **>(tdata + 0x90 + 4);
-            for(int o=0;o<*reinterpret_cast<uint32_t *>(tdata + 0x90);o++) {
-                char *overlay_element = overlay_elements + o * 104;
-                char *overlays = *reinterpret_cast<char **>(overlay_element + 0x34 + 4);
-                for(int k=0;k<*reinterpret_cast<uint32_t *>(overlay_element + 0x34);k++) {
-                    char *overlay = overlays + k * 136;
-                    change_xy(overlay + 0x0);
+            for(int o=0;o<tdata.overlay_elements_count;o++) {
+                auto &overlay = tdata.overlay_elements[o];
+                for(int i=0;i<overlay.overlays_count;i++) {
+                    change_xy(overlay.overlays[i].position);
                 }
             }
         }
@@ -73,25 +69,23 @@ static void on_map_load() {
         objects[i] = true;
         if(tag.tag_class == 0x68756467) {
             if(not_center(tdata + 0x0)) {
-                change_xy(tdata + 0x24);
+                change_xy(*reinterpret_cast<AnchorOffset *>(tdata + 0x24));
             }
         }
         else if(tag.tag_class == 0x6D617467) {
-            auto *&data = *reinterpret_cast<char **>(tdata + 0x128 + 4);
+            auto *&grenades = *reinterpret_cast<char **>(tdata + 0x128 + 4);
             for(size_t g=0;g<*reinterpret_cast<uint32_t *>(tdata + 0x128);g++) {
-                auto &tag_id = *reinterpret_cast<HaloTagID *>(data + g * 68 + 0x14 + 0xC);
+                auto &tag_id = *reinterpret_cast<HaloTagID *>(grenades + g * 68 + 0x14 + 0xC);
                 if(tag_id.is_valid() && !objects[tag_id.index]) {
                     objects[tag_id.index] = true;
                     auto &tag = HaloTag::from_id(tag_id);
-                    auto *&tdata = tag.data;
-                    if(not_center(tdata + 0x0)) {
-                        change_xy(tdata + 0x24);
-                        change_xy(tdata + 0x8C);
-                        change_xy(tdata + 0xF4);
-                        char *overlays = *reinterpret_cast<char **>(tdata + 0x15C + 4);
-                        for(int k=0;k<*reinterpret_cast<uint32_t *>(tdata + 0x15C);k++) {
-                            char *overlay = overlays + k * 136;
-                            change_xy(overlay);
+                    GrenadeHUDInterface &tdata = *reinterpret_cast<GrenadeHUDInterface *>(tag.data);
+                    if(tdata.anchor != ANCHOR_CENTER) {
+                        change_xy(tdata.grenade_hud_background.position);
+                        change_xy(tdata.total_grenades_background.position);
+                        change_xy(tdata.total_grenades_numbers.position);
+                        for(uint32_t o=0;o<tdata.overlays_count;o++) {
+                            change_xy(tdata.overlays[o].position);
                         }
                     }
                 }
@@ -134,26 +128,23 @@ static void apply_safe_zones() {
                 if(tag_id.is_valid() && !objects[tag_id.index]) {
                     objects[tag_id.index] = true;
                     auto &unhi_tag = HaloTag::from_id(tag_id);
-                    auto *&tdata = unhi_tag.data;
-                    if(not_center(tdata + 0x0)) {
-                        change_xy(tdata + 0x24);
-                        change_xy(tdata + 0x8C);
-                        change_xy(tdata + 0xF4);
-                        change_xy(tdata + 0x17C);
-                        change_xy(tdata + 0x1E4);
-                        change_xy(tdata + 0x26C);
-                        change_xy(tdata + 0x2D4);
-                        change_xy(tdata + 0x35C);
-                        char *aux_overlays = *reinterpret_cast<char **>(tdata + 0x3A4 + 4);
-                        for(int k=0;k<*reinterpret_cast<uint32_t *>(tdata + 0x3A4);k++) {
-                            char *aux_overlay = aux_overlays + k * 132;
-                            change_xy(aux_overlay);
+                    auto &tdata = *reinterpret_cast<UnitHUDInterface *>(unhi_tag.data);
+                    if(tdata.anchor != ANCHOR_CENTER) {
+                        change_xy(tdata.unit_hud_background.position);
+                        change_xy(tdata.shield_panel_background.position);
+                        change_xy(tdata.shield_panel_meter.prelude.position);
+                        change_xy(tdata.health_panel_background.position);
+                        change_xy(tdata.health_panel_meter.prelude.position);
+                        change_xy(tdata.motion_sensor_background.position);
+                        change_xy(tdata.motion_sensor_foreground.position);
+                        change_xy(tdata.motion_sensor_center);
+                        for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
+                            change_xy(tdata.auxiliary_hud_meters[i].background.position);
                         }
-                        char *aux_meters = *reinterpret_cast<char **>(tdata + 0x3CC + 4);
-                        for(int k=0;k<*reinterpret_cast<uint32_t *>(tdata + 0x3CC);k++) {
-                            char *aux_meter = aux_meters + k * 324;
-                            change_xy(aux_meter + 0x14);
-                            change_xy(aux_meter + 0x7C);
+                    }
+                    if(tdata.auxiliary_overlays.anchor != ANCHOR_CENTER) {
+                        for(uint32_t i=0;i<tdata.auxiliary_overlays.overlays_count;i++) {
+                            change_xy(tdata.auxiliary_overlays.overlays[i].position);
                         }
                     }
                 }

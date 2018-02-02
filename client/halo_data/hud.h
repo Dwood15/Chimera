@@ -419,7 +419,7 @@ struct UnitHUDInterface {
         ColorByte overcharge_flash_color;
         ColorByte overcharge_empty_color;
         PAD_CHARS(0x10);
-    };
+    } shield_panel_meter;
     UnitHUDInterfaceBackground health_panel_background;
     struct {
         UnitHUDInterfaceMeterPrelude prelude;

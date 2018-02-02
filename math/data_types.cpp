@@ -68,6 +68,8 @@ ColorByte::ColorByte(const ColorByte &other) noexcept :
     red(other.red),
     alpha(other.alpha) {}
 
+Quaternion::Quaternion() noexcept {};
+
 // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 Quaternion::Quaternion(const RotationMatrix &matrix) noexcept {
     float tr = matrix.v[0].x + matrix.v[1].y + matrix.v[2].z;
