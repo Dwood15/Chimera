@@ -105,6 +105,7 @@ static void do_things_to_unhi_tag(HaloTagID tag_id, char *objects, std::vector<S
             change_xy(tdata.motion_sensor_center, mods, x, y);
             for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
                 change_xy(tdata.auxiliary_hud_meters[i].background.position, mods, x, y);
+                change_xy(tdata.auxiliary_hud_meters[i].meter.prelude.position, mods, x, y);
             }
         }
         if(tdata.auxiliary_overlays.anchor != ANCHOR_CENTER) {
