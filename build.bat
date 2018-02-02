@@ -82,6 +82,8 @@ g++ -c client/hooks/map_load.cpp %ARGS% -o bin/client__hooks__map_load.o
 g++ -c client/hooks/rcon_message.cpp %ARGS% -o bin/client__hooks__rcon_message.o
 g++ -c client/hooks/tick.cpp %ARGS% -o bin/client__hooks__tick.o
 
+g++ -c client/hud_mod/offset_hud_elements.cpp %ARGS% -o bin/client__hud_mod__offset_hud_elements.o
+
 g++ -c client/interpolation/camera.cpp %ARGSFAST% -o bin/client__interpolation__camera.o
 g++ -c client/interpolation/fp.cpp %ARGSFAST% -o bin/client__interpolation__fp.o
 g++ -c client/interpolation/light.cpp %ARGSFAST% -o bin/client__interpolation__light.o

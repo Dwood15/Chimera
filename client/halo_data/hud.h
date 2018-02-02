@@ -187,7 +187,7 @@ enum WeaponHUDInterfaceStateAttachedTo : uint16_t {
     STATE_ATTACHED_TO_SECONDARY_WEAPON_LOADED_AMMO,
     STATE_ATTACHED_TO_DISTANCE_TO_TARGET,
     STATE_ATTACHED_TO_ELEVATION_TO_TARGET
-} state_attached_to;
+};
 
 struct WeaponHUDInterfaceElementPrelude {
     WeaponHUDInterfaceStateAttachedTo state_attached_to;
