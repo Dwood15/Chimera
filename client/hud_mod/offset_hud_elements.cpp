@@ -155,6 +155,7 @@ void offset_tick(char *objects, std::vector<SafeZoneMod> &mods, short x, short y
     auto *object_data = object.object_data();
     if(object_data) {
         auto &odata = *reinterpret_cast<BaseHaloObject *>(object_data);
+        if(odata.object_type > 1) return;
         do_things_to_unit_tag(odata.tag_id, objects, mods, x, y);
 
         HaloObject vehicle_object(odata.parent_object_id);

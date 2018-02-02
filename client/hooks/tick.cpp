@@ -31,9 +31,12 @@ void remove_pretick_event(event_no_args event_function) noexcept {
 }
 
 static void on_pretick() noexcept {
-    if(tick_count() == 0) {
+    static size_t load_count = SIZE_MAX - 1;
+    auto ticks = tick_count();
+    if(ticks - 1 != load_count) {
         on_map_load();
     }
+    load_count = ticks;
     call_in_order(preevents);
 }
 
