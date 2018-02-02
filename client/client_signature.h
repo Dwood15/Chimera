@@ -21,6 +21,7 @@ bool find_loading_screen_signatures() noexcept;
 bool find_multitexture_overlay_signature() noexcept;
 bool find_set_resolution_signatures() noexcept;
 bool find_widescreen_fix_signatures() noexcept;
+bool find_gametype_indicator_sig() noexcept;
 
 #define I32(x) reinterpret_cast<int32_t>(x)
 #define I32PTR(x) reinterpret_cast<int32_t *>(x)

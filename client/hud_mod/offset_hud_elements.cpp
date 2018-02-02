@@ -74,13 +74,6 @@ void offset_map_load(char *objects, std::vector<SafeZoneMod> &mods, short x, sho
             }
         }
         else {
-            if(text && tag.tag_class == 0x6269746D) {
-                const char *satanic = "ui\\shell\\bitmaps\\team_background";
-                const auto satanic_size = strlen(satanic);
-                if(memcmp(tag.path,satanic,satanic_size) == 0) {
-                    change_xy(*reinterpret_cast<AnchorOffset *>(const_cast<char *>(tag.path)), mods, x, y);
-                }
-            }
             objects[i] = false;
         }
     }

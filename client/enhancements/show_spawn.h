@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../client_signature.h"
 #include "../command/command.h"
 
 /// Function for command chimera_show_spawns

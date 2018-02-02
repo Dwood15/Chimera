@@ -430,3 +430,12 @@ bool find_widescreen_fix_signatures() noexcept {
 
     set_result
 }
+
+bool find_gametype_indicator_sig() noexcept {
+    check_result
+
+    const short team_icon_background_name_sig[] = { 0x68, -1, -1, -1, -1, 0xBF, 0x6D, 0x74, 0x69, 0x62, 0x89, 0x74, 0x24, 0x14, 0xE8, -1, -1, -1, -1, 0x6A, 0x00, 0x33, 0xFF };
+    add_signature_s2(team_icon_background_name_sig);
+
+    set_result
+}

@@ -1,6 +1,7 @@
 #include "show_spawn.h"
 
 #include <math.h>
+#include <string.h>
 
 #include "../halo_data/tag_data.h"
 #include "../halo_data/server.h"

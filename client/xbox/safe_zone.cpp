@@ -8,8 +8,25 @@
 static char *objects;
 static std::vector<SafeZoneMod> mods;
 
+static void mod_team_background() {
+    for(size_t i=0;i<*reinterpret_cast<uint32_t *>(0x4044000C);i++) {
+        auto &tag = HaloTag::from_id(i);
+        if(tag.tag_class == 0x6269746D) {
+            const char *satanic = "ui\\shell\\bitmaps\\team_background";
+            const auto satanic_size = strlen(satanic);
+            if(memcmp(tag.path,satanic,satanic_size) == 0) {
+                tag.path++;
+            }
+            else if(memcmp(tag.path-1,satanic,satanic_size) == 0) {
+                tag.path--;
+            }
+        }
+    }
+}
+
 static void on_map_load() {
     offset_map_load(objects, mods, 33, 25, true);
+    mod_team_background();
 }
 
 static void apply_safe_zones() {
@@ -32,6 +49,7 @@ ChimeraCommandError safe_zones_command(size_t argc, const char **argv) noexcept 
                 offset_undo(mods);
                 remove_tick_event(apply_safe_zones);
                 remove_map_load_event(on_map_load);
+                mod_team_background();
             }
             active = new_value;
         }

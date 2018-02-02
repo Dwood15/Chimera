@@ -23,7 +23,6 @@
 #include "enhancements/auto_center.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
-#include "xbox/safe_zone.h"
 #include "enhancements/show_spawn.h"
 #include "enhancements/skip_loading.h"
 #include "enhancements/throttle_fps.h"
@@ -42,6 +41,10 @@
 #include "lua/lua.h"
 
 #include "messaging/messaging.h"
+
+#include "xbox/safe_zone.h"
+
+#include "visuals/gametype_indicator.h"
 
 extern std::vector<ChimeraSignature> *signatures;
 extern std::vector<std::string> *missing_signatures;
@@ -129,6 +132,13 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_af [true/false]"
     , 0, 1, find_anisotropic_filtering_signature(), true);
+
+    (*commands).emplace_back("chimera_block_gametype_indicator", block_gametype_indicator_command, "visuals",
+        "Get or set whether or not to turn off the gametype indicator.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_block_gametype_indicator [true/false]"
+    , 0, 1, find_gametype_indicator_sig(), true);
 
     (*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
         "Get or set whether or not to turn vSync off startup.\n\n"
