@@ -9,7 +9,7 @@ Resolution &get_resolution() noexcept {
     return *resolution;
 }
 
-static void apply_fix() {
+void apply_scope_fix() {
     static float *width = reinterpret_cast<float *>(get_signature("widescreen_scope_sig").address() + 4);
     static float *height = reinterpret_cast<float *>(get_signature("widescreen_scope_sig").address() + 4 + 8);
     auto &resolution = get_resolution();
@@ -24,25 +24,33 @@ static void apply_fix() {
     }
 }
 
+void undo_scope_fix() {
+    get_signature("widescreen_scope_sig").undo();
+}
+
+bool widescreen_scope_mask_active = false;
+
 ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv) noexcept {
-    static bool active = false;
+    extern bool widescreen_fix_active;
     if(argc == 1) {
-        auto &widescreen_scope_sig = get_signature("widescreen_scope_sig");
         bool new_value = bool_value(argv[0]);
-        if(new_value != active) {
+        if(new_value != widescreen_scope_mask_active) {
             if(new_value) {
+                if(widescreen_fix_active) {
+                    execute_chimera_command("chimera_widescreen_fix 0", true);
+                }
                 if(!hac2_present())
                     console_out_warning("chimera_widescreen_scope_mask: HAC2 is not installed, so this function does nothing.");
                 else
-                    add_tick_event(apply_fix);
+                    add_tick_event(apply_scope_fix);
             }
             else {
-                remove_tick_event(apply_fix);
-                widescreen_scope_sig.undo();
+                remove_tick_event(apply_scope_fix);
+                undo_scope_fix();
             }
-            active = new_value;
+            widescreen_scope_mask_active = new_value;
         }
     }
-    console_out(std::string("chimera_widescreen_scope_mask: ") + (active ? "true" : "false"));
+    console_out(std::string("chimera_widescreen_scope_mask: ") + (widescreen_scope_mask_active ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

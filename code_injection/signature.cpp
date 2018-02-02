@@ -13,7 +13,7 @@ void ChimeraSignature::undo() {
     if(this->i_found_address == NULL) return;
     DWORD a;
     DWORD b;
-    size_t length = this->i_original_code.size();
+    size_t length = this->size();
     if(VirtualProtect(this->i_found_address, length, PAGE_READWRITE, &a) == false) return;
     for(int i=0;i<length;i++) {
         this->i_found_address[i] = this->i_original_code[i];
@@ -23,6 +23,10 @@ void ChimeraSignature::undo() {
 
 unsigned char *ChimeraSignature::signature() {
     return &this->i_original_code[0];
+}
+
+size_t ChimeraSignature::size() {
+    return this->i_original_code.size();
 }
 
 ChimeraSignature::ChimeraSignature(const char *name, const short *signature, size_t signature_length) :
@@ -51,4 +55,12 @@ bool write_code(unsigned char *where, const short *what, size_t length) {
     }
     VirtualProtect(where, length, old_protect, &old_protect_b);
     return true;
+}
+
+bool write_code(unsigned char *where, const unsigned char *what, size_t length) {
+    auto *code = new short[length];
+    for(size_t i=0;i<length;i++) code[i] = what[i];
+    auto r = write_code(where, code, length);
+    delete[] code;
+    return r;
 }

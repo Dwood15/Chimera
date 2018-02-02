@@ -51,6 +51,7 @@ g++ -c client/command/console.cpp %ARGS% -o bin/client__command__console.o
 
 g++ -c client/fix/descope_fix.cpp %ARGS% -o bin/client__fix__descope_fix.o
 g++ -c client/fix/magnetism_fix.cpp %ARGS% -o bin/client__fix__magnetism_fix.o
+g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
 g++ -c client/debug/budget.cpp %ARGS% -o bin/client__debug__budget.o
 g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o

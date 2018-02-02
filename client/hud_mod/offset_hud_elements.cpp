@@ -17,7 +17,7 @@ static void change_xy(HUDElementPosition &addr, std::vector<SafeZoneMod> &mods, 
 
 #define not_center(addr) *reinterpret_cast<short *>(addr) != 4
 
-static void do_things_to_wphi_tag(HaloTagID tag_id, char *objects, std::vector<SafeZoneMod> &mods, short x, short y) {
+static void do_things_to_wphi_tag(HaloTagID tag_id, char *objects, std::vector<SafeZoneMod> &mods, short x, short y) noexcept {
     if(tag_id.is_valid() && !objects[tag_id.index]) {
         objects[tag_id.index] = true;
         auto &tdata = *reinterpret_cast<WeaponHUDInterface *>(HaloTag::from_id(tag_id).data);
@@ -89,53 +89,86 @@ void offset_map_load(char *objects, std::vector<SafeZoneMod> &mods, short x, sho
     }
 }
 
+static void do_things_to_unhi_tag(HaloTagID tag_id, char *objects, std::vector<SafeZoneMod> &mods, short x, short y) noexcept {
+    if(tag_id.is_valid() && !objects[tag_id.index]) {
+        objects[tag_id.index] = true;
+        auto &unhi_tag = HaloTag::from_id(tag_id);
+        auto &tdata = *reinterpret_cast<UnitHUDInterface *>(unhi_tag.data);
+        if(tdata.anchor != ANCHOR_CENTER) {
+            change_xy(tdata.unit_hud_background.position, mods, x, y);
+            change_xy(tdata.shield_panel_background.position, mods, x, y);
+            change_xy(tdata.shield_panel_meter.prelude.position, mods, x, y);
+            change_xy(tdata.health_panel_background.position, mods, x, y);
+            change_xy(tdata.health_panel_meter.prelude.position, mods, x, y);
+            change_xy(tdata.motion_sensor_background.position, mods, x, y);
+            change_xy(tdata.motion_sensor_foreground.position, mods, x, y);
+            change_xy(tdata.motion_sensor_center, mods, x, y);
+            for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
+                change_xy(tdata.auxiliary_hud_meters[i].background.position, mods, x, y);
+            }
+        }
+        if(tdata.auxiliary_overlays.anchor != ANCHOR_CENTER) {
+            for(uint32_t i=0;i<tdata.auxiliary_overlays.overlays_count;i++) {
+                change_xy(tdata.auxiliary_overlays.overlays[i].position, mods, x, y);
+            }
+        }
+    }
+}
+
+static void do_things_to_weap_tag(HaloTagID tag_id, char *objects, std::vector<SafeZoneMod> &mods, short x, short y) noexcept {
+    if(!objects[tag_id.index]) {
+        objects[tag_id.index] = true;
+        do_things_to_wphi_tag(*reinterpret_cast<HaloTagID *>(HaloTag::from_id(tag_id).data + 0x480 + 0xC), objects, mods, x, y);
+    }
+}
+
+static void do_things_to_unit_tag(HaloTagID tag_id, char *objects, std::vector<SafeZoneMod> &mods, short x, short y) noexcept {
+    if(tag_id.is_valid() && !objects[tag_id.index]) {
+        objects[tag_id.index] = true;
+        auto &tag = HaloTag::from_id(tag_id);
+        auto *&tag_data = tag.data;
+        auto *&data_ptr = *reinterpret_cast<char **>(tag_data + 0x2A8 + 4);
+        for(uint32_t h=0;h<*reinterpret_cast<uint32_t *>(tag_data + 0x2A8);h++) {
+            auto &tag_id = *reinterpret_cast<HaloTagID *>(data_ptr + h * 48 + 0xC);
+            do_things_to_unhi_tag(tag_id, objects, mods, x, y);
+        }
+
+        for(uint32_t w=0;w<*reinterpret_cast<uint32_t *>(tag_data + 0x2D8);w++) {
+            auto *weapon = *reinterpret_cast<char **>(tag_data + 0x2D8 + 4) + w * 36;
+            do_things_to_weap_tag(*reinterpret_cast<HaloTagID *>(weapon + 0xC),objects,mods,x,y);
+        }
+
+        for(uint32_t s=0;s<*reinterpret_cast<uint32_t *>(tag_data + 0x2E4);s++) {
+            auto *seat = *reinterpret_cast<char **>(tag_data + 0x2E4 + 4) + s * 284;
+            auto *&hud_ptr = *reinterpret_cast<char **>(seat + 0xDC + 4);
+            for(uint32_t h=0;h<*reinterpret_cast<uint32_t *>(seat + 0xDC);h++) {
+                do_things_to_unhi_tag(*reinterpret_cast<HaloTagID *>(hud_ptr + h * 48 + 0xC), objects, mods, x, y);
+            }
+        }
+    }
+}
+
 void offset_tick(char *objects, std::vector<SafeZoneMod> &mods, short x, short y) noexcept {
     HaloPlayer player;
     HaloObject object(player.object_id());
     auto *object_data = object.object_data();
     if(object_data) {
-        auto &tag_id = *reinterpret_cast<HaloTagID *>(object_data);
-        if(!objects[tag_id.index]) {
-            objects[tag_id.index] = true;
-            auto &tag = HaloTag::from_id(tag_id);
-            auto *&tag_data = tag.data;
-            auto *&data_ptr = *reinterpret_cast<char **>(tag_data + 0x2A8 + 4);
-            for(auto h=0;h<*reinterpret_cast<uint32_t *>(tag_data + 0x2A8);h++) {
-                auto &tag_id = *reinterpret_cast<HaloTagID *>(data_ptr + h * 48 + 0xC);
-                if(tag_id.is_valid() && !objects[tag_id.index]) {
-                    objects[tag_id.index] = true;
-                    auto &unhi_tag = HaloTag::from_id(tag_id);
-                    auto &tdata = *reinterpret_cast<UnitHUDInterface *>(unhi_tag.data);
-                    if(tdata.anchor != ANCHOR_CENTER) {
-                        change_xy(tdata.unit_hud_background.position, mods, x, y);
-                        change_xy(tdata.shield_panel_background.position, mods, x, y);
-                        change_xy(tdata.shield_panel_meter.prelude.position, mods, x, y);
-                        change_xy(tdata.health_panel_background.position, mods, x, y);
-                        change_xy(tdata.health_panel_meter.prelude.position, mods, x, y);
-                        change_xy(tdata.motion_sensor_background.position, mods, x, y);
-                        change_xy(tdata.motion_sensor_foreground.position, mods, x, y);
-                        change_xy(tdata.motion_sensor_center, mods, x, y);
-                        for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
-                            change_xy(tdata.auxiliary_hud_meters[i].background.position, mods, x, y);
-                        }
-                    }
-                    if(tdata.auxiliary_overlays.anchor != ANCHOR_CENTER) {
-                        for(uint32_t i=0;i<tdata.auxiliary_overlays.overlays_count;i++) {
-                            change_xy(tdata.auxiliary_overlays.overlays[i].position, mods, x, y);
-                        }
-                    }
-                }
+        auto &odata = *reinterpret_cast<BaseHaloObject *>(object_data);
+        do_things_to_unit_tag(odata.tag_id, objects, mods, x, y);
+
+        HaloObject vehicle_object(odata.parent_object_id);
+        auto *vobject_data = vehicle_object.object_data();
+        if(vobject_data) {
+            auto &vdata = *reinterpret_cast<BaseHaloObject *>(vobject_data);
+            if(vdata.object_type <= 1) {
+                do_things_to_unit_tag(vdata.tag_id, objects, mods, x, y);
             }
         }
-        auto &weapon = *reinterpret_cast<uint32_t *>(object_data + 0x118);
-        auto object = HaloObject(weapon);
-        auto *object_data = object.object_data();
-        if(object_data && *reinterpret_cast<uint16_t *>(object_data + 0xB4) == 2) {
-            auto &weapon_tag_id = *reinterpret_cast<HaloTagID *>(object_data);
-            if(!objects[weapon_tag_id.index]) {
-                objects[weapon_tag_id.index] = true;
-                do_things_to_wphi_tag(*reinterpret_cast<HaloTagID *>(HaloTag::from_id(weapon_tag_id).data + 0x480 + 0xC), objects, mods, x, y);
-            }
+
+        auto weapon_object = HaloObject(odata.weapon_object_id);
+        auto *weapon_data = weapon_object.object_data();
+        if(weapon_data && *reinterpret_cast<uint16_t *>(weapon_data + 0xB4) == 2) {
+            do_things_to_weap_tag(*reinterpret_cast<HaloTagID *>(weapon_data),objects,mods,x,y);
         }
     }
 }

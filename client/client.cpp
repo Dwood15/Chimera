@@ -11,6 +11,7 @@
 
 #include "fix/descope_fix.h"
 #include "fix/magnetism_fix.h"
+#include "fix/widescreen_fix.h"
 
 #include "debug/budget.h"
 #include "debug/wireframe.h"
@@ -250,7 +251,16 @@ void initialize_client() noexcept {
         "Enhance HAC2's widescreen fix by also fixing the scope mask.\n\n"
         "Syntax:\n"
         "  - chimera_widescreen_scope_mask [true/false]"
-    , 0, 1, find_widescreen_signatures(), true);
+    , 0, 1, find_widescreen_scope_signature(), true);
+
+    // Fixes
+
+    (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fix",
+        "Get or set whether or not to (mostly) fix the HUD.\n\n"
+        "Note that this will break the HUD if you are using any other widescreen fix.\n\n"
+        "Syntax:\n"
+        "  - chimera_widescreen_fix <true/false>"
+    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
     // Debug
 

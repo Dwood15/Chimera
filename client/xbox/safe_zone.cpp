@@ -1,9 +1,6 @@
 #include "safe_zone.h"
 #include <string.h>
 #include "../hud_mod/offset_hud_elements.h"
-#include "../halo_data/hud.h"
-#include "../halo_data/table.h"
-#include "../halo_data/tag_data.h"
 #include "../messaging/messaging.h"
 #include "../hooks/map_load.h"
 #include "../hooks/tick.h"

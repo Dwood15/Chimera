@@ -13,13 +13,14 @@ bool find_interpolation_signatures() noexcept;
 bool find_uncap_cinematic_signatures() noexcept;
 bool find_magnetism_signatures() noexcept;
 bool find_auto_center_signature() noexcept;
-bool find_widescreen_signatures() noexcept;
+bool find_widescreen_scope_signature() noexcept;
 bool find_zoom_blur_signatures() noexcept;
 bool find_anisotropic_filtering_signature() noexcept;
 bool find_debug_signatures() noexcept;
 bool find_loading_screen_signatures() noexcept;
 bool find_multitexture_overlay_signature() noexcept;
 bool find_set_resolution_signatures() noexcept;
+bool find_widescreen_fix_signatures() noexcept;
 
 #define I32(x) reinterpret_cast<int32_t>(x)
 #define I32PTR(x) reinterpret_cast<int32_t *>(x)
