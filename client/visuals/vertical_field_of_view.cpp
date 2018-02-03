@@ -16,7 +16,6 @@ static void on_precamera() {
     auto &resolution = get_resolution();
 
     float calculated_fov = 2.0 * atan(tan(vfov * M_PI / 180.0 / 2.0) * resolution.width / resolution.height) * (data.fov / default_fov);
-    if(calculated_fov > (M_PI - 0.001)) calculated_fov = M_PI - 0.001;
     data.fov = calculated_fov;
     previous_fov = data.fov;
 }
