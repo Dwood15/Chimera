@@ -44,6 +44,7 @@
 #include "messaging/messaging.h"
 
 #include "xbox/safe_zone.h"
+#include "xbox/simple_score_screen.h"
 
 #include "visuals/gametype_indicator.h"
 
@@ -259,6 +260,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_safe_zones [true/false]"
     , 0, 1, true, true);
+
+    (*commands).emplace_back("chimera_simple_score_screen", simple_score_screen_command, "xbox",
+        "Get or set whether or not to use a simplified in-game score screen.\n\n"
+        "Syntax:\n"
+        "  - chimera_simple_score_screen [true/false]"
+    , 0, 1, find_simple_score_screen_sigs(), true);
 
     // HAC2
 
