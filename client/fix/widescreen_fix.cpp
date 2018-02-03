@@ -33,7 +33,8 @@ static void set_mod(bool force) {
     auto &resolution = get_resolution();
     float aspect_ratio = static_cast<float>(resolution.width) / resolution.height;
     float new_width_scale = aspect_ratio / (4.0 / 3.0);
-    if(width_scale != new_width_scale || force) {
+    auto scale_changed = width_scale != new_width_scale;
+    if(scale_changed || force) {
         static float adder = 1.0;
         static float adder_negative = -1.0;
         width_scale = new_width_scale;
@@ -78,7 +79,7 @@ static void set_mod(bool force) {
         offset_sig(get_signature("team_icon_oddball_sig"));
         offset_sig(get_signature("team_icon_background_sig"));
 
-        offset_undo(mods);
+        if(scale_changed) offset_undo(mods);
         offset_map_load(objects, mods, 320.0 - 320.0 * width_scale, 0, false);
         apply_scope_fix();
     }
