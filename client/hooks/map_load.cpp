@@ -33,6 +33,6 @@ void on_map_load() noexcept {
 
 static void initialize_map_load() noexcept {
     map_load_initialized = true;
-    static BasicCodecave on_map_load_bytecode;
-    write_jmp_call(get_signature("on_map_load_sig").address(), nullptr, reinterpret_cast<void *>(on_map_load), on_map_load_bytecode);
+    //static BasicCodecave on_map_load_bytecode; // CAUSES CRASHING; FIX LATER PLZ
+    //write_jmp_call(get_signature("on_map_load_sig").address(), nullptr, reinterpret_cast<void *>(on_map_load), on_map_load_bytecode);
 }

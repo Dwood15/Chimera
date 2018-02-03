@@ -3,11 +3,12 @@
 #include "../client_signature.h"
 #include "../command/command.h"
 #include "../messaging/messaging.h"
+#include "../halo_data/tag_data.h"
 #include "tick.h"
 
 static struct timespec current_tick_time;
 
-void on_map_load() noexcept;
+extern void on_map_load() noexcept;
 static void initialize_tick() noexcept;
 static bool tick_initialized = false;
 
@@ -31,6 +32,11 @@ void remove_pretick_event(event_no_args event_function) noexcept {
 }
 
 static void on_pretick() noexcept {
+    auto &no_cares = HaloTag::from_id(0).dont_care[7];
+    if(!no_cares) {
+        on_map_load();
+        no_cares = 1;
+    }
     call_in_order(preevents);
 }
 
