@@ -6,12 +6,20 @@
 static void change_xy(AnchorOffset &addr, std::vector<SafeZoneMod> &mods, short x, short y) {
     SafeZoneMod mod;
     mod.address = &addr;
-    if(addr.x > 460) {
-        x *= -1;
-    }
-    else if(addr.x > 140) {
+
+    if(addr.x > 140 && addr.x < 460 && addr.y > 80 && addr.y < 400) {
         x = 0;
+        y = 0;
     }
+    else {
+        if(addr.x > 320) {
+            x *= -1;
+        }
+        if(addr.y > 240) {
+            y *= -1;
+        }
+    }
+
     mod.delta = {x, y};
     addr.x += x;
     addr.y += y;
