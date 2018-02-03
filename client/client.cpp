@@ -178,8 +178,12 @@ void initialize_client() noexcept {
         "Get or set whether the next tick should be predicted when interpolating. This will prevent\n"
         "objects from appearing as if they are one tick behind, but sudden object movement may\n"
         "cause jitteriness.\n\n"
+        "Settings:\n"
+        "  0: Off\n"
+        "  1: On\n"
+        "  2: On - Do not interpolate first person camera (may make riding elevators juddery)\n\n"
         "Syntax:\n"
-        "  - chimera_interpolate_predict [true/false]"
+        "  - chimera_interpolate_predict [setting]"
     , 0, 1, find_interpolation_signatures(), true);
 
     // Enhancements

@@ -41,7 +41,8 @@ void interpolate_all_cam_before() noexcept {
         }
     }
 
-    interpolate_vector(camera_coords_buffer_1.position, camera_coords_buffer_0.position, data.position, interpolation_tick_progress);
+    extern char chimera_interpolate_predict;
+    if(chimera_interpolate_predict < 2) interpolate_vector(camera_coords_buffer_1.position, camera_coords_buffer_0.position, data.position, interpolation_tick_progress);
 }
 
 void interpolate_all_cam_after() noexcept {

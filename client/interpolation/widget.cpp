@@ -4,7 +4,7 @@
 #include "../halo_data/table.h"
 #include "widget.h"
 
-extern interpolate_vector_fn interpolate_vector_x;
+extern interpolate_vector_fn interpolate_vector_objects;
 
 struct AntennaVertex {
     Vector3D position;
@@ -54,7 +54,7 @@ void do_antenna_interpolation() noexcept {
     for(uint32_t i=0;i<MAX_ANTENNA;i++) {
         if(distance_squared(antenna_buffer_1[i].position, antenna_buffer_0[i].position) > 1) continue;
         for(uint32_t j=0;j<21;j++) {
-            interpolate_vector_x(antenna_buffer_1[i].vertices[j].position, antenna_buffer_0[i].vertices[j].position, ant[i].vertices[j].position, interpolation_tick_progress);
+            interpolate_vector_objects(antenna_buffer_1[i].vertices[j].position, antenna_buffer_0[i].vertices[j].position, ant[i].vertices[j].position, interpolation_tick_progress);
         }
     }
 }
@@ -66,10 +66,10 @@ void do_flag_interpolation() noexcept {
         char *odata = o.object_data();
         if(odata && odata[0xB4] == 2) {
             if(distance_squared(flag_buffer_0[i].position, flag_buffer_1[i].position) > 4) continue;
-            interpolate_vector_x(flag_buffer_1[i].position, flag_buffer_0[i].position, flag[i].position, interpolation_tick_progress);
+            interpolate_vector_objects(flag_buffer_1[i].position, flag_buffer_0[i].position, flag[i].position, interpolation_tick_progress);
             rollback_flag = true;
             for(uint32_t j=0;j<sizeof(flag_buffer_1[i].parts) / sizeof(flag_buffer_1[i].parts[0]);j++) {
-                interpolate_vector_x(flag_buffer_1[i].parts[j].position, flag_buffer_0[i].parts[j].position, flag[i].parts[j].position, interpolation_tick_progress);
+                interpolate_vector_objects(flag_buffer_1[i].parts[j].position, flag_buffer_0[i].parts[j].position, flag[i].parts[j].position, interpolation_tick_progress);
             }
         }
     }

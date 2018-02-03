@@ -17,7 +17,7 @@
 
 static float *camera_tick_rate = nullptr;
 size_t chimera_interpolate_setting = 0;
-static bool chimera_interpolate_predict = false;
+char chimera_interpolate_predict = 0;
 
 static bool nuked = true;
 
@@ -73,7 +73,7 @@ const uint32_t model_node_offset[16] = {
 };
 
 float interpolation_tick_progress = 0.0;
-extern interpolate_vector_fn interpolate_vector_x;
+extern interpolate_vector_fn interpolate_vector_objects;
 
 static void do_interpolation(uint32_t i) noexcept {
     HaloObject o(i);
@@ -137,12 +137,12 @@ static void do_interpolation(uint32_t i) noexcept {
         if(objects_buffer_0[i].interpolation_type == INTERPOLATION_NONE) return;
 
         if(objects_buffer_1[i].interpolation_type != INTERPOLATION_NONE)
-            interpolate_vector_x(objects_buffer_1[i].position_center, objects_buffer_0[i].position_center, position_center, interpolation_tick_progress);
+            interpolate_vector_objects(objects_buffer_1[i].position_center, objects_buffer_0[i].position_center, position_center, interpolation_tick_progress);
 
         for(uint32_t x=0;x<node_count;x++) {
             objects_buffer_0[i].nodes[x] = nodes[x];
             if(objects_buffer_1[i].interpolation_type != INTERPOLATION_NONE) {
-                interpolate_vector_x(objects_buffer_1[i].nodes[x].position, objects_buffer_0[i].nodes[x].position, nodes[x].position, interpolation_tick_progress);
+                interpolate_vector_objects(objects_buffer_1[i].nodes[x].position, objects_buffer_0[i].nodes[x].position, nodes[x].position, interpolation_tick_progress);
                 nodes[x].scale = objects_buffer_1[i].nodes[x].scale + (objects_buffer_0[i].nodes[x].scale - objects_buffer_1[i].nodes[x].scale) * interpolation_tick_progress;
 
                 if(objects_buffer_0[i].interpolation_type == INTERPOLATION_POSITION_ROTATION) {
@@ -324,8 +324,23 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
 
 ChimeraCommandError interpolate_predict_command(size_t argc, const char **argv) noexcept {
     if(argc != 0) {
-        chimera_interpolate_predict = bool_value(argv[0]);
-        interpolate_vector_x = chimera_interpolate_predict ? interpolate_vector_predict : interpolate_vector;
+        auto new_value = atol(argv[0]);
+        if(new_value != chimera_interpolate_predict) {
+            switch(new_value) {
+                case 0:
+                    interpolate_vector_objects = interpolate_vector;
+                    break;
+                case 1:
+                case 2:
+                    interpolate_vector_objects = interpolate_vector_predict;
+                    break;
+                default: {
+                    console_out_error("chimera_interpolate_predict: Expected a value between 0 and 2.");
+                    return CHIMERA_COMMAND_ERROR_FAILURE;
+                }
+            }
+        }
+        chimera_interpolate_predict = new_value;
     }
     console_out(std::string("chimera_interpolate_predict: ") + (chimera_interpolate_predict ? "true" : "false"));
     return CHIMERA_COMMAND_ERROR_SUCCESS;

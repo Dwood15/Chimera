@@ -1,7 +1,7 @@
 #include <cmath>
 #include "data_types.h"
 
-interpolate_vector_fn interpolate_vector_x = interpolate_vector;
+interpolate_vector_fn interpolate_vector_objects = interpolate_vector;
 
 ColorRGB::ColorRGB() noexcept {}
 ColorRGB::ColorRGB(float r, float g, float b) noexcept :
