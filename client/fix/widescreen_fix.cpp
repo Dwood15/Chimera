@@ -27,7 +27,7 @@ static void on_map_load() {
 static void apply_offsets() {
     set_mod();
     **letterbox = -1;
-    offset_tick(objects, mods, 320.0 - 320.0 * width_scale, 0);
+    if(widescreen_fix_active == 1) offset_tick(objects, mods, 320.0 - 320.0 * width_scale, 0);
 }
 
 static void set_mod(bool force) {
@@ -94,6 +94,10 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
     if(argc == 1) {
         int new_value = bool_value(argv[0]);
         if(new_value == false) new_value = atol(argv[0]);
+        if(new_value < 0 || new_value > 2) {
+            console_out_error("chimera_widescreen_fix: Expected a value between 0 and 2");
+            return CHIMERA_COMMAND_ERROR_FAILURE;
+        }
 
         if(new_value != widescreen_fix_active) {
             delete[] objects;
@@ -128,6 +132,8 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 }
                 case 1: {
                     objects = new char[65535]();
+                }
+                case 2: {
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope_mask 0", true);
                     }
@@ -135,17 +141,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     add_map_load_event(on_map_load);
                     break;
                 }
-                case 2: {
-                    if(widescreen_scope_mask_active) {
-                        execute_chimera_command("chimera_widescreen_scope_mask 0", true);
-                    }
-                    add_map_load_event(on_map_load);
-                    break;
-                }
-                default: {
-                    console_out_error("chimera_widescreen_fix: Expected a value between 0 and 2");
-                    return CHIMERA_COMMAND_ERROR_FAILURE;
-                }
+                default: std::terminate();
             }
             widescreen_fix_active = new_value;
             if(widescreen_fix_active > 0) on_map_load();
