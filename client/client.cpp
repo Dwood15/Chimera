@@ -269,7 +269,7 @@ void initialize_client() noexcept {
 
     // Fixes
 
-    (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fix",
+    (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
         "Get or set whether or not to (mostly) fix the HUD.\n\n"
         "Note that this will break the HUD if you are using any other widescreen fix.\n\n"
         "Syntax:\n"
