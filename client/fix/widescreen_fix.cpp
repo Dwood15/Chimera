@@ -30,12 +30,12 @@ static void apply_offsets() {
 }
 
 static void set_mod(bool force) {
-    static float adder = 1.0;
-    static float adder_negative = -1.0;
     auto &resolution = get_resolution();
     float aspect_ratio = static_cast<float>(resolution.width) / resolution.height;
     float new_width_scale = aspect_ratio / (4.0 / 3.0);
     if(width_scale != new_width_scale || force) {
+        static float adder = 1.0;
+        static float adder_negative = -1.0;
         width_scale = new_width_scale;
         float p_scale = 1.0/(320.0 * new_width_scale);
         adder = 1.0 / new_width_scale;
@@ -53,14 +53,23 @@ static void set_mod(bool force) {
         write_code_any_value(hud_text_widescreen_sig + 2 + 4, p_scale);
         write_code_any_value(hud_text_widescreen_sig + 0x1E + 2 + 4, adder_negative);
 
+        auto *hud_nav_widescreen_sig_address = get_signature("hud_nav_widescreen_sig").address();
+        write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig_address + 2)), static_cast<float>(640.0 * width_scale));
+
+        static float nav_scale = 320.0;
+        nav_scale = -320.0 * (width_scale - 1);
+        static unsigned char instructions[] = {0xD8, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xDA, 0x04, 0x24, 0xD9, 0x19, 0xE9, 0xFF, 0xFF, 0xFF, 0xFF};
+
+        *reinterpret_cast<float **>(instructions + 2) = &nav_scale;
+        auto *ins = instructions + 11;
+        *reinterpret_cast<uint32_t *>(ins + 1) = hud_nav_widescreen_sig_address + 11 - (ins + 5);
+        write_code_any_value(hud_nav_widescreen_sig_address + 6, static_cast<unsigned char>(0xE9));
+        write_code_any_value(hud_nav_widescreen_sig_address + 7, instructions - (hud_nav_widescreen_sig_address + 11));
+
         auto offset_sig = [](ChimeraSignature &signature) {
             const auto &offset = *reinterpret_cast<const int16_t *>(signature.signature() + 5);
             write_code_any_value(signature.address() + 5, static_cast<int16_t>(offset - 320 + 320 * width_scale));
         };
-
-        auto *hud_nav_widescreen_sig_address = get_signature("hud_nav_widescreen_sig").address();
-        write_code_any_value(hud_nav_widescreen_sig_address + 1, static_cast<uint32_t>(320 * new_width_scale));
-        write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig_address + 0x5A)), static_cast<float>(640.0 * width_scale));
 
         offset_sig(get_signature("team_icon_ctf_sig"));
         offset_sig(get_signature("team_icon_slayer_sig"));
