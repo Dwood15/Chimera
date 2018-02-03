@@ -31,7 +31,7 @@ void undo_scope_fix() {
 bool widescreen_scope_mask_active = false;
 
 ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv) noexcept {
-    extern bool widescreen_fix_active;
+    extern int widescreen_fix_active;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
         if(new_value != widescreen_scope_mask_active) {

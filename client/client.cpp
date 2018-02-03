@@ -184,7 +184,7 @@ void initialize_client() noexcept {
         "  1: On\n"
         "  2: On - Do not interpolate first person camera (may make riding elevators juddery)\n\n"
         "Syntax:\n"
-        "  - chimera_interpolate_predict [setting]"
+        "  - chimera_interpolate_predict [0-2]"
     , 0, 1, find_interpolation_signatures(), true);
 
     // Enhancements
@@ -273,8 +273,12 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
         "Get or set whether or not to (mostly) fix the HUD.\n\n"
         "Note that this will break the HUD if you are using any other widescreen fix.\n\n"
+        "Settings:\n"
+        "  0: Off\n"
+        "  1: On\n"
+        "  2: On (center HUD)\n\n"
         "Syntax:\n"
-        "  - chimera_widescreen_fix <true/false>"
+        "  - chimera_widescreen_fix [0-2]"
     , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
     // Debug

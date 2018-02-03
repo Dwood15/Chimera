@@ -8,10 +8,11 @@
 #include "../hooks/tick.h"
 #include "../client_signature.h"
 
-static char *objects;
+static char *objects = nullptr;
 static std::vector<SafeZoneMod> mods;
 
 float width_scale = 0;
+int widescreen_fix_active = 0;
 
 static void set_mod(bool force = false);
 extern void apply_scope_fix();
@@ -67,67 +68,89 @@ static void set_mod(bool force) {
         write_code_any_value(hud_nav_widescreen_sig_address + 6, static_cast<unsigned char>(0xE9));
         write_code_any_value(hud_nav_widescreen_sig_address + 7, instructions - (hud_nav_widescreen_sig_address + 11));
 
-        auto offset_sig = [](ChimeraSignature &signature) {
-            const auto &offset = *reinterpret_cast<const int16_t *>(signature.signature() + 5);
-            write_code_any_value(signature.address() + 5, static_cast<int16_t>(offset - 320 + 320 * width_scale));
-        };
+        if(widescreen_fix_active == 1) {
+            auto offset_sig = [](ChimeraSignature &signature) {
+                const auto &offset = *reinterpret_cast<const int16_t *>(signature.signature() + 5);
+                write_code_any_value(signature.address() + 5, static_cast<int16_t>(offset - 320 + 320 * width_scale));
+            };
 
-        offset_sig(get_signature("team_icon_ctf_sig"));
-        offset_sig(get_signature("team_icon_slayer_sig"));
-        offset_sig(get_signature("team_icon_king_sig"));
-        offset_sig(get_signature("team_icon_race_sig"));
-        offset_sig(get_signature("team_icon_oddball_sig"));
-        offset_sig(get_signature("team_icon_background_sig"));
+            offset_sig(get_signature("team_icon_ctf_sig"));
+            offset_sig(get_signature("team_icon_slayer_sig"));
+            offset_sig(get_signature("team_icon_king_sig"));
+            offset_sig(get_signature("team_icon_race_sig"));
+            offset_sig(get_signature("team_icon_oddball_sig"));
+            offset_sig(get_signature("team_icon_background_sig"));
 
-        if(scale_changed) offset_undo(mods);
-        offset_map_load(objects, mods, 320.0 - 320.0 * width_scale, 0, false);
+            if(scale_changed) offset_undo(mods);
+            offset_map_load(objects, mods, 320.0 - 320.0 * width_scale, 0, false);
+        }
+
         apply_scope_fix();
     }
 }
 
-bool widescreen_fix_active = false;
-
 ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexcept {
     extern bool widescreen_scope_mask_active;
     if(argc == 1) {
-        bool new_value = bool_value(argv[0]);
+        int new_value = bool_value(argv[0]);
+        if(new_value == false) new_value = atol(argv[0]);
+
         if(new_value != widescreen_fix_active) {
-            if(new_value) {
-                objects = new char[65535]();
-                if(widescreen_scope_mask_active) {
-                    execute_chimera_command("chimera_widescreen_scope_mask 0", true);
+            delete[] objects;
+            objects = nullptr;
+
+            offset_undo(mods);
+            remove_tick_event(apply_offsets);
+            remove_map_load_event(on_map_load);
+
+            get_signature("team_icon_ctf_sig").undo();
+            get_signature("team_icon_slayer_sig").undo();
+            get_signature("team_icon_king_sig").undo();
+            get_signature("team_icon_race_sig").undo();
+            get_signature("team_icon_oddball_sig").undo();
+            get_signature("team_icon_background_sig").undo();
+
+            letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
+            switch(new_value) {
+                case 0: {
+                    get_signature("hud_element_widescreen_sig").undo();
+                    get_signature("hud_element_motion_sensor_blip_widescreen_sig").undo();
+                    get_signature("hud_text_widescreen_sig").undo();
+                    get_signature("hud_nav_widescreen_sig").undo();
+
+                    auto &hud_nav_widescreen_sig = get_signature("hud_nav_widescreen_sig");
+                    hud_nav_widescreen_sig.undo();
+                    write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig.address() + 2)), static_cast<float>(640.0));
+
+                    undo_scope_fix();
+                    width_scale = 0;
+                    break;
                 }
-                letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
-                add_tick_event(apply_offsets);
-                add_map_load_event(on_map_load);
-                on_map_load();
-            }
-            else {
-                delete[] objects;
-                offset_undo(mods);
-                remove_tick_event(apply_offsets);
-                remove_map_load_event(on_map_load);
-                get_signature("hud_element_widescreen_sig").undo();
-                get_signature("hud_element_motion_sensor_blip_widescreen_sig").undo();
-                get_signature("hud_text_widescreen_sig").undo();
-                get_signature("hud_nav_widescreen_sig").undo();
-
-                auto &hud_nav_widescreen_sig = get_signature("hud_nav_widescreen_sig");
-                hud_nav_widescreen_sig.undo();
-                write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig.address() + 2)), static_cast<float>(640.0));
-
-                get_signature("team_icon_ctf_sig").undo();
-                get_signature("team_icon_slayer_sig").undo();
-                get_signature("team_icon_king_sig").undo();
-                get_signature("team_icon_race_sig").undo();
-                get_signature("team_icon_oddball_sig").undo();
-                get_signature("team_icon_background_sig").undo();
-                undo_scope_fix();
-                width_scale = 0;
+                case 1: {
+                    objects = new char[65535]();
+                    if(widescreen_scope_mask_active) {
+                        execute_chimera_command("chimera_widescreen_scope_mask 0", true);
+                    }
+                    add_tick_event(apply_offsets);
+                    add_map_load_event(on_map_load);
+                    break;
+                }
+                case 2: {
+                    if(widescreen_scope_mask_active) {
+                        execute_chimera_command("chimera_widescreen_scope_mask 0", true);
+                    }
+                    add_map_load_event(on_map_load);
+                    break;
+                }
+                default: {
+                    console_out_error("chimera_widescreen_fix: Expected a value between 0 and 2");
+                    return CHIMERA_COMMAND_ERROR_FAILURE;
+                }
             }
             widescreen_fix_active = new_value;
+            if(widescreen_fix_active > 0) on_map_load();
         }
     }
-    console_out(std::string("chimera_widescreen_fix: ") + (widescreen_fix_active ? "true" : "false"));
+    console_out(std::string("chimera_widescreen_fix: ") + std::to_string(widescreen_fix_active));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
