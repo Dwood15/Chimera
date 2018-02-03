@@ -448,3 +448,12 @@ bool find_gametype_indicator_sig() noexcept {
 
     set_result
 }
+
+bool find_devmode_sig() noexcept {
+    check_result
+
+    const short devmode_sig[] = { 0x8A, 0x0D, -1, -1, -1, -1, 0x80, 0xE2, 0x07, 0x84, 0xC9, 0xB0, 0x01 };
+    add_signature_s2(devmode_sig);
+
+    set_result
+}

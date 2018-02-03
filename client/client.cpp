@@ -14,6 +14,7 @@
 #include "fix/widescreen_fix.h"
 
 #include "debug/budget.h"
+#include "debug/devmode.h"
 #include "debug/wireframe.h"
 
 #include "visuals/anisotropic_filtering.h"
@@ -287,6 +288,13 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_budget [0-2]"
     , 0, 1, find_debug_signatures(), false);
+
+    (*commands).emplace_back("chimera_devmode", devmode_command, "debug",
+        "Get or set whether or not to enable Halo's developer commands.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_devmode [true/false]"
+    , 0, 1, find_devmode_sig(), true);
 
     (*commands).emplace_back("chimera_set_tps", set_tps_command, "debug",
         "Get or set tick rate. This value cannot be set below 0.01.\n\n"
