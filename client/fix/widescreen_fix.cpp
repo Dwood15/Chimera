@@ -110,9 +110,11 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 get_signature("hud_element_motion_sensor_blip_widescreen_sig").undo();
                 get_signature("hud_text_widescreen_sig").undo();
                 get_signature("hud_nav_widescreen_sig").undo();
+
                 auto &hud_nav_widescreen_sig = get_signature("hud_nav_widescreen_sig");
                 hud_nav_widescreen_sig.undo();
-                write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig.address() + 0x5A)), static_cast<float>(640.0));
+                write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig.address() + 2)), static_cast<float>(640.0));
+
                 get_signature("team_icon_ctf_sig").undo();
                 get_signature("team_icon_slayer_sig").undo();
                 get_signature("team_icon_king_sig").undo();
