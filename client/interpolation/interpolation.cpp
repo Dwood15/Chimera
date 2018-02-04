@@ -157,9 +157,11 @@ static void do_interpolation(uint32_t i) noexcept {
     }
 }
 
+extern void buffer_cam() noexcept;
+
 static void interpolate_objects() noexcept {
     if(tick_count() == 0) return;
-    interpolation_tick_progress = tick_progress_inaccurate();
+    
     for(uint32_t t=0;t<2048;t++) {
         do_interpolation(t);
     }
@@ -342,6 +344,6 @@ ChimeraCommandError interpolate_predict_command(size_t argc, const char **argv) 
         }
         chimera_interpolate_predict = new_value;
     }
-    console_out(std::string("chimera_interpolate_predict: ") + (chimera_interpolate_predict ? "true" : "false"));
+    console_out(std::string("chimera_interpolate_predict: ") + std::to_string(chimera_interpolate_predict));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -101,12 +101,6 @@ double tick_progress() noexcept {
     else return 1.0;
 }
 
-double tick_progress_inaccurate() noexcept {
-    auto current_time = tick_time() * effective_tick_rate();
-    if(current_time < 1.666666667) return current_time;
-    else return 1.666666667;
-}
-
 ChimeraCommandError set_tps_command(size_t argc, const char **argv) noexcept {
     if(argc == 1) {
         auto new_rate = atof(argv[0]);

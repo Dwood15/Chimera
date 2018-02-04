@@ -15,15 +15,17 @@ CameraData &camera_data() noexcept {
 }
 
 void interpolate_all_cam_before() noexcept {
+    static bool skip_interpolation;
     extern float interpolation_tick_progress;
+    interpolation_tick_progress = tick_progress();
     static int32_t tick_before = 0;
     auto tick_now = tick_count();
-    static bool skip_interpolation = false;
 
     auto &data = camera_data();
 
     if(tick_now != tick_before) {
         tick_before = tick_now;
+        auto &data = camera_data();
         memcpy(&camera_coords_buffer_1,&camera_coords_buffer_0,sizeof(camera_coords_buffer_1));
         memcpy(&camera_coords_buffer_0,&data,sizeof(camera_coords_buffer_0));
         skip_interpolation = distance_squared(camera_coords_buffer_0.position, camera_coords_buffer_1.position) > 10;
@@ -32,7 +34,9 @@ void interpolate_all_cam_before() noexcept {
     auto ct = get_camera_type();
     float etr = effective_tick_rate();
 
-    bool cannot_interpolate_camera = tick_now < 2 || (etr < 20 && ct != CAMERA_FIRST_PERSON) || skip_interpolation;
+    extern char chimera_interpolate_predict;
+
+    bool cannot_interpolate_camera = tick_now < 2 || (etr < 20 && ct != CAMERA_FIRST_PERSON) || skip_interpolation || chimera_interpolate_predict == 2;
     if(cannot_interpolate_camera) return;
     cam_interped = true;
     if(ct != CAMERA_FIRST_PERSON) {
@@ -41,8 +45,7 @@ void interpolate_all_cam_before() noexcept {
         }
     }
 
-    extern char chimera_interpolate_predict;
-    if(chimera_interpolate_predict < 2) interpolate_vector(camera_coords_buffer_1.position, camera_coords_buffer_0.position, data.position, interpolation_tick_progress);
+    interpolate_vector(camera_coords_buffer_1.position, camera_coords_buffer_0.position, data.position, interpolation_tick_progress);
 }
 
 void interpolate_all_cam_after() noexcept {

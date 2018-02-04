@@ -16,7 +16,6 @@ float effective_tick_rate() noexcept;
 int32_t tick_count() noexcept;
 double tick_time() noexcept;
 double tick_progress() noexcept;
-double tick_progress_inaccurate() noexcept;
 
 /// Function for command chimera_set_tps
 ChimeraCommandError set_tps_command(size_t argc, const char **argv) noexcept;
