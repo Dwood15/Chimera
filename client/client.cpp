@@ -45,6 +45,7 @@
 
 #include "xbox/safe_zone.h"
 #include "xbox/simple_score_screen.h"
+#include "xbox/split_screen_hud.h"
 
 #include "visuals/gametype_indicator.h"
 
@@ -266,6 +267,15 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_simple_score_screen_sigs(), true);
+
+    (*commands).emplace_back("chimera_split_screen_hud", split_screen_hud_command, "xbox",
+        "Get or set whether or not to use Halo's split screen HUD.\n"
+        "\n"
+        "Note: This may cause potential crashing issues on HAC2. Also, the health and shield bar\n"
+        "is broken on stock Halo.\n\n"
+        "Syntax:\n"
+        "  - chimera_simple_score_screen [true/false]"
+    , 0, 1, find_split_screen_hud_sigs(), true);
 
     // HAC2
 

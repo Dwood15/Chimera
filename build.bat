@@ -107,6 +107,7 @@ g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__
 
 g++ -c client/xbox/safe_zone.cpp %ARGS% -o bin/client__xbox__safe_zone.o
 g++ -c client/xbox/simple_score_screen.cpp %ARGS% -o bin/client__xbox__simple_score_screen.o
+g++ -c client/xbox/split_screen_hud.cpp %ARGS% -o bin/client__xbox__split_screen_hud.o
 
 g++ -c code_injection/codefinder.cpp %ARGS% -o bin/code_injection__codefinder.o
 g++ -c code_injection/signature.cpp %ARGS% -o bin/code_injection__signature.o
