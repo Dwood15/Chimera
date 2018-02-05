@@ -23,15 +23,15 @@ static void on_precamera() {
 ChimeraCommandError vfov_command(size_t argc, const char **argv) noexcept {
     if(argc == 1) {
         double new_value = strtod(argv[0], nullptr);
-        if(new_value < 1 || new_value > 179) {
+        if(new_value == 0) {
+            remove_precamera_event(on_precamera);
+        }
+        else if(new_value < 1 || new_value > 179) {
             console_out_error("chimera_vfov: FOV must be between 1 and 179");
             return CHIMERA_COMMAND_ERROR_FAILURE;
         }
         if(vfov == 0 && new_value != 0) {
             add_precamera_event(on_precamera, EVENT_PRIORITY_AFTER);
-        }
-        else if(vfov != 0 && new_value == 0) {
-            remove_precamera_event(on_precamera);
         }
         vfov = new_value;
     }
