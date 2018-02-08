@@ -134,7 +134,6 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     }
                     add_tick_event(apply_offsets);
                     add_map_load_event(on_map_load);
-                    set_mod(true);
                     break;
                 }
                 default: std::terminate();
