@@ -17,7 +17,9 @@ static void after_frame() noexcept {
             prev_time = now_time;
             break;
         }
-        Sleep(0);
+        DWORD zzz = 1000.0 * (seconds_per_frame - r);
+        if(zzz > 0) zzz--;
+        Sleep(zzz);
     }
     while(true);
 }
