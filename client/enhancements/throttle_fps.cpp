@@ -1,17 +1,29 @@
 #include "throttle_fps.h"
+#include <sys/time.h>
 #include "../client_signature.h"
-#include "../hooks/tick.h"
+#include "../hooks/frame.h"
 #include "../messaging/messaging.h"
 
-static void fps_throttle() {
-    static auto *do_throttle_fps = *reinterpret_cast<char **>(get_signature("do_throttle_fps_sig").address() + 1);
-    *do_throttle_fps = 1;
+static struct timespec prev_time;
+static double throttle_fps = 0.0;
+
+static void after_frame() noexcept {
+    auto seconds_per_frame = 1.0 / throttle_fps;
+    do {
+        struct timespec now_time;
+        clock_gettime(CLOCK_MONOTONIC,&now_time);
+        auto r = static_cast<double>(now_time.tv_sec - prev_time.tv_sec) + static_cast<double>(now_time.tv_nsec - prev_time.tv_nsec) / 1000000000.0;
+        if(r >= seconds_per_frame) {
+            prev_time = now_time;
+            break;
+        }
+        Sleep(0);
+    }
+    while(true);
 }
 
 ChimeraCommandError throttle_fps_command(size_t argc, const char **argv) noexcept {
-    static double throttle_fps = 0.0;
     if(argc == 1) {
-        auto &fps_throttle_s = get_signature("fps_throttle_sig");
         auto new_value = atof(argv[0]);
         if(new_value != throttle_fps) {
             if(new_value <= 5.0) {
@@ -21,21 +33,14 @@ ChimeraCommandError throttle_fps_command(size_t argc, const char **argv) noexcep
                 }
                 new_value = 0.0;
             }
-            auto *frametime = *reinterpret_cast<double **>(fps_throttle_s.address() + 2);
-            DWORD prota;
-            DWORD protb;
-            VirtualProtect(reinterpret_cast<char *>(frametime),sizeof(*frametime),PAGE_READWRITE,&prota);
+
             if(new_value == 0.0) {
-                *frametime = 1.0/30.0;
-                **reinterpret_cast<char **>(get_signature("do_throttle_fps_sig").address() + 1) = 0;
-                remove_tick_event(fps_throttle);
+                remove_frame_event(after_frame);
             }
             else {
-                *frametime = 1.0/new_value;
-                if(throttle_fps == 0) add_tick_event(fps_throttle);
-                execute_chimera_command("chimera_uncap_cinematic 1", true);
+                add_frame_event(after_frame, EVENT_PRIORITY_FINAL);
+                clock_gettime(CLOCK_MONOTONIC,&prev_time);
             }
-            VirtualProtect(reinterpret_cast<char *>(frametime),sizeof(*frametime),prota,&protb);
             throttle_fps = new_value;
         }
     }
