@@ -72,7 +72,7 @@ static void set_mod(bool force) noexcept {
 
             if(scale_changed) {
                 destroy_offsetter(index);
-                index = create_offsetter(320.0 - 320.0 * width_scale, 0, false, EVENT_PRIORITY_AFTER);
+                index = create_offsetter(320.0 - 320.0 * width_scale, 0, false, EVENT_PRIORITY_BEFORE);
             }
         }
 
