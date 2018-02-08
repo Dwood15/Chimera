@@ -70,10 +70,8 @@ static void set_mod(bool force) noexcept {
             offset_sig(get_signature("team_icon_oddball_sig"));
             offset_sig(get_signature("team_icon_background_sig"));
 
-            if(scale_changed) {
-                destroy_offsetter(index);
-                index = create_offsetter(320.0 - 320.0 * width_scale, 0, false, EVENT_PRIORITY_BEFORE);
-            }
+            destroy_offsetter(index);
+            index = create_offsetter(320.0 - 320.0 * width_scale, 0, false);
         }
 
         apply_scope_fix();
@@ -136,6 +134,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     }
                     add_tick_event(apply_offsets);
                     add_map_load_event(on_map_load);
+                    set_mod(true);
                     break;
                 }
                 default: std::terminate();

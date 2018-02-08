@@ -14,18 +14,21 @@ struct OriginalHudValue {
 
 static std::vector<OriginalHudValue> original;
 
+struct OffsetHudModMod {
+    AnchorOffset *address;
+    AnchorOffset delta;
+};
+
 struct OffsetHudMod {
-    std::vector<AnchorOffset *> mods;
+    std::vector<OffsetHudModMod> mods;
     char objects[65535] = {};
     OffsetterIndex index;
     AnchorOffset delta;
-    EventPriority priority;
     bool text;
 
-    OffsetHudMod(short x, short y, EventPriority priority, bool text) {
+    OffsetHudMod(short x, short y, bool text) {
         static OffsetterIndex next_index = OFFSETTER_INDEX_NULL;
         this->delta = {x,y};
-        this->priority = priority;
         this->index = ++next_index;
         this->text = text;
     }
@@ -34,28 +37,35 @@ struct OffsetHudMod {
 static std::vector<OffsetHudMod> all_mods;
 
 static void change_xy(AnchorOffset &addr, OffsetHudMod &mod) {
-    bool found = false;
+    OriginalHudValue *v = nullptr;
+    AnchorOffset delta = mod.delta;
 
     for(size_t o=0;o<original.size();o++) {
         if(original[o].address == &addr) {
-            found = true;
-            original[o].total_delta.x += mod.delta.x;
-            original[o].total_delta.y += mod.delta.y;
+            v = &original[o];
             break;
         }
     }
 
-    if(!found) {
-        OriginalHudValue v;
-        v.address = &addr;
-        v.original_value = addr;
-        v.total_delta = mod.delta;
-        original.push_back(v);
+    if(!v) {
+        OriginalHudValue new_val;
+        new_val.address = &addr;
+        new_val.original_value = addr;
+        new_val.total_delta = {};
+        original.push_back(new_val);
+        v = &original[original.size() - 1];
     }
 
-    addr.x += mod.delta.x;
-    addr.y += mod.delta.y;
-    mod.mods.push_back(&addr);
+
+    v->total_delta.x += delta.x;
+    v->total_delta.y += delta.y;
+
+    OffsetHudModMod mod_mod;
+    mod_mod.delta = delta;
+    mod_mod.address = &addr;
+    addr.x += delta.x;
+    addr.y += delta.y;
+    mod.mods.push_back(mod_mod);
 }
 
 static void change_xy(HUDElementPosition &addr, OffsetHudMod &mod) {
@@ -208,18 +218,9 @@ static void map_load_mod(OffsetHudMod &mod) noexcept {
 static void on_map_load() noexcept {
     if(!should_rerun_mod_load()) return;
     original.clear();
-    auto call_if_priority = [](EventPriority priority) {
-        for(size_t i=0;i<all_mods.size();i++) {
-            auto &mod = all_mods[i];
-            if(mod.priority == priority) {
-                map_load_mod(mod);
-            }
-        }
-    };
-    call_if_priority(EVENT_PRIORITY_BEFORE);
-    call_if_priority(EVENT_PRIORITY_DEFAULT);
-    call_if_priority(EVENT_PRIORITY_AFTER);
-    call_if_priority(EVENT_PRIORITY_FINAL);
+    for(size_t i=0;i<all_mods.size();i++) {
+        map_load_mod(all_mods[i]);
+    }
 }
 
 static void on_tick() noexcept {
@@ -260,9 +261,9 @@ static void make_hooks() noexcept {
     add_tick_event(on_tick);
 }
 
-OffsetterIndex create_offsetter(short x, short y, bool text, EventPriority priority) noexcept {
+OffsetterIndex create_offsetter(short x, short y, bool text) noexcept {
     if(!hooks_made) make_hooks();
-    all_mods.emplace_back(OffsetHudMod(x,y,priority,text));
+    all_mods.emplace_back(OffsetHudMod(x,y,text));
     map_load_mod(all_mods.back());
     return all_mods.back().index;
 }
@@ -272,14 +273,16 @@ void destroy_offsetter(OffsetterIndex index) {
     for(size_t i=0;i<all_mods.size();i++) {
         if(all_mods[i].index == index) {
             auto &mod = all_mods[i];
-            for(size_t o=0;o<original.size();o++) {
-                original[o].total_delta.x -= mod.delta.x;
-                original[o].total_delta.y -= mod.delta.y;
-            }
             for(size_t m=0;m<mod.mods.size();m++) {
-                auto *mod_mod = mod.mods[m];
-                mod_mod->x -= mod.delta.x;
-                mod_mod->y -= mod.delta.y;
+                auto &mod_mod = mod.mods[m];
+                mod_mod.address->x -= mod_mod.delta.x;
+                mod_mod.address->y -= mod_mod.delta.y;
+                for(size_t o=0;o<original.size();o++) {
+                    if(mod_mod.address == original[o].address) {
+                        original[o].total_delta.x -= mod_mod.delta.x;
+                        original[o].total_delta.y -= mod_mod.delta.y;
+                    }
+                }
             }
             all_mods.erase(all_mods.begin() + i);
             return;

@@ -7,7 +7,7 @@
 typedef size_t OffsetterIndex;
 
 /// Create an offsetter and return its index.
-OffsetterIndex create_offsetter(short x, short y, bool text, EventPriority priority = EVENT_PRIORITY_DEFAULT) noexcept;
+OffsetterIndex create_offsetter(short x, short y, bool text) noexcept;
 
 /// Delete an offsetter. No operation is done if 0 is passed. An exception will occur if an invalid index is passed.
 void destroy_offsetter(OffsetterIndex index);
