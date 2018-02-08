@@ -9,9 +9,5 @@ typedef size_t OffsetterIndex;
 /// Create an offsetter and return its index.
 OffsetterIndex create_offsetter(short x, short y, bool text, EventPriority priority = EVENT_PRIORITY_DEFAULT) noexcept;
 
-/// Delete an offsetter.
+/// Delete an offsetter. No operation is done if 0 is passed. An exception will occur if an invalid index is passed.
 void destroy_offsetter(OffsetterIndex index);
-
-//void offset_map_load(char *objects, std::vector<SafeZoneMod> &mods, short x, short y, bool text) noexcept;
-//void offset_tick(char *objects, std::vector<SafeZoneMod> &mods, short x, short y) noexcept;
-//void offset_undo(std::vector<SafeZoneMod> &mods) noexcept;
