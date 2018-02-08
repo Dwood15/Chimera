@@ -5,6 +5,8 @@
 #include "../halo_data/tag_data.h"
 #include "camera.h"
 
+bool uncap_cutscenes = false;
+
 static CameraData camera_coords_buffer_0 = {};
 static CameraData camera_coords_buffer_1 = {};
 static bool cam_interped = false;
@@ -28,15 +30,17 @@ void interpolate_all_cam_before() noexcept {
         auto &data = camera_data();
         memcpy(&camera_coords_buffer_1,&camera_coords_buffer_0,sizeof(camera_coords_buffer_1));
         memcpy(&camera_coords_buffer_0,&data,sizeof(camera_coords_buffer_0));
-        skip_interpolation = distance_squared(camera_coords_buffer_0.position, camera_coords_buffer_1.position) > 10;
+        skip_interpolation = distance_squared(camera_coords_buffer_0.position, camera_coords_buffer_1.position) > (1.5*1.5);
     }
     cam_interped = false;
+
+    if(skip_interpolation) return;
     auto ct = get_camera_type();
     float etr = effective_tick_rate();
 
     extern char chimera_interpolate_predict;
 
-    bool cannot_interpolate_camera = tick_now < 2 || (etr < 20 && ct != CAMERA_FIRST_PERSON) || skip_interpolation || chimera_interpolate_predict == 2;
+    bool cannot_interpolate_camera = tick_now < 2 || (etr < 20 && ct != CAMERA_FIRST_PERSON) || chimera_interpolate_predict == 2 || (!uncap_cutscenes && ct == CAMERA_CINEMATIC);
     if(cannot_interpolate_camera) return;
     cam_interped = true;
     if(ct != CAMERA_FIRST_PERSON) {
