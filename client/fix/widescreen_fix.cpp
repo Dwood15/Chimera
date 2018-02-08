@@ -8,29 +8,18 @@
 #include "../hooks/tick.h"
 #include "../client_signature.h"
 
-static char *objects = nullptr;
-static std::vector<SafeZoneMod> mods;
-
-float width_scale = 0;
 int widescreen_fix_active = 0;
 
-static void set_mod(bool force = false);
+OffsetterIndex index = OFFSETTER_INDEX_NULL;
+
+static float width_scale = 0;
+
 extern void apply_scope_fix();
 extern void undo_scope_fix();
 
 float **letterbox;
 
-static void on_map_load() {
-    set_mod(true);
-}
-
-static void apply_offsets() {
-    set_mod();
-    **letterbox = -1;
-    if(widescreen_fix_active == 1) offset_tick(objects, mods, 320.0 - 320.0 * width_scale, 0);
-}
-
-static void set_mod(bool force) {
+static void set_mod(bool force) noexcept {
     auto &resolution = get_resolution();
     float aspect_ratio = static_cast<float>(resolution.width) / resolution.height;
     float new_width_scale = aspect_ratio / (4.0 / 3.0);
@@ -81,12 +70,23 @@ static void set_mod(bool force) {
             offset_sig(get_signature("team_icon_oddball_sig"));
             offset_sig(get_signature("team_icon_background_sig"));
 
-            if(scale_changed) offset_undo(mods);
-            offset_map_load(objects, mods, 320.0 - 320.0 * width_scale, 0, false);
+            if(scale_changed) {
+                destroy_offsetter(index);
+                index = create_offsetter(320.0 - 320.0 * width_scale, 0, false, EVENT_PRIORITY_AFTER);
+            }
         }
 
         apply_scope_fix();
     }
+}
+
+static void on_map_load() noexcept {
+    set_mod(true);
+}
+
+static void apply_offsets() noexcept {
+    set_mod(false);
+    **letterbox = -1;
 }
 
 ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexcept {
@@ -100,10 +100,9 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
         }
 
         if(new_value != widescreen_fix_active) {
-            delete[] objects;
-            objects = nullptr;
+            destroy_offsetter(index);
+            index = OFFSETTER_INDEX_NULL;
 
-            offset_undo(mods);
             remove_tick_event(apply_offsets);
             remove_map_load_event(on_map_load);
 
@@ -130,9 +129,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     width_scale = 0;
                     break;
                 }
-                case 1: {
-                    objects = new char[65535]();
-                }
+                case 1:
                 case 2: {
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope_mask 0", true);
