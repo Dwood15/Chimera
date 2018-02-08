@@ -56,6 +56,12 @@ static void change_xy(AnchorOffset &addr, OffsetHudMod &mod) {
         v = &original[original.size() - 1];
     }
 
+    if(v->original_value.x > 140 && v->original_value.x < 460 && v->original_value.y > 80 && v->original_value.y < 400) {
+        delta.x = 0;
+        delta.y = 0;
+    }
+    else if(v->original_value.x > 320) delta.x *= -1;
+    else if(v->original_value.y > 240) delta.y *= -1;
 
     v->total_delta.x += delta.x;
     v->total_delta.y += delta.y;
