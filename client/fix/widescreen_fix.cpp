@@ -93,7 +93,7 @@ static void set_mod(bool force) noexcept {
             offset_sig(get_signature("team_icon_background_sig"));
 
             destroy_offsetter(index);
-            index = create_offsetter(320.0 - 320.0 * width_scale, 0, false);
+            index = create_offsetter(320.0 - 320.0 * width_scale, 0, true);
         }
 
         apply_scope_fix();
@@ -133,6 +133,9 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             get_signature("team_icon_oddball_sig").undo();
             get_signature("team_icon_background_sig").undo();
             get_signature("cursor_sig").undo();
+            get_signature("hud_text_fix_1_sig").undo();
+            get_signature("hud_text_fix_2_sig").undo();
+            get_signature("hud_text_fix_3_sig").undo();
 
             letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
             switch(new_value) {
@@ -161,12 +164,17 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope 0", true);
                     }
+
                     auto &cursor_sig = get_signature("cursor_sig");
                     auto *cursor_sig_address = cursor_sig.address();
                     cursor_x = *reinterpret_cast<int **>(cursor_sig_address + 4);
                     unsigned char nope[256];
                     memset(nope, 0x90, sizeof(nope));
                     write_code_any_array(cursor_sig_address, nope, cursor_sig.size());
+
+                    write_code_any_value(get_signature("hud_text_fix_1_sig").address(), static_cast<unsigned char>(0xEB));
+                    write_code_any_value(get_signature("hud_text_fix_2_sig").address(), static_cast<unsigned char>(0xEB));
+                    write_code_any_value(get_signature("hud_text_fix_3_sig").address(), static_cast<unsigned char>(0xEB));
 
                     add_tick_event(apply_offsets);
                     add_map_load_event(on_map_load);
