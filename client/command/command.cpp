@@ -123,7 +123,7 @@ ChimeraCommandError execute_chimera_command(const char *command_input, bool sile
             if(args_cleaned[0] == command.name()) {
                 extern const char *current_command;
                 const char *older_command = current_command;
-                current_command = command.name();
+                if(strcmp(command.name(),"chimera") != 0) current_command = command.name();
                 extern bool silence_all_messages;
                 bool already_silent = silence_all_messages;
                 if(silently && !already_silent) {
