@@ -25,6 +25,8 @@ static float **letterbox;
 static int menu_extra_width = 0;
 static int *cursor_x;
 
+static bool on_to_on = false;
+
 static void check_cursor() noexcept {
     static bool firstrun = true;
     int min = menu_extra_width/2 * -1 - 1;
@@ -102,17 +104,17 @@ static void set_mod(bool force) noexcept {
                 HaloTag &tag = HaloTag::from_id(i);
                 if(tag.tag_class == 0x44654C61) {
                     auto *data = tag.data;
-                    int16_t &bounds_top = *reinterpret_cast<int16_t *>(data + 0x24);
+                    //int16_t &bounds_top = *reinterpret_cast<int16_t *>(data + 0x24);
                     int16_t &bounds_left = *reinterpret_cast<int16_t *>(data + 0x26);
-                    int16_t &bounds_bottom = *reinterpret_cast<int16_t *>(data + 0x28);
+                    //int16_t &bounds_bottom = *reinterpret_cast<int16_t *>(data + 0x28);
                     int16_t &bounds_right = *reinterpret_cast<int16_t *>(data + 0x2A);
 
-                    if(force) {
+                    if(force && !on_to_on) {
                         tags[tag.id.index].x = bounds_left;
                         tags[tag.id.index].y = bounds_right;
                     }
 
-                    if(tags[tag.id.index].x <= 0 && tags[tag.id.index].y >= 640 && bounds_top == 0 && bounds_bottom == 480) {
+                    if(tags[tag.id.index].x <= 0 && tags[tag.id.index].y >= 640) {
                         HaloTagID &background = *reinterpret_cast<HaloTagID *>(data + 0x38 + 0xC);
                         if(background.is_valid()) {
                             HaloTag &background_bitmap = HaloTag::from_id(background);
@@ -135,6 +137,8 @@ static void set_mod(bool force) noexcept {
                             }
                         }
                     }
+
+                    on_to_on = false;
                 }
             }
         }
@@ -242,6 +246,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 }
                 default: std::terminate();
             }
+            on_to_on = widescreen_fix_active > 0 && new_value > 0;
             widescreen_fix_active = new_value;
             if(widescreen_fix_active > 0) on_map_load();
         }
