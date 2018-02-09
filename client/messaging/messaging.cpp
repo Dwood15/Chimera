@@ -29,9 +29,9 @@ void console_out(const std::string &text, const ColorARGB &color) noexcept {
 void console_out_warning(const char *text) noexcept {
     ColorARGB color;
     color.alpha = 1.0;
-    color.red = 1.0;
-    color.green = 1.0;
-    color.blue = 0.2;
+    color.red = 0.94;
+    color.green = 0.75;
+    color.blue = 0.098;
     console_out(text, color);
 }
 
