@@ -11,6 +11,7 @@
 #include "../open_sauce.h"
 
 int widescreen_fix_active = 0;
+static AnchorOffset tags[65535] = {};
 
 OffsetterIndex index = OFFSETTER_INDEX_NULL;
 
@@ -96,6 +97,48 @@ static void set_mod(bool force) noexcept {
             index = create_offsetter(320.0 - 320.0 * width_scale, 0, true);
         }
 
+        if(new_width_scale >= 1.0) {
+            for(size_t i=0;i<*reinterpret_cast<uint32_t *>(0x4044000C);i++) {
+                HaloTag &tag = HaloTag::from_id(i);
+                if(tag.tag_class == 0x44654C61) {
+                    auto *data = tag.data;
+                    int16_t &bounds_top = *reinterpret_cast<int16_t *>(data + 0x24);
+                    int16_t &bounds_left = *reinterpret_cast<int16_t *>(data + 0x26);
+                    int16_t &bounds_bottom = *reinterpret_cast<int16_t *>(data + 0x28);
+                    int16_t &bounds_right = *reinterpret_cast<int16_t *>(data + 0x2A);
+
+                    if(force) {
+                        tags[tag.id.index].x = bounds_left;
+                        tags[tag.id.index].y = bounds_right;
+                    }
+
+                    if(tags[tag.id.index].x <= 0 && tags[tag.id.index].y >= 640 && bounds_top == 0 && bounds_bottom == 480) {
+                        HaloTagID &background = *reinterpret_cast<HaloTagID *>(data + 0x38 + 0xC);
+                        if(background.is_valid()) {
+                            HaloTag &background_bitmap = HaloTag::from_id(background);
+                            auto *&bb_data = background_bitmap.data;
+                            uint32_t bitmaps_count = *reinterpret_cast<uint32_t *>(bb_data + 0x60);
+                            auto *bitmaps = *reinterpret_cast<char **>(bb_data + 0x64);
+
+                            bool do_it = true;
+
+                            for(size_t b=0;b<bitmaps_count && do_it;b++) {
+                                auto *bitmap = bitmaps + b * 48;
+                                uint16_t &width = *reinterpret_cast<uint16_t *>(bitmap + 0x4);
+                                uint16_t &height = *reinterpret_cast<uint16_t *>(bitmap + 0x4);
+                                do_it = (width <= 32 && height <= 32);
+                            }
+
+                            if(do_it) {
+                                bounds_left = 320 - 320.0 * width_scale;
+                                bounds_right = 320 + 320.0 * width_scale;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         apply_scope_fix();
     }
 }
@@ -136,6 +179,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             get_signature("hud_text_fix_1_sig").undo();
             get_signature("hud_text_fix_2_sig").undo();
             get_signature("hud_text_fix_3_sig").undo();
+            get_signature("hud_menu_sig").undo();
 
             letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
             switch(new_value) {
@@ -148,6 +192,17 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     auto &hud_nav_widescreen_sig = get_signature("hud_nav_widescreen_sig");
                     hud_nav_widescreen_sig.undo();
                     write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig.address() + 2)), static_cast<float>(640.0));
+
+                    for(size_t i=0;i<*reinterpret_cast<uint32_t *>(0x4044000C);i++) {
+                        HaloTag &tag = HaloTag::from_id(i);
+                        if(tag.tag_class == 0x44654C61) {
+                            auto *data = tag.data;
+                            int16_t &bounds_left = *reinterpret_cast<int16_t *>(data + 0x26);
+                            int16_t &bounds_right = *reinterpret_cast<int16_t *>(data + 0x2A);
+                            bounds_left = tags[i].x;
+                            bounds_right = tags[i].y;
+                        }
+                    }
 
                     undo_scope_fix();
                     width_scale = 0;
@@ -175,6 +230,10 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     write_code_any_value(get_signature("hud_text_fix_1_sig").address(), static_cast<unsigned char>(0xEB));
                     write_code_any_value(get_signature("hud_text_fix_2_sig").address(), static_cast<unsigned char>(0xEB));
                     write_code_any_value(get_signature("hud_text_fix_3_sig").address(), static_cast<unsigned char>(0xEB));
+
+                    auto *hud_menu_sig_address = get_signature("hud_menu_sig").address();
+                    write_code_any_value(hud_menu_sig_address + 0x00, static_cast<unsigned char>(0xEB));
+                    write_code_any_value(hud_menu_sig_address + 0x1E, static_cast<unsigned char>(0xEB));
 
                     add_tick_event(apply_offsets);
                     add_map_load_event(on_map_load);
