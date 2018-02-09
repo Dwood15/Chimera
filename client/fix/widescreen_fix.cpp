@@ -25,8 +25,8 @@ int menu_extra_width = 0;
 int *cursor_x;
 
 static void check_cursor() noexcept {
-    int min = menu_extra_width/2 * -1;
-    int max = menu_extra_width/2 + 640;
+    int min = menu_extra_width/2 * -1 - 1;
+    int max = menu_extra_width/2 + 640 - 1;
     if(*cursor_x > max) {
         *cursor_x = max;
     }
