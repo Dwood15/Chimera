@@ -3,10 +3,11 @@
 #include "../hooks/map_load.h"
 #include "../hooks/tick.h"
 
-#include <string.h>
 #include <vector>
+#include <string.h>
 
 struct OriginalHudValue {
+    HUDAnchor anchor;
     AnchorOffset *address;
     AnchorOffset original_value;
     AnchorOffset total_delta;
@@ -15,6 +16,7 @@ struct OriginalHudValue {
 static std::vector<OriginalHudValue> original;
 
 struct OffsetHudModMod {
+    HUDAnchor anchor;
     AnchorOffset *address;
     AnchorOffset delta;
 };
@@ -36,9 +38,8 @@ struct OffsetHudMod {
 
 static std::vector<OffsetHudMod> all_mods;
 
-static void change_xy(AnchorOffset &addr, OffsetHudMod &mod) {
+static void change_xy(AnchorOffset &addr, HUDAnchor anchor, OffsetHudMod &mod) {
     OriginalHudValue *v = nullptr;
-    AnchorOffset delta = mod.delta;
 
     for(size_t o=0;o<original.size();o++) {
         if(original[o].address == &addr) {
@@ -49,6 +50,7 @@ static void change_xy(AnchorOffset &addr, OffsetHudMod &mod) {
 
     if(!v) {
         OriginalHudValue new_val;
+        new_val.anchor = anchor;
         new_val.address = &addr;
         new_val.original_value = addr;
         new_val.total_delta = {};
@@ -56,17 +58,31 @@ static void change_xy(AnchorOffset &addr, OffsetHudMod &mod) {
         v = &original[original.size() - 1];
     }
 
-    if(v->original_value.x > 140 && v->original_value.x < 460 && v->original_value.y > 80 && v->original_value.y < 400) {
-        delta.x = 0;
-        delta.y = 0;
+    AnchorOffset delta = mod.delta;
+
+    #define X_OFFSET 160
+    #define Y_OFFSET 160
+
+    if(anchor == ANCHOR_CENTER) {
+        if(v->original_value.x > - X_OFFSET && v->original_value.x < X_OFFSET) delta.x = 0;
+        if(v->original_value.y > - Y_OFFSET && v->original_value.y < Y_OFFSET) delta.y = 0;
+
+        if(v->original_value.x < 0) delta.x *= -1;
+        if(v->original_value.y > 0) delta.y *= -1;
     }
-    else if(v->original_value.x > 320) delta.x *= -1;
-    else if(v->original_value.y > 240) delta.y *= -1;
+    else {
+        if(v->original_value.x > (320 - X_OFFSET) && v->original_value.x < (320 + X_OFFSET)) delta.x = 0;
+        if(v->original_value.y > (240 - Y_OFFSET) && v->original_value.y < (240 + Y_OFFSET)) delta.y = 0;
+
+        if(v->original_value.x > 320) delta.x *= -1;
+        if(v->original_value.y > 240) delta.y *= -1;
+    }
 
     v->total_delta.x += delta.x;
     v->total_delta.y += delta.y;
 
     OffsetHudModMod mod_mod;
+    mod_mod.anchor = anchor;
     mod_mod.delta = delta;
     mod_mod.address = &addr;
     addr.x += delta.x;
@@ -74,8 +90,8 @@ static void change_xy(AnchorOffset &addr, OffsetHudMod &mod) {
     mod.mods.push_back(mod_mod);
 }
 
-static void change_xy(HUDElementPosition &addr, OffsetHudMod &mod) {
-    return change_xy(addr.anchor_offset, mod);
+static void change_xy(HUDElementPosition &addr, HUDAnchor anchor, OffsetHudMod &mod) {
+    return change_xy(addr.anchor_offset, anchor, mod);
 }
 
 static void do_things_to_wphi_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept {
@@ -83,21 +99,19 @@ static void do_things_to_wphi_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept 
         mod.objects[tag_id.index] = 1;
         auto &tdata = *reinterpret_cast<WeaponHUDInterface *>(HaloTag::from_id(tag_id).data);
         do_things_to_wphi_tag(tdata.child.tag_id, mod);
-        if(tdata.anchor != ANCHOR_CENTER) {
-            for(int i=0;i<tdata.static_elements_count;i++) {
-                change_xy(tdata.static_elements[i].prelude.position, mod);
-            }
-            for(int i=0;i<tdata.meter_elements_count;i++) {
-                change_xy(tdata.meter_elements[i].prelude.position, mod);
-            }
-            for(int i=0;i<tdata.number_elements_count;i++) {
-                change_xy(tdata.number_elements[i].prelude.position, mod);
-            }
-            for(int o=0;o<tdata.overlay_elements_count;o++) {
-                auto &overlay = tdata.overlay_elements[o];
-                for(int i=0;i<overlay.overlays_count;i++) {
-                    change_xy(overlay.overlays[i].position, mod);
-                }
+        for(int i=0;i<tdata.static_elements_count;i++) {
+            change_xy(tdata.static_elements[i].prelude.position, tdata.anchor, mod);
+        }
+        for(int i=0;i<tdata.meter_elements_count;i++) {
+            change_xy(tdata.meter_elements[i].prelude.position, tdata.anchor, mod);
+        }
+        for(int i=0;i<tdata.number_elements_count;i++) {
+            change_xy(tdata.number_elements[i].prelude.position, tdata.anchor, mod);
+        }
+        for(int o=0;o<tdata.overlay_elements_count;o++) {
+            auto &overlay = tdata.overlay_elements[o];
+            for(int i=0;i<overlay.overlays_count;i++) {
+                change_xy(overlay.overlays[i].position, tdata.anchor, mod);
             }
         }
     }
@@ -108,24 +122,20 @@ static void do_things_to_unhi_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept 
         mod.objects[tag_id.index] = 1;
         auto &unhi_tag = HaloTag::from_id(tag_id);
         auto &tdata = *reinterpret_cast<UnitHUDInterface *>(unhi_tag.data);
-        if(tdata.anchor != ANCHOR_CENTER) {
-            change_xy(tdata.unit_hud_background.position, mod);
-            change_xy(tdata.shield_panel_background.position, mod);
-            change_xy(tdata.shield_panel_meter.prelude.position, mod);
-            change_xy(tdata.health_panel_background.position, mod);
-            change_xy(tdata.health_panel_meter.prelude.position, mod);
-            change_xy(tdata.motion_sensor_background.position, mod);
-            change_xy(tdata.motion_sensor_foreground.position, mod);
-            change_xy(tdata.motion_sensor_center, mod);
-            for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
-                change_xy(tdata.auxiliary_hud_meters[i].background.position, mod);
-                change_xy(tdata.auxiliary_hud_meters[i].meter.prelude.position, mod);
-            }
+        change_xy(tdata.unit_hud_background.position, tdata.anchor, mod);
+        change_xy(tdata.shield_panel_background.position, tdata.anchor, mod);
+        change_xy(tdata.shield_panel_meter.prelude.position, tdata.anchor, mod);
+        change_xy(tdata.health_panel_background.position, tdata.anchor, mod);
+        change_xy(tdata.health_panel_meter.prelude.position, tdata.anchor, mod);
+        change_xy(tdata.motion_sensor_background.position, ANCHOR_BOTTOM_LEFT, mod);
+        change_xy(tdata.motion_sensor_foreground.position, ANCHOR_BOTTOM_LEFT, mod);
+        change_xy(tdata.motion_sensor_center, ANCHOR_BOTTOM_LEFT, mod);
+        for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
+            change_xy(tdata.auxiliary_hud_meters[i].background.position, tdata.anchor, mod);
+            change_xy(tdata.auxiliary_hud_meters[i].meter.prelude.position, tdata.anchor, mod);
         }
-        if(tdata.auxiliary_overlays.anchor != ANCHOR_CENTER) {
-            for(uint32_t i=0;i<tdata.auxiliary_overlays.overlays_count;i++) {
-                change_xy(tdata.auxiliary_overlays.overlays[i].position, mod);
-            }
+        for(uint32_t i=0;i<tdata.auxiliary_overlays.overlays_count;i++) {
+            change_xy(tdata.auxiliary_overlays.overlays[i].position, tdata.auxiliary_overlays.anchor, mod);
         }
     }
 }
@@ -163,25 +173,26 @@ static void do_things_to_unit_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept 
     }
 }
 
+static void do_things_to_grhi_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept {
+    if(tag_id.is_valid() && !mod.objects[tag_id.index]) {
+        mod.objects[tag_id.index] = 1;
+        auto &tag = HaloTag::from_id(tag_id);
+        GrenadeHUDInterface &tdata = *reinterpret_cast<GrenadeHUDInterface *>(tag.data);
+        change_xy(tdata.grenade_hud_background.position, tdata.anchor, mod);
+        change_xy(tdata.total_grenades_background.position, tdata.anchor, mod);
+        change_xy(tdata.total_grenades_numbers.position, tdata.anchor, mod);
+        for(uint32_t o=0;o<tdata.overlays_count;o++) {
+            change_xy(tdata.overlays[o].position, tdata.anchor, mod);
+        }
+    }
+}
+
 static void do_things_to_matg_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept {
     if(tag_id.is_valid() && !mod.objects[tag_id.index]) {
         auto *&tdata = HaloTag::from_id(tag_id).data;
         auto *&grenades = *reinterpret_cast<char **>(tdata + 0x128 + 4);
         for(size_t g=0;g<*reinterpret_cast<uint32_t *>(tdata + 0x128);g++) {
-            auto &tag_id = *reinterpret_cast<HaloTagID *>(grenades + g * 68 + 0x14 + 0xC);
-            if(tag_id.is_valid() && !mod.objects[tag_id.index]) {
-                mod.objects[tag_id.index] = 1;
-                auto &tag = HaloTag::from_id(tag_id);
-                GrenadeHUDInterface &tdata = *reinterpret_cast<GrenadeHUDInterface *>(tag.data);
-                if(tdata.anchor != ANCHOR_CENTER) {
-                    change_xy(tdata.grenade_hud_background.position, mod);
-                    change_xy(tdata.total_grenades_background.position, mod);
-                    change_xy(tdata.total_grenades_numbers.position, mod);
-                    for(uint32_t o=0;o<tdata.overlays_count;o++) {
-                        change_xy(tdata.overlays[o].position, mod);
-                    }
-                }
-            }
+            do_things_to_grhi_tag(*reinterpret_cast<HaloTagID *>(grenades + g * 68 + 0x14 + 0xC), mod);
         }
     }
 }
@@ -190,9 +201,7 @@ static void do_things_to_hudg_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept 
     if(tag_id.is_valid() && !mod.objects[tag_id.index]) {
         mod.objects[tag_id.index] = 1;
         auto *&tdata = HaloTag::from_id(tag_id).data;
-        if(*tdata != 5) {
-            change_xy(*reinterpret_cast<AnchorOffset *>(tdata + 0x24), mod);
-        }
+        change_xy(*reinterpret_cast<AnchorOffset *>(tdata + 0x24), *reinterpret_cast<HUDAnchor *>(tdata), mod);
     }
 }
 
@@ -208,7 +217,7 @@ static bool should_rerun_mod_load() {
 }
 
 static void map_load_mod(OffsetHudMod &mod) noexcept {
-    memset(mod.objects, 0, 65535);
+    memset(mod.objects, 0, sizeof(mod.objects));
     mod.mods.clear();
     for(size_t i=0;i<*reinterpret_cast<uint32_t *>(0x4044000C);i++) {
         auto &tag = HaloTag::from_id(i);
@@ -276,6 +285,7 @@ OffsetterIndex create_offsetter(short x, short y, bool text) noexcept {
 
 void destroy_offsetter(OffsetterIndex index) {
     if(index == OFFSETTER_INDEX_NULL) return;
+    on_map_load();
     for(size_t i=0;i<all_mods.size();i++) {
         if(all_mods[i].index == index) {
             auto &mod = all_mods[i];
