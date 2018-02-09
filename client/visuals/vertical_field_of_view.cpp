@@ -36,7 +36,7 @@ ChimeraCommandError vfov_command(size_t argc, const char **argv) noexcept {
         vfov = new_value;
     }
     if(vfov == 0)
-        console_out("chimera_vfov: off");
+        console_out("off");
     else
         console_out(std::to_string(vfov) + " degrees");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
