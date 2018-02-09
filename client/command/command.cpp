@@ -304,8 +304,9 @@ ChimeraCommandError chimera_command(size_t argc, const char **argv) noexcept {
                 }
                 catch(std::exception &) {
                     if(z == 1) {
-                        sprintf(x, "chimera: Could not find command or category \"%s\". Check your spelling and try again.", category.data());
+                        sprintf(x, "chimera: Could not find command or category \"%s\".", category.data());
                         console_out_error(x);
+                        console_out_error("chimera: Check your spelling and try again.");
                         return CHIMERA_COMMAND_ERROR_FAILURE;
                     }
                 }
