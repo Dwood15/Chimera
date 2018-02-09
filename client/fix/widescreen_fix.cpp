@@ -19,14 +19,19 @@ static float width_scale = 0;
 extern void apply_scope_fix();
 extern void undo_scope_fix();
 
-float **letterbox;
+static float **letterbox;
 
-int menu_extra_width = 0;
-int *cursor_x;
+static int menu_extra_width = 0;
+static int *cursor_x;
 
 static void check_cursor() noexcept {
+    static bool firstrun = true;
     int min = menu_extra_width/2 * -1 - 1;
     int max = menu_extra_width/2 + 640 - 1;
+    if(firstrun) {
+        *cursor_x = min;
+        firstrun = false;
+    }
     if(*cursor_x > max) {
         *cursor_x = max;
     }
