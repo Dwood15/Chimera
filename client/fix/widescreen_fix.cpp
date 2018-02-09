@@ -4,6 +4,7 @@
 #include "../client_signature.h"
 #include "../halo_data/resolution.h"
 #include "../hooks/map_load.h"
+#include "../hooks/frame.h"
 #include "../hooks/tick.h"
 #include "../hud_mod/offset_hud_elements.h"
 #include "../messaging/messaging.h"
@@ -20,6 +21,20 @@ extern void undo_scope_fix();
 
 float **letterbox;
 
+int menu_extra_width = 0;
+int *cursor_x;
+
+static void check_cursor() noexcept {
+    int min = menu_extra_width/2 * -1;
+    int max = menu_extra_width/2 + 640;
+    if(*cursor_x > max) {
+        *cursor_x = max;
+    }
+    else if(*cursor_x < min) {
+        *cursor_x = min;
+    }
+}
+
 static void set_mod(bool force) noexcept {
     auto &resolution = get_resolution();
     float aspect_ratio = static_cast<float>(resolution.width) / resolution.height;
@@ -32,6 +47,7 @@ static void set_mod(bool force) noexcept {
         float p_scale = 1.0/(320.0 * new_width_scale);
         adder = 1.0 / new_width_scale;
         adder_negative = -(1.0 + 1.0 / 640.0) / new_width_scale;
+        menu_extra_width = 640 * width_scale - 640;
 
         auto *hud_element_widescreen_sig_address = get_signature("hud_element_widescreen_sig").address();
         write_code_any_value(hud_element_widescreen_sig_address + 0x7, p_scale);
@@ -111,6 +127,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             get_signature("team_icon_race_sig").undo();
             get_signature("team_icon_oddball_sig").undo();
             get_signature("team_icon_background_sig").undo();
+            get_signature("cursor_sig").undo();
 
             letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
             switch(new_value) {
@@ -139,8 +156,16 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope 0", true);
                     }
+                    auto &cursor_sig = get_signature("cursor_sig");
+                    auto *cursor_sig_address = cursor_sig.address();
+                    cursor_x = *reinterpret_cast<int **>(cursor_sig_address + 4);
+                    unsigned char nope[256];
+                    memset(nope, 0x90, sizeof(nope));
+                    write_code_any_array(cursor_sig_address, nope, cursor_sig.size());
+
                     add_tick_event(apply_offsets);
                     add_map_load_event(on_map_load);
+                    add_preframe_event(check_cursor);
                     break;
                 }
                 default: std::terminate();
