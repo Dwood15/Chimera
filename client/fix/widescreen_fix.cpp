@@ -131,8 +131,10 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 case 1:
                 case 2: {
                     if(open_sauce_present()) {
-                        console_out_warning("Using this feature is not recommended if Open Sauce is installed.");
-                        console_out_warning("You should use Open Sauce's widescreen fix, instead.");
+                        console_out_warning("chimera_widescreen_fix is not compatible with Open Sauce.");
+                        console_out_warning("Using chimera_widescreen_scope_fix, instead...");
+                        execute_chimera_command("chimera_widescreen_scope_fix 1");
+                        return CHIMERA_COMMAND_ERROR_SUCCESS;
                     }
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope 0", true);
