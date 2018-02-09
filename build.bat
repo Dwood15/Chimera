@@ -43,15 +43,12 @@ g++ -c main.cpp %ARGS% -o bin/main.o
 
 g++ -c client/client_signature.cpp %ARGS% -o bin/client__client_signature.o
 g++ -c client/client.cpp %ARGS% -o bin/client__client.o
+g++ -c client/open_sauce.cpp %ARGS% -o bin/client__open_sauce.o
 g++ -c client/path.cpp %ARGS% -o bin/client__path.o
 g++ -c client/settings.cpp %ARGS% -o bin/client__settings.o
 
 g++ -c client/command/command.cpp %ARGS% -o bin/client__command__command.o
 g++ -c client/command/console.cpp %ARGS% -o bin/client__command__console.o
-
-g++ -c client/fix/descope_fix.cpp %ARGS% -o bin/client__fix__descope_fix.o
-g++ -c client/fix/magnetism_fix.cpp %ARGS% -o bin/client__fix__magnetism_fix.o
-g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
 g++ -c client/debug/budget.cpp %ARGS% -o bin/client__debug__budget.o
 g++ -c client/debug/devmode.cpp %ARGS% -o bin/client__debug__devmode.o
@@ -65,6 +62,10 @@ g++ -c client/enhancements/skip_loading.cpp %ARGS% -o bin/client__enhancements__
 g++ -c client/enhancements/throttle_fps.cpp %ARGS% -o bin/client__enhancements__throttle_fps.o
 g++ -c client/enhancements/uncap_cinematic.cpp %ARGS% -o bin/client__enhancements__uncap_cinematic.o
 g++ -c client/enhancements/zoom_blur.cpp %ARGS% -o bin/client__enhancements__zoom_blur.o
+
+g++ -c client/fix/descope_fix.cpp %ARGS% -o bin/client__fix__descope_fix.o
+g++ -c client/fix/magnetism_fix.cpp %ARGS% -o bin/client__fix__magnetism_fix.o
+g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
 g++ -c client/hac2/hac2.cpp %ARGS% -o bin/client__hac2__hac2.o
 g++ -c client/hac2/scope_fix.cpp %ARGS% -o bin/client__hac2__scope_fix.o

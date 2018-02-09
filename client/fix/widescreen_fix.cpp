@@ -1,12 +1,13 @@
 #include "widescreen_fix.h"
 
 #include <string.h>
+#include "../client_signature.h"
 #include "../hac2/scope_fix.h"
-#include "../hud_mod/offset_hud_elements.h"
-#include "../messaging/messaging.h"
 #include "../hooks/map_load.h"
 #include "../hooks/tick.h"
-#include "../client_signature.h"
+#include "../hud_mod/offset_hud_elements.h"
+#include "../messaging/messaging.h"
+#include "../open_sauce.h"
 
 int widescreen_fix_active = 0;
 
@@ -129,6 +130,10 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 }
                 case 1:
                 case 2: {
+                    if(open_sauce_present()) {
+                        console_out_warning("Using this feature is not recommended if Open Sauce is installed.");
+                        console_out_warning("You should use Open Sauce's widescreen fix, instead.");
+                    }
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope_mask 0", true);
                     }
