@@ -1,7 +1,6 @@
-#include "set_resolution.h"
+#include "resolution.h"
 
 #include <stdlib.h>
-#include "../fix/scope_fix.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
 
@@ -34,6 +33,11 @@ struct ChangeResolutionStructB {
 };
 
 static_assert(sizeof(ChangeResolutionStructB) == 0x38);
+
+Resolution &get_resolution() noexcept {
+    static Resolution *resolution = *reinterpret_cast<Resolution **>(get_signature("resolution_sig").address() + 4);
+    return *resolution;
+}
 
 static void set_resolution(int width, int height, int refresh_rate=1000, int vsync=-1, int windowed=-1) {
     static bool repeating = false;

@@ -1,8 +1,8 @@
 #include "widescreen_fix.h"
 
 #include <string.h>
-#include "scope_fix.h"
 #include "../client_signature.h"
+#include "../halo_data/resolution.h"
 #include "../hooks/map_load.h"
 #include "../hooks/tick.h"
 #include "../hud_mod/offset_hud_elements.h"

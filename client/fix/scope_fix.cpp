@@ -1,14 +1,8 @@
 #include "scope_fix.h"
 #include "../client_signature.h"
-#include "../hac2.h"
+#include "../halo_data/resolution.h"
 #include "../hooks/tick.h"
 #include "../messaging/messaging.h"
-#include "../open_sauce.h"
-
-Resolution &get_resolution() noexcept {
-    static Resolution *resolution = *reinterpret_cast<Resolution **>(get_signature("resolution_sig").address() + 4);
-    return *resolution;
-}
 
 void apply_scope_fix() {
     static float *width = reinterpret_cast<float *>(get_signature("widescreen_scope_sig").address() + 4);
@@ -31,7 +25,7 @@ void undo_scope_fix() {
 
 bool widescreen_scope_mask_active = false;
 
-ChimeraCommandError widescreen_scope_command(size_t argc, const char **argv) noexcept {
+ChimeraCommandError widescreen_scope_fix_command(size_t argc, const char **argv) noexcept {
     extern int widescreen_fix_active;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);

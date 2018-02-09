@@ -9,18 +9,9 @@
 #include "command/console.h"
 #include "command/command.h"
 
-#include "fix/descope_fix.h"
-#include "fix/magnetism_fix.h"
-#include "fix/scope_fix.h"
-#include "fix/widescreen_fix.h"
-
 #include "debug/budget.h"
 #include "debug/devmode.h"
 #include "debug/wireframe.h"
-
-#include "visuals/anisotropic_filtering.h"
-#include "visuals/set_resolution.h"
-#include "visuals/vertical_field_of_view.h"
 
 #include "enhancements/auto_center.h"
 #include "enhancements/firing_particle.h"
@@ -30,6 +21,13 @@
 #include "enhancements/throttle_fps.h"
 #include "enhancements/uncap_cinematic.h"
 #include "enhancements/zoom_blur.h"
+
+#include "fix/descope_fix.h"
+#include "fix/magnetism_fix.h"
+#include "fix/scope_fix.h"
+#include "fix/widescreen_fix.h"
+
+#include "halo_data/resolution.h"
 
 #include "hooks/camera.h"
 #include "hooks/frame.h"
@@ -41,6 +39,9 @@
 #include "lua/lua.h"
 
 #include "messaging/messaging.h"
+
+#include "visuals/anisotropic_filtering.h"
+#include "visuals/vertical_field_of_view.h"
 
 #include "xbox/safe_zone.h"
 #include "xbox/simple_score_screen.h"
@@ -278,10 +279,10 @@ void initialize_client() noexcept {
 
     // HAC2
 
-    (*commands).emplace_back("chimera_widescreen_scope", widescreen_scope_command, "hac2",
+    (*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "hac2",
         "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
         "Syntax:\n"
-        "  - chimera_widescreen_scope_mask [true/false]"
+        "  - chimera_widescreen_scope_fix [true/false]"
     , 0, 1, find_widescreen_scope_signature(), true);
 
     // Fixes
