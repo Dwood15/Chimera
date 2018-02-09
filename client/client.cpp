@@ -279,7 +279,7 @@ void initialize_client() noexcept {
 
     // HAC2
 
-    (*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "hac2",
+    (*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "fixes",
         "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
         "Syntax:\n"
         "  - chimera_widescreen_scope_fix [true/false]"
