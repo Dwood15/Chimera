@@ -90,6 +90,6 @@ ChimeraCommandError enable_console_command(size_t argc, const char **argv) noexc
         }
         active = new_value;
     }
-    console_out(std::string("chimera_enable_console: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
