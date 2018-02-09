@@ -52,6 +52,6 @@ ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv
             widescreen_scope_mask_active = new_value;
         }
     }
-    console_out(std::string("chimera_widescreen_scope_mask: ") + (widescreen_scope_mask_active ? "true" : "false"));
+    console_out(widescreen_scope_mask_active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
