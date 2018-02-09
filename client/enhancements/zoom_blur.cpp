@@ -1,8 +1,8 @@
 #include "zoom_blur.h"
 
-#include "../messaging/messaging.h"
-#include "../hac2/hac2.h"
 #include "../client_signature.h"
+#include "../messaging/messaging.h"
+#include "../hac2.h"
 
 ChimeraCommandError block_zoom_blur_command(size_t argc, const char **argv) noexcept {
     static bool active = false;

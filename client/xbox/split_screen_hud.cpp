@@ -1,7 +1,7 @@
 #include "split_screen_hud.h"
 
-#include "../hac2/hac2.h"
 #include "../client_signature.h"
+#include "../hac2.h"
 #include "../messaging/messaging.h"
 
 ChimeraCommandError split_screen_hud_command(size_t argc, const char **argv) noexcept {

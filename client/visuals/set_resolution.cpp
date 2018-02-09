@@ -1,7 +1,7 @@
 #include "set_resolution.h"
 
 #include <stdlib.h>
-#include "../hac2/scope_fix.h"
+#include "../fix/scope_fix.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
 

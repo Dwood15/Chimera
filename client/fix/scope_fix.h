@@ -10,5 +10,5 @@ struct Resolution {
 /// Obtain a reference to the current resolution of Halo.
 Resolution &get_resolution() noexcept;
 
-/// Function for command chimera_widescreen_scope_fix
-ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv) noexcept;
+/// Function for command chimera_widescreen_scope
+ChimeraCommandError widescreen_scope_command(size_t argc, const char **argv) noexcept;

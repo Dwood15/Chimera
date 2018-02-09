@@ -1,8 +1,9 @@
 #include "scope_fix.h"
-#include "../hac2/hac2.h"
-#include "../messaging/messaging.h"
 #include "../client_signature.h"
+#include "../hac2.h"
 #include "../hooks/tick.h"
+#include "../messaging/messaging.h"
+#include "../open_sauce.h"
 
 Resolution &get_resolution() noexcept {
     static Resolution *resolution = *reinterpret_cast<Resolution **>(get_signature("resolution_sig").address() + 4);
@@ -30,7 +31,7 @@ void undo_scope_fix() {
 
 bool widescreen_scope_mask_active = false;
 
-ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv) noexcept {
+ChimeraCommandError widescreen_scope_command(size_t argc, const char **argv) noexcept {
     extern int widescreen_fix_active;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
@@ -40,10 +41,7 @@ ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv
                     console_out_error("chimera_widescreen_fix is enabled. Turn this off, first.");
                     return CHIMERA_COMMAND_ERROR_FAILURE;
                 }
-                if(!hac2_present())
-                    console_out_warning("HAC2 is not installed, so this function does nothing.");
-                else
-                    add_tick_event(apply_scope_fix);
+                add_tick_event(apply_scope_fix);
             }
             else {
                 remove_tick_event(apply_scope_fix);

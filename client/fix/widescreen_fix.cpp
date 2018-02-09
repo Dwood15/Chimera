@@ -1,8 +1,8 @@
 #include "widescreen_fix.h"
 
 #include <string.h>
+#include "scope_fix.h"
 #include "../client_signature.h"
-#include "../hac2/scope_fix.h"
 #include "../hooks/map_load.h"
 #include "../hooks/tick.h"
 #include "../hud_mod/offset_hud_elements.h"
@@ -135,7 +135,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                         console_out_warning("You should use Open Sauce's widescreen fix, instead.");
                     }
                     if(widescreen_scope_mask_active) {
-                        execute_chimera_command("chimera_widescreen_scope_mask 0", true);
+                        execute_chimera_command("chimera_widescreen_scope 0", true);
                     }
                     add_tick_event(apply_offsets);
                     add_map_load_event(on_map_load);

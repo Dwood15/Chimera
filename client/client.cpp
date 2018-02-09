@@ -11,6 +11,7 @@
 
 #include "fix/descope_fix.h"
 #include "fix/magnetism_fix.h"
+#include "fix/scope_fix.h"
 #include "fix/widescreen_fix.h"
 
 #include "debug/budget.h"
@@ -29,8 +30,6 @@
 #include "enhancements/throttle_fps.h"
 #include "enhancements/uncap_cinematic.h"
 #include "enhancements/zoom_blur.h"
-
-#include "hac2/scope_fix.h"
 
 #include "hooks/camera.h"
 #include "hooks/frame.h"
@@ -279,8 +278,8 @@ void initialize_client() noexcept {
 
     // HAC2
 
-    (*commands).emplace_back("chimera_widescreen_scope_mask", widescreen_scope_mask_command, "hac2",
-        "Enhance HAC2's widescreen fix by also fixing the scope mask.\n\n"
+    (*commands).emplace_back("chimera_widescreen_scope", widescreen_scope_command, "hac2",
+        "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
         "Syntax:\n"
         "  - chimera_widescreen_scope_mask [true/false]"
     , 0, 1, find_widescreen_scope_signature(), true);

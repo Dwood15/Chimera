@@ -1,7 +1,7 @@
 #include "vertical_field_of_view.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "../hac2/scope_fix.h"
+#include "../fix/scope_fix.h"
 #include "../messaging/messaging.h"
 #include "../hooks/camera.h"
 #include "../interpolation/camera.h"
