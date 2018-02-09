@@ -37,10 +37,11 @@ ChimeraCommandError widescreen_scope_mask_command(size_t argc, const char **argv
         if(new_value != widescreen_scope_mask_active) {
             if(new_value) {
                 if(widescreen_fix_active) {
-                    execute_chimera_command("chimera_widescreen_fix 0", true);
+                    console_out_error("chimera_widescreen_fix is enabled. Turn this off, first.");
+                    return CHIMERA_COMMAND_ERROR_FAILURE;
                 }
                 if(!hac2_present())
-                    console_out_warning("chimera_widescreen_scope_mask: HAC2 is not installed, so this function does nothing.");
+                    console_out_warning("HAC2 is not installed, so this function does nothing.");
                 else
                     add_tick_event(apply_scope_fix);
             }

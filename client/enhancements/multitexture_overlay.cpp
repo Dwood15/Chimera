@@ -18,6 +18,6 @@ ChimeraCommandError block_mo_command(size_t argc, const char **argv) noexcept {
             active = new_value;
         }
     }
-    console_out(std::string("chimera_block_mo: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

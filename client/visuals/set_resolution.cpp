@@ -130,7 +130,7 @@ ChimeraCommandError set_resolution_command(size_t argc, const char **argv) noexc
         }
     }
     if(width < 640 || height < 480) {
-        console_out_error("chimera_set_resolution requires a resolution of at least 640 pixels wide by 480 pixels high");
+        console_out_error("A resolution of at least 640 pixels wide by 480 pixels high is required.");
         return CHIMERA_COMMAND_ERROR_FAILURE;
     }
     int refresh_rate = 1000;

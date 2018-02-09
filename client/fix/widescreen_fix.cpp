@@ -142,6 +142,6 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             if(widescreen_fix_active > 0) on_map_load();
         }
     }
-    console_out(std::string("chimera_widescreen_fix: ") + std::to_string(widescreen_fix_active));
+    console_out(std::to_string(widescreen_fix_active));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

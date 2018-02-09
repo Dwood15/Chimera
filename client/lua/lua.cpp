@@ -256,7 +256,7 @@ LuaScript::~LuaScript() noexcept {
 ChimeraCommandError reload_lua_command(size_t argc, const char **argv) noexcept {
     scripts.clear();
     open_lua_scripts();
-    console_out("chimera_reload_lua: Scripts were reloaded.");
+    console_out("Scripts were reloaded.");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
 

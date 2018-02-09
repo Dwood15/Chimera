@@ -161,7 +161,7 @@ extern void buffer_cam() noexcept;
 
 static void interpolate_objects() noexcept {
     if(tick_count() == 0) return;
-    
+
     for(uint32_t t=0;t<2048;t++) {
         do_interpolation(t);
     }
@@ -316,10 +316,10 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
             what = "custom";
             break;
         }
-        console_out(std::string("chimera_interpolate: ") + what);
+        console_out(what);
     }
     else {
-        console_out(std::string("chimera_interpolate: ") + std::to_string(chimera_interpolate_setting));
+        console_out(std::to_string(chimera_interpolate_setting));
     }
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
@@ -337,13 +337,13 @@ ChimeraCommandError interpolate_predict_command(size_t argc, const char **argv) 
                     interpolate_vector_objects = interpolate_vector_predict;
                     break;
                 default: {
-                    console_out_error("chimera_interpolate_predict: Expected a value between 0 and 2.");
+                    console_out_error("Expected a value between 0 and 2.");
                     return CHIMERA_COMMAND_ERROR_FAILURE;
                 }
             }
         }
         chimera_interpolate_predict = new_value;
     }
-    console_out(std::string("chimera_interpolate_predict: ") + std::to_string(chimera_interpolate_predict));
+    console_out(std::to_string(chimera_interpolate_predict));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

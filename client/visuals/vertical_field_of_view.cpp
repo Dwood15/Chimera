@@ -27,7 +27,7 @@ ChimeraCommandError vfov_command(size_t argc, const char **argv) noexcept {
             remove_precamera_event(on_precamera);
         }
         else if(new_value < 1 || new_value > 179) {
-            console_out_error("chimera_vfov: FOV must be between 1 and 179");
+            console_out_error("FOV must be between 1 and 179");
             return CHIMERA_COMMAND_ERROR_FAILURE;
         }
         if(vfov == 0 && new_value != 0) {
@@ -38,6 +38,6 @@ ChimeraCommandError vfov_command(size_t argc, const char **argv) noexcept {
     if(vfov == 0)
         console_out("chimera_vfov: off");
     else
-        console_out(std::string("chimera_vfov: ") + std::to_string(vfov) + " degrees");
+        console_out(std::to_string(vfov) + " degrees");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -33,6 +33,6 @@ ChimeraCommandError simple_score_screen_command(size_t argc, const char **argv) 
             active = new_value;
         }
     }
-    console_out(std::string("chimera_simple_score_screen: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

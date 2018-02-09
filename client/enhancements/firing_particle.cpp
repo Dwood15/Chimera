@@ -84,6 +84,6 @@ ChimeraCommandError block_firing_particles_command(size_t argc, const char **arg
             active = new_value;
         }
     }
-    console_out(std::string("chimera_block_firing_particles: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

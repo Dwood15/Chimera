@@ -18,6 +18,6 @@ ChimeraCommandError block_gametype_indicator_command(size_t argc, const char **a
             active = new_value;
         }
     }
-    console_out(std::string("chimera_block_gametype_indicator: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

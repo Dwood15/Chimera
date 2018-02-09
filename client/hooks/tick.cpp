@@ -105,11 +105,11 @@ ChimeraCommandError set_tps_command(size_t argc, const char **argv) noexcept {
     if(argc == 1) {
         auto new_rate = atof(argv[0]);
         if(new_rate < 0.01) {
-            console_out_error("chimera_set_tps: Tick rate cannot be less than 0.01.");
+            console_out_error("Tick rate cannot be less than 0.01.");
             return CHIMERA_COMMAND_ERROR_FAILURE;
         }
         set_tick_rate(new_rate);
     }
-    console_out(std::string("chimera_set_tps: ") + std::to_string(tick_rate()));
+    console_out(std::to_string(tick_rate()));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -25,6 +25,6 @@ ChimeraCommandError skip_loading_command(size_t argc, const char **argv) noexcep
             active = new_value;
         }
     }
-    console_out(std::string("chimera_skip_loading: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

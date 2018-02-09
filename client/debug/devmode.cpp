@@ -19,6 +19,6 @@ ChimeraCommandError devmode_command(size_t argc, const char **argv) noexcept {
             enabled = new_value;
         }
     }
-    console_out(std::string("chimera_devmode: ") + (enabled ? "true" : "false"));
+    console_out(enabled ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

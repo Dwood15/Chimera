@@ -65,6 +65,6 @@ ChimeraCommandError split_screen_hud_command(size_t argc, const char **argv) noe
             active = new_value;
         }
     }
-    console_out(std::string("chimera_split_screen_hud: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

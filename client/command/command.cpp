@@ -121,6 +121,9 @@ ChimeraCommandError execute_chimera_command(const char *command_input, bool sile
         for(size_t i=0;i<commands->size();i++) {
             ChimeraCommand &command = (*commands)[i];
             if(args_cleaned[0] == command.name()) {
+                extern const char *current_command;
+                const char *older_command = current_command;
+                current_command = command.name();
                 extern bool silence_all_messages;
                 bool already_silent = silence_all_messages;
                 if(silently && !already_silent) {
@@ -134,6 +137,7 @@ ChimeraCommandError execute_chimera_command(const char *command_input, bool sile
                 if(silently && !already_silent) {
                     silence_all_messages = false;
                 }
+                current_command = older_command;
                 return rval;
             }
         }

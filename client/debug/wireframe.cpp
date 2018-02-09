@@ -23,7 +23,7 @@ ChimeraCommandError wireframe_command(size_t argc, const char **argv) noexcept {
         if(new_value != enabled) {
             if(new_value) {
                 if(server_type() == SERVER_DEDICATED) {
-                    console_out_error("chimera_wireframe: This command cannot be used on a dedicated server.");
+                    console_out_error("This command cannot be used on a dedicated server.");
                     return CHIMERA_COMMAND_ERROR_FAILURE;
                 }
                 add_tick_event(auto_hide_wireframe);
@@ -35,6 +35,6 @@ ChimeraCommandError wireframe_command(size_t argc, const char **argv) noexcept {
             enabled = new_value;
         }
     }
-    console_out(std::string("chimera_wireframe: ") + (enabled ? "true" : "false"));
+    console_out(enabled ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

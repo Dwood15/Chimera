@@ -39,13 +39,13 @@ ChimeraCommandError auto_center_command(size_t argc, const char **argv) noexcept
                 write_code_s(auto_center_s.address(),mod);
                 break;
             default:
-                console_out_error("chimera_auto_center: Setting can only be between 0 and 2.");
+                console_out_error("Setting can only be between 0 and 2.");
                 return CHIMERA_COMMAND_ERROR_FAILURE;
             }
 
             auto_center = new_value;
         }
     }
-    console_out(std::string("chimera_auto_center: ") + std::to_string(auto_center));
+    console_out(std::to_string(auto_center));
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

@@ -81,7 +81,7 @@ ChimeraCommandError enable_console_command(size_t argc, const char **argv) noexc
         auto new_value = bool_value(argv[0]);
         if(!already_set && new_value != active) {
             if(!initial_tick) {
-                console_out("chimera_enable_console: Changes will take effect after you relaunch Halo.");
+                console_out("Changes will take effect after you relaunch Halo.");
                 already_set = true;
             }
             else {

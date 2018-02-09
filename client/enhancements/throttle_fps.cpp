@@ -30,7 +30,7 @@ ChimeraCommandError throttle_fps_command(size_t argc, const char **argv) noexcep
         if(new_value != throttle_fps) {
             if(new_value <= 5.0) {
                 if(new_value != 0.0) {
-                    console_out_error("chimera_throttle_fps: Invalid framerate.");
+                    console_out_error("Invalid framerate.");
                     return CHIMERA_COMMAND_ERROR_FAILURE;
                 }
                 new_value = 0.0;
@@ -47,10 +47,10 @@ ChimeraCommandError throttle_fps_command(size_t argc, const char **argv) noexcep
         }
     }
     if(throttle_fps == 0.0) {
-        console_out("chimera_throttle_fps: off");
+        console_out("off");
     }
     else {
-        console_out(std::string("chimera_throttle_fps: ") + std::to_string(throttle_fps));
+        console_out(std::to_string(throttle_fps));
     }
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

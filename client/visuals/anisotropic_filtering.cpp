@@ -12,7 +12,7 @@ ChimeraCommandError af_command(size_t argc, const char **argv) noexcept {
             auto &setting = **reinterpret_cast<char **>(get_signature("af_is_enabled_sig").address() + 1);
             if(default_setting == -1) {
                 if(setting) {
-                    console_out_warning("chimera_af: Anisotropic filtering is already enabled (likely via config.txt)!");
+                    console_out_warning("Anisotropic filtering is already enabled (likely via config.txt)!");
                     default_setting = 1;
                 }
                 else {
@@ -23,6 +23,6 @@ ChimeraCommandError af_command(size_t argc, const char **argv) noexcept {
             active = new_value;
         }
     }
-    console_out(std::string("chimera_af: ") + (active ? "true" : "false"));
+    console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

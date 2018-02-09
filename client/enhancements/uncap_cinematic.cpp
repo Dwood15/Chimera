@@ -18,6 +18,6 @@ ChimeraCommandError uncap_cinematic_command(size_t argc, const char **argv) noex
             uncap_cutscenes = new_value;
         }
     }
-    console_out(std::string("chimera_uncap_cinematic: ") + (uncap_cutscenes ? "true" : "false"));
+    console_out(uncap_cutscenes ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

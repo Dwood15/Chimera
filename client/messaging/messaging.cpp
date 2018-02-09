@@ -3,8 +3,11 @@
 
 bool silence_all_messages = false;
 
+const char *current_command = nullptr;
+
 void console_out(const char *text, const ColorARGB &color) noexcept {
     if(silence_all_messages) return;
+    std::string formatted_output = (current_command && strcmp(current_command, "chimera") != 0) ? (std::string(current_command) + ": " + text) : text;
     static auto *console_out_address = get_signature("console_out_sig").address();
     asm (
         "pushad;"
@@ -15,7 +18,7 @@ void console_out(const char *text, const ColorARGB &color) noexcept {
         "add esp, 8;"
         "popad;"
         :
-        : "r" (&color), "r" (text), "r" ("%s"), "r" (console_out_address)
+        : "r" (&color), "r" (formatted_output.data()), "r" ("%s"), "r" (console_out_address)
     );
 }
 
