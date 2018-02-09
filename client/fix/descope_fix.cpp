@@ -7,7 +7,7 @@
 typedef void (*ds)(uint32_t object_id);
 static ds do_descope = nullptr;
 
-static bool descope_fix_enabled = true;
+static bool descope_fix_enabled = false;
 
 static void set_halo_descoping(bool do_it) {
     if(!do_it == descope_fix_enabled) return;
