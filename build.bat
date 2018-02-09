@@ -71,6 +71,7 @@ g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
 g++ -c client/halo_data/global.cpp %ARGS% -o bin/client__halo_data__global.o
 g++ -c client/halo_data/map.cpp %ARGS% -o bin/client__halo_data__map.o
+g++ -c client/halo_data/resolution.cpp -masm=intel -o bin/client__halo_data__resolution.o
 g++ -c client/halo_data/server.cpp %ARGS% -o bin/client__halo_data__server.o
 g++ -c client/halo_data/spawn_object.cpp -masm=intel -o bin/client__halo_data__spawn_object.o
 g++ -c client/halo_data/script.cpp -masm=intel -o bin/client__halo_data__script.o
@@ -102,7 +103,6 @@ g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messa
 
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
 g++ -c client/visuals/gametype_indicator.cpp %ARGS% -o bin/client__visuals__gametype_indicator.o
-g++ -c client/visuals/set_resolution.cpp -masm=intel -o bin/client__visuals__set_resolution.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
 g++ -c client/xbox/safe_zone.cpp %ARGS% -o bin/client__xbox__safe_zone.o

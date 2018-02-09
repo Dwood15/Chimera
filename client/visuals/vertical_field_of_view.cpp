@@ -1,10 +1,10 @@
 #include "vertical_field_of_view.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "../fix/scope_fix.h"
-#include "../messaging/messaging.h"
+#include "../halo_data/resolution.h"
 #include "../hooks/camera.h"
 #include "../interpolation/camera.h"
+#include "../messaging/messaging.h"
 
 static float vfov = 0.0;
 
