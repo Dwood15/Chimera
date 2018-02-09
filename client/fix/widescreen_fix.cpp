@@ -9,6 +9,7 @@
 #include "../hud_mod/offset_hud_elements.h"
 #include "../messaging/messaging.h"
 #include "../open_sauce.h"
+#include "../visuals/letterbox.h"
 
 int widescreen_fix_active = 0;
 static AnchorOffset tags[65535] = {};
@@ -19,8 +20,6 @@ static float width_scale = 0;
 
 extern void apply_scope_fix();
 extern void undo_scope_fix();
-
-static float **letterbox;
 
 static int menu_extra_width = 0;
 static int *cursor_x;
@@ -153,7 +152,6 @@ static void on_map_load() noexcept {
 
 static void apply_offsets() noexcept {
     set_mod(false);
-    **letterbox = -1;
 }
 
 ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexcept {
@@ -173,6 +171,8 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             remove_tick_event(apply_offsets);
             remove_map_load_event(on_map_load);
 
+            on_to_on = widescreen_fix_active > 0 && new_value > 0;
+
             get_signature("team_icon_ctf_sig").undo();
             get_signature("team_icon_slayer_sig").undo();
             get_signature("team_icon_king_sig").undo();
@@ -185,9 +185,9 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             get_signature("hud_text_fix_3_sig").undo();
             get_signature("hud_menu_sig").undo();
 
-            letterbox = *reinterpret_cast<float ***>(get_signature("letterbox_sig").address() + 2);
             switch(new_value) {
                 case 0: {
+                    set_block_letterbox(false);
                     get_signature("hud_element_widescreen_sig").undo();
                     get_signature("hud_element_motion_sensor_blip_widescreen_sig").undo();
                     get_signature("hud_text_widescreen_sig").undo();
@@ -223,6 +223,8 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     if(widescreen_scope_mask_active) {
                         execute_chimera_command("chimera_widescreen_scope 0", true);
                     }
+                    if(!on_to_on)
+                        set_block_letterbox(true);
 
                     auto &cursor_sig = get_signature("cursor_sig");
                     auto *cursor_sig_address = cursor_sig.address();
@@ -246,7 +248,6 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                 }
                 default: std::terminate();
             }
-            on_to_on = widescreen_fix_active > 0 && new_value > 0;
             widescreen_fix_active = new_value;
             if(widescreen_fix_active > 0) on_map_load();
         }

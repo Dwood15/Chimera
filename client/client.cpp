@@ -41,6 +41,7 @@
 #include "messaging/messaging.h"
 
 #include "visuals/anisotropic_filtering.h"
+#include "visuals/letterbox.h"
 #include "visuals/vertical_field_of_view.h"
 
 #include "xbox/safe_zone.h"
@@ -294,6 +295,12 @@ void initialize_client() noexcept {
         "  0: Off\n"
         "  1: On\n"
         "  2: On (center HUD)\n\n"
+        "Syntax:\n"
+        "  - chimera_widescreen_fix [0-2]"
+    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
+
+    (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "fixes",
+        "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
         "Syntax:\n"
         "  - chimera_widescreen_fix [0-2]"
     , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);

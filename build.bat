@@ -103,6 +103,7 @@ g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messa
 
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
 g++ -c client/visuals/gametype_indicator.cpp %ARGS% -o bin/client__visuals__gametype_indicator.o
+g++ -c client/visuals/letterbox.cpp %ARGS% -o bin/client__visuals__letterbox.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
 g++ -c client/xbox/safe_zone.cpp %ARGS% -o bin/client__xbox__safe_zone.o
