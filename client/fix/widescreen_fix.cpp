@@ -234,8 +234,8 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
                     write_code_any_array(cursor_sig_address, nope, cursor_sig.size());
 
                     write_code_any_value(get_signature("hud_text_fix_1_sig").address(), static_cast<unsigned char>(0xEB));
-                    write_code_any_value(get_signature("hud_text_fix_2_sig").address(), static_cast<unsigned char>(0xEB));
-                    write_code_any_value(get_signature("hud_text_fix_3_sig").address(), static_cast<unsigned char>(0xEB));
+                    write_code_any_value(get_signature("hud_text_fix_2_sig").address(), static_cast<unsigned char>(0x77));
+                    write_code_any_value(get_signature("hud_text_fix_3_sig").address(), static_cast<unsigned char>(0x77));
 
                     auto *hud_menu_sig_address = get_signature("hud_menu_sig").address();
                     write_code_any_value(hud_menu_sig_address + 0x00, static_cast<unsigned char>(0xEB));
