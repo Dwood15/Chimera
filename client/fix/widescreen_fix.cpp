@@ -71,6 +71,16 @@ static void set_mod(bool force) noexcept {
         auto *hud_nav_widescreen_sig_address = get_signature("hud_nav_widescreen_sig").address();
         write_code_any_value(reinterpret_cast<unsigned char *>(*reinterpret_cast<float **>(hud_nav_widescreen_sig_address + 2)), static_cast<float>(640.0 * width_scale));
 
+        auto *console_text_fix_1_sig_address = get_signature("console_text_fix_1_sig").address();
+        static int32_t console_input_offset = 8;
+        write_code_any_value(console_text_fix_1_sig_address + 3, &console_input_offset);
+        console_input_offset = 320.0 - 320.0 * width_scale + 8;
+        write_code_any_value(console_text_fix_1_sig_address + 0x37, static_cast<uint32_t>(320 + 320 * width_scale));
+
+        auto *console_text_fix_2_sig_address = get_signature("console_text_fix_2_sig").address();
+        write_code_any_value(console_text_fix_2_sig_address + 3, &console_input_offset);
+        write_code_any_value(console_text_fix_2_sig_address + 0x3A, static_cast<uint32_t>(320 + 320 * width_scale));
+
         static float nav_scale = 320.0;
         nav_scale = -320.0 * (width_scale - 1);
         static unsigned char instructions[] = {0xD8, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xDA, 0x04, 0x24, 0xD9, 0x19, 0xE9, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -184,6 +194,8 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             get_signature("hud_text_fix_2_sig").undo();
             get_signature("hud_text_fix_3_sig").undo();
             get_signature("hud_menu_sig").undo();
+            get_signature("console_text_fix_1_sig").undo();
+            get_signature("console_text_fix_2_sig").undo();
 
             switch(new_value) {
                 case 0: {
@@ -235,6 +247,7 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
 
                     write_code_any_value(get_signature("hud_text_fix_1_sig").address(), static_cast<unsigned char>(0xEB));
                     write_code_any_value(get_signature("hud_text_fix_2_sig").address(), static_cast<unsigned char>(0x77));
+                    write_code_any_value(get_signature("hud_text_fix_2_sig").address() + 0x37, static_cast<unsigned char>(0xEB));
                     write_code_any_value(get_signature("hud_text_fix_3_sig").address(), static_cast<unsigned char>(0x77));
 
                     auto *hud_menu_sig_address = get_signature("hud_menu_sig").address();
