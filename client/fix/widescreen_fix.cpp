@@ -1,5 +1,6 @@
 #include "widescreen_fix.h"
 
+#include <math.h>
 #include <string.h>
 #include "../client_signature.h"
 #include "../halo_data/resolution.h"
@@ -54,7 +55,7 @@ static void set_mod(bool force) noexcept {
         float p_scale = 1.0/(320.0 * new_width_scale);
         adder = 1.0 / new_width_scale;
         adder_negative = -(1.0 + 1.0 / 640.0) / new_width_scale;
-        menu_extra_width = 640 * width_scale - 640;
+        menu_extra_width = ceil(640 * width_scale - 640);
 
         auto *hud_element_widescreen_sig_address = get_signature("hud_element_widescreen_sig").address();
         write_code_any_value(hud_element_widescreen_sig_address + 0x7, p_scale);
@@ -75,16 +76,16 @@ static void set_mod(bool force) noexcept {
         static int32_t console_input_offset = 8;
         write_code_any_value(console_text_fix_1_sig_address + 3, &console_input_offset);
         console_input_offset = 320.0 - 320.0 * width_scale + 8;
-        write_code_any_value(console_text_fix_1_sig_address + 0x37, static_cast<uint32_t>(320 + 320 * width_scale));
+        write_code_any_value(console_text_fix_1_sig_address + 0x37, static_cast<uint32_t>(ceil(320.0 + 320.0 * width_scale)));
 
         auto *console_text_fix_2_sig_address = get_signature("console_text_fix_2_sig").address();
         write_code_any_value(console_text_fix_2_sig_address + 3, &console_input_offset);
-        write_code_any_value(console_text_fix_2_sig_address + 0x3A, static_cast<uint32_t>(320 + 320 * width_scale));
+        write_code_any_value(console_text_fix_2_sig_address + 0x3A, static_cast<uint32_t>(ceil(320.0 + 320.0 * width_scale)));
 
         static int16_t tables[3];
-        tables[0] = 320 - 160 * width_scale;
+        tables[0] = floor(320 - 160 * width_scale);
         tables[1] = 320;
-        tables[2] = 320 + 160 * width_scale;
+        tables[2] = ceil(320 + 160 * width_scale);
         write_code_any_value(console_text_fix_2_sig_address + 0x51 + 1, tables);
         write_code_any_value(console_text_fix_2_sig_address + 0x56 + 3, tables + 2);
 
@@ -101,7 +102,7 @@ static void set_mod(bool force) noexcept {
         if(widescreen_fix_active == 1) {
             auto offset_sig = [](ChimeraSignature &signature) {
                 const auto &offset = *reinterpret_cast<const int16_t *>(signature.signature() + 5);
-                write_code_any_value(signature.address() + 5, static_cast<int16_t>(offset - 320 + 320 * width_scale));
+                write_code_any_value(signature.address() + 5, static_cast<int16_t>(ceil(offset - 320.0 + 320.0 * width_scale)));
             };
 
             offset_sig(get_signature("team_icon_ctf_sig"));
@@ -148,8 +149,8 @@ static void set_mod(bool force) noexcept {
                             }
 
                             if(do_it) {
-                                bounds_left = 320 - 320.0 * width_scale;
-                                bounds_right = 320 + 320.0 * width_scale;
+                                bounds_left = floor(320.0 - 320.0 * width_scale);
+                                bounds_right = ceil(320.0 + 320.0 * width_scale);
                             }
                         }
                     }
