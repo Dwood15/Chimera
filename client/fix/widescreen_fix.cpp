@@ -81,6 +81,13 @@ static void set_mod(bool force) noexcept {
         write_code_any_value(console_text_fix_2_sig_address + 3, &console_input_offset);
         write_code_any_value(console_text_fix_2_sig_address + 0x3A, static_cast<uint32_t>(320 + 320 * width_scale));
 
+        static int16_t tables[3];
+        tables[0] = 320 - 160 * width_scale;
+        tables[1] = 320;
+        tables[2] = 320 + 160 * width_scale;
+        write_code_any_value(console_text_fix_2_sig_address + 0x51 + 1, tables);
+        write_code_any_value(console_text_fix_2_sig_address + 0x56 + 3, tables + 2);
+
         static float nav_scale = 320.0;
         nav_scale = -320.0 * (width_scale - 1);
         static unsigned char instructions[] = {0xD8, 0x05, 0xFF, 0xFF, 0xFF, 0xFF, 0xDA, 0x04, 0x24, 0xD9, 0x19, 0xE9, 0xFF, 0xFF, 0xFF, 0xFF};
