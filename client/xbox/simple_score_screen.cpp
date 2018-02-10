@@ -12,14 +12,16 @@ ChimeraCommandError simple_score_screen_command(size_t argc, const char **argv) 
             auto &ss_score_header_sig = get_signature("ss_score_header_sig");
             auto &ss_score_background_sig = get_signature("ss_score_background_sig");
             if(new_value) {
+                static uint16_t star[2] = { 0xCC - 12, 0xCC - 12 };
                 auto *ss_elements_addr = ss_elements_sig.address();
-                write_code_any_value(ss_elements_addr + 7*0 + 5, static_cast<unsigned short>(0x7FFF)); // placement
-                write_code_any_value(ss_elements_addr + 7*1 + 5, static_cast<unsigned short>(0x00CC)); // name
-                write_code_any_value(ss_elements_addr + 7*2 + 5, static_cast<unsigned short>(0x0168)); // score
-                write_code_any_value(ss_elements_addr + 7*3 + 5, static_cast<unsigned short>(0x7FFF)); // kills
-                write_code_any_value(ss_elements_addr + 7*4 + 5, static_cast<unsigned short>(0x7FFF)); // assists
-                write_code_any_value(ss_elements_addr + 7*5 + 5, static_cast<unsigned short>(0x7FFF)); // deaths
-                write_code_any_value(ss_elements_addr + 7*6 + 2, static_cast<unsigned short>(0x01A4)); // ping
+                write_code_any_value(ss_elements_addr + 2, star);
+                write_code_any_value(ss_elements_addr + 0x2E + 7*0 + 5, static_cast<unsigned short>(0x7FFF)); // placement
+                write_code_any_value(ss_elements_addr + 0x2E + 7*1 + 5, static_cast<unsigned short>(0x00CC)); // name
+                write_code_any_value(ss_elements_addr + 0x2E + 7*2 + 5, static_cast<unsigned short>(0x0168)); // score
+                write_code_any_value(ss_elements_addr + 0x2E + 7*3 + 5, static_cast<unsigned short>(0x7FFF)); // kills
+                write_code_any_value(ss_elements_addr + 0x2E + 7*4 + 5, static_cast<unsigned short>(0x7FFF)); // assists
+                write_code_any_value(ss_elements_addr + 0x2E + 7*5 + 5, static_cast<unsigned short>(0x7FFF)); // deaths
+                write_code_any_value(ss_elements_addr + 0x2E + 7*6 + 2, static_cast<unsigned short>(0x01A4)); // ping
 
                 unsigned char nope[] = {0x90, 0x90, 0x90, 0x90, 0x90};
                 write_code_c(ss_score_header_sig.address(), nope);
