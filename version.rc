@@ -14,7 +14,7 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "Comments",         "It's unfinished!"
-            VALUE "CompanyName",      "002"
+            VALUE "CompanyName",      CHIMERA_AUTHOR
             VALUE "FileDescription",  "Chimera build " CHIMERA_BUILD_STRING
             VALUE "FileVersion",      "Build " CHIMERA_BUILD_STRING
             VALUE "InternalName",     "chimera"

@@ -1,7 +1,9 @@
 #define STRA(x) #x
 #define STR(x) STRA(x)
+
+#define CHIMERA_AUTHOR "Kavawuvi ^v^"
 #define CHIMERA_BUILD_NUMBER 50
-#define CHIMERA_ALPHA_VERSION -553
+#define CHIMERA_ALPHA_VERSION -554
 #define CHIMERA_LUA_INTERPRETER 2.04
 
 #ifdef CHIMERA_ALPHA_VERSION
