@@ -299,6 +299,9 @@ ChimeraCommandError chimera_command(size_t argc, const char **argv) noexcept {
                             sprintf(x,"> %s", lines[i]);
                             console_out(x, color);
                         }
+                        if(!command_found.saves()) {
+                            console_out("This command does not automatically save.", color);
+                        }
                     }
                     break;
                 }
