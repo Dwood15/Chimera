@@ -164,7 +164,7 @@ ChimeraCommandError chimera_command(size_t argc, const char **argv) noexcept {
     std::vector<std::string> list;
     if(argc == 0) {
         std::vector<std::string> list_a;
-        console_out("Chimera build " CHIMERA_BUILD_STRING " by 002");
+        console_out("Chimera build " CHIMERA_BUILD_STRING " by " CHIMERA_AUTHOR);
         console_out("Lua API version (clua_version): " STR(CHIMERA_LUA_INTERPRETER));
         for(size_t i=0;i<(*commands).size();i++) {
             auto &command = (*commands)[i];
