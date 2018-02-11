@@ -1,4 +1,6 @@
 #include <string>
+#include <iostream>
+#include <fstream>
 
 #include "client.h"
 #include "../version.h"
@@ -74,6 +76,20 @@ static void init() {
     CreateDirectory(z, nullptr);
     save_settings = false;
     sprintf(z,"%s\\chimera\\chimerainit.txt", halo_path());
+    auto *f = fopen(z, "r");
+    if(f) {
+        fclose(f);
+    }
+    else {
+        std::ofstream init(z);
+        init << "###" << std::endl;
+        init << "### chimerainit.txt" << std::endl;
+        init << "###" << std::endl;
+        init << "### This file can be used for configuring Chimera commands that are not saved" << std::endl;
+        init << "### automatically such as chimera_set_resolution." << std::endl;
+        init << "###" << std::endl;
+        init << std::endl;
+    }
     read_init_file(z, "[-path]/chimerainit.txt");
     save_settings = true;
     sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
