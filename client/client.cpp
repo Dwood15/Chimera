@@ -128,15 +128,9 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera", chimera_command, nullptr,
         "This command is the commands directory for Chimera.\n\n"
         "Syntax:\n"
-        "  - chimera\n    Display version and a list of command categories.\n"
-        "  - chimera <category>\n    Display a list of commands in category.\n"
-        "  - chimera <command>\n    Display help for a command.\n"
-    , 0, 1, true);
-
-    (*commands).emplace_back("chimera_verbose_init", verbose_init_command, nullptr,
-        "Set whether or not chimerainit.txt commands should output messages.\n\n"
-        "Syntax:\n"
-        "  - chimera_verbose_init [max FPS]"
+        "  - chimera - Display version and a list of command categories.\n"
+        "  - chimera <category> - Display a list of commands in category.\n"
+        "  - chimera <command> - Display help for a command."
     , 0, 1, true);
 
     (*commands).emplace_back("chimera_reload_lua", reload_lua_command, "lua",
@@ -144,6 +138,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_reload_lua"
     , 0, 0, true);
+
+    (*commands).emplace_back("chimera_verbose_init", verbose_init_command, nullptr,
+        "Get or set whethe chimerainit.txt or chimeraname.txt commands should output messages.\n\n"
+        "Syntax:\n"
+        "  - chimera_verbose_init"
+    , 0, 1, true);
 
     // Visuals
 
@@ -169,10 +169,7 @@ void initialize_client() noexcept {
 
     (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
         "Change Halo's resolution. Width and height can be either resolution in pixels or an aspect\n"
-        "ratio.\n"
-        "\n"
-        "Note: Changing this to an invalid value can break video output. For your protection, this\n"
-        "setting is not automatically saved. Please use chimerainit.txt for this setting.\n\n"
+        "ratio.\n\n"
         "Syntax:\n"
         "  - chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]"
     , 2, 5, find_set_resolution_signatures(), false);
@@ -294,15 +291,13 @@ void initialize_client() noexcept {
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_split_screen_hud_sigs(), true);
 
-    // HAC2
-
-    (*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "fixes",
-        "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
-        "Syntax:\n"
-        "  - chimera_widescreen_scope_fix [true/false]"
-    , 0, 1, find_widescreen_scope_signature(), true);
-
     // Fixes
+
+    (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "fixes",
+        "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
+        "Syntax:\n"
+        "  - chimera_widescreen_fix [0-2]"
+    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
     (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
         "Get or set whether or not to (mostly) fix the HUD.\n\n"
@@ -315,11 +310,11 @@ void initialize_client() noexcept {
         "  - chimera_widescreen_fix [0-2]"
     , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
-    (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "fixes",
-        "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
+    (*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "fixes",
+        "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
         "Syntax:\n"
-        "  - chimera_widescreen_fix [0-2]"
-    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
+        "  - chimera_widescreen_scope_fix [true/false]"
+    , 0, 1, find_widescreen_scope_signature(), true);
 
     // Debug
 
