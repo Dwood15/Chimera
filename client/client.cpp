@@ -145,63 +145,36 @@ void initialize_client() noexcept {
         "  - chimera_verbose_init"
     , 0, 1, true);
 
-    // Visuals
+    // Debug
 
-    (*commands).emplace_back("chimera_af", af_command, "visuals",
-        "Get or set whether or not to enable anisotropic filtering.\n\n"
-        "Syntax:\n"
-        "  - chimera_af [true/false]"
-    , 0, 1, find_anisotropic_filtering_signature(), true);
-
-    (*commands).emplace_back("chimera_block_gametype_indicator", block_gametype_indicator_command, "visuals",
-        "Get or set whether or not to turn off the gametype indicator.\n\n"
-        "\n"
-        "Syntax:\n"
-        "  - chimera_block_gametype_indicator [true/false]"
-    , 0, 1, find_gametype_indicator_sig(), true);
-
-    (*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
-        "Get or set whether or not to turn vSync off startup.\n\n"
-        "\n"
-        "Syntax:\n"
-        "  - chimera_block_vsync [true/false]"
-    , 0, 1, find_set_resolution_signatures(), true);
-
-    (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
-        "Change Halo's resolution. Width and height can be either resolution in pixels or an aspect\n"
-        "ratio.\n\n"
-        "Syntax:\n"
-        "  - chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]"
-    , 2, 5, find_set_resolution_signatures(), false);
-
-    (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
-        "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
-        "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
-        "Syntax:\n"
-        "  - chimera_vfov <FOV>"
-    , 0, 1, find_interpolation_signatures(), true);
-
-    // Interpolation
-
-    (*commands).emplace_back("chimera_interpolate", interpolate_command, "interpolation",
-        "Get or set the interpolation level. Interpolation smoothens out object movement between\n"
-        "ticks, providing a substantial visual improvement. Higher levels incur greater CPU usage and\n"
-        "may impact framerate on slower CPUs.\n\n"
-        "Syntax:\n"
-        "  - chimera_interpolate [off / low / medium / high / ultra]"
-    , 0, 1, find_interpolation_signatures(), true);
-
-    (*commands).emplace_back("chimera_interpolate_predict", interpolate_predict_command, "interpolation",
-        "Get or set whether the next tick should be predicted when interpolating. This will prevent\n"
-        "objects from appearing as if they are one tick behind, but sudden object movement may\n"
-        "cause jitteriness.\n\n"
-        "Settings:\n"
+    (*commands).emplace_back("chimera_budget", budget_command, "debug",
+        "Get or set whether or show or hide various budgets.\n"
+        "Options:\n"
         "  0: Off\n"
-        "  1: On\n"
-        "  2: On - Do not interpolate first person camera (may make riding elevators juddery)\n\n"
+        "  1: On (Modded budgets if a mod is installed such as HAC2)\n"
+        "  2: On (Stock budgets)\n\n"
         "Syntax:\n"
-        "  - chimera_interpolate_predict [0-2]"
-    , 0, 1, find_interpolation_signatures(), true);
+        "  - chimera_budget [0-2]"
+    , 0, 1, find_debug_signatures(), false);
+
+    (*commands).emplace_back("chimera_devmode", devmode_command, "debug",
+        "Get or set whether or not to enable Halo's developer commands.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_devmode [true/false]"
+    , 0, 1, find_devmode_sig(), true);
+
+    (*commands).emplace_back("chimera_set_tps", set_tps_command, "debug",
+        "Get or set tick rate. This value cannot be set below 0.01.\n\n"
+        "Syntax:\n"
+        "  - chimera_set_tps [ticks per second]"
+    , 0, 1, find_debug_signatures(), false);
+
+    (*commands).emplace_back("chimera_wireframe", wireframe_command, "debug",
+        "Get or set whether to enable or disable wireframe mode. This will not work while in a server.\n\n"
+        "Syntax:\n"
+        "  - chimera_wireframe [true/false]"
+    , 0, 1, find_debug_signatures(), false);
 
     // Enhancements
 
@@ -218,11 +191,17 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_block_firing_particles", block_firing_particles_command, "enhancements",
         "Get or set whether or not to block firing particles.\n\n"
         "Syntax:\n"
-        "  - block_firing_particles [true/false]"
+        "  - chimera_block_firing_particles [true/false]"
     , 0, 1, true, true);
 
+    (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "enhancements",
+        "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
+        "Syntax:\n"
+        "  - chimera_widescreen_fix [0-2]"
+    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
+
     (*commands).emplace_back("chimera_block_mo", block_mo_command, "enhancements",
-        "Get or set whether or not to disable multitexture overlays. This feature is intended to fixthe\n"
+        "Get or set whether or not to disable multitexture overlays. This feature is intended to fix the\n"
         "buggy HUD on the stock sniper rifle, but multitexture overlays may be used correctly on\n"
         "some maps.\n\n"
         "Syntax:\n"
@@ -254,13 +233,6 @@ void initialize_client() noexcept {
         "  - chimera_skip_loading [true/false]"
     , 0, 1, find_loading_screen_signatures(), true);
 
-    (*commands).emplace_back("chimera_throttle_fps", throttle_fps_command, "enhancements",
-        "Throttle Halo's framerate. This uses Halo's built-in throttler, but modifies the minimum\n"
-        "frame time. Enabling this will also enable chimera_uncap_cinematic.\n\n"
-        "Syntax:\n"
-        "  - chimera_throttle_fps [max FPS]"
-    , 0, 1, find_uncap_cinematic_signatures(), true);
-
     (*commands).emplace_back("chimera_uncap_cinematic", uncap_cinematic_command, "enhancements",
         "Get or set whether or not to remove the 30 FPS framerate cap in cinematics. This may result\n"
         "in objects jittering during cutscenes if chimera_interpolate is not enabled.\n\n"
@@ -268,36 +240,7 @@ void initialize_client() noexcept {
         "  - chimera_uncap_cinematic [true/false]"
     , 0, 1, find_uncap_cinematic_signatures(), true);
 
-    // Xbox
-
-    (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
-        "Get or set whether or not to emulate Xbox safe zones.\n\n"
-        "Syntax:\n"
-        "  - chimera_safe_zones [true/false]"
-    , 0, 1, true, true);
-
-    (*commands).emplace_back("chimera_simple_score_screen", simple_score_screen_command, "xbox",
-        "Get or set whether or not to use a simplified in-game score screen.\n\n"
-        "Syntax:\n"
-        "  - chimera_simple_score_screen [true/false]"
-    , 0, 1, find_simple_score_screen_sigs(), true);
-
-    (*commands).emplace_back("chimera_split_screen_hud", split_screen_hud_command, "xbox",
-        "Get or set whether or not to use Halo's split screen HUD.\n"
-        "\n"
-        "Note: This may cause potential crashing issues on HAC2. Also, the health and shield bar\n"
-        "is broken on stock Halo.\n\n"
-        "Syntax:\n"
-        "  - chimera_simple_score_screen [true/false]"
-    , 0, 1, find_split_screen_hud_sigs(), true);
-
     // Fixes
-
-    (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "fixes",
-        "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
-        "Syntax:\n"
-        "  - chimera_widescreen_fix [0-2]"
-    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
     (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
         "Get or set whether or not to (mostly) fix the HUD.\n\n"
@@ -316,36 +259,89 @@ void initialize_client() noexcept {
         "  - chimera_widescreen_scope_fix [true/false]"
     , 0, 1, find_widescreen_scope_signature(), true);
 
-    // Debug
+    // Interpolation
 
-    (*commands).emplace_back("chimera_budget", budget_command, "debug",
-        "Get or set whether or show or hide various budgets.\n"
-        "Options:\n"
-        "  0: off\n"
-        "  1: on (used custom maximums if a mod is used [e.g. HAC2])\n"
-        "  2: on (use stock maximums regardless of if a mod is used)\n\n"
+    (*commands).emplace_back("chimera_interpolate", interpolate_command, "interpolation",
+        "Get or set the interpolation level. Interpolation smoothes out object movement between\n"
+        "ticks, providing a substantial visual improvement. Higher levels incur greater CPU usage and\n"
+        "may impact framerate on slower CPUs.\n\n"
         "Syntax:\n"
-        "  - chimera_budget [0-2]"
-    , 0, 1, find_debug_signatures(), false);
+        "  - chimera_interpolate [off/low/medium/high/ultra]"
+    , 0, 1, find_interpolation_signatures(), true);
 
-    (*commands).emplace_back("chimera_devmode", devmode_command, "debug",
-        "Get or set whether or not to enable Halo's developer commands.\n\n"
+    (*commands).emplace_back("chimera_interpolate_predict", interpolate_predict_command, "interpolation",
+        "Get or set whether the next tick should be predicted when interpolating. This will prevent\n"
+        "objects from appearing as if they are one tick behind, but sudden object movement may\n"
+        "cause jitteriness.\n\n"
+        "Settings:\n"
+        "  0: Off\n"
+        "  1: On\n"
+        "  2: On - Do not interpolate first person camera (may make riding elevators juddery)\n\n"
+        "Syntax:\n"
+        "  - chimera_interpolate_predict [0-2]"
+    , 0, 1, find_interpolation_signatures(), true);
+
+    // Visuals
+
+    (*commands).emplace_back("chimera_af", af_command, "visuals",
+        "Get or set whether or not to enable anisotropic filtering.\n\n"
+        "Syntax:\n"
+        "  - chimera_af [true/false]"
+    , 0, 1, find_anisotropic_filtering_signature(), true);
+
+    (*commands).emplace_back("chimera_block_gametype_indicator", block_gametype_indicator_command, "visuals",
+        "Get or set whether or not to turn off the gametype indicator.\n\n"
         "\n"
         "Syntax:\n"
-        "  - chimera_devmode [true/false]"
-    , 0, 1, find_devmode_sig(), true);
+        "  - chimera_block_gametype_indicator [true/false]"
+    , 0, 1, find_gametype_indicator_sig(), true);
 
-    (*commands).emplace_back("chimera_set_tps", set_tps_command, "debug",
-        "Get or set tick rate. This value cannot be set below 0.01.\n\n"
+    (*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
+        "Get or set whether or not to turn vSync off startup.\n\n"
+        "\n"
         "Syntax:\n"
-        "  - chimera_set_tps [ticks_per_second]"
-    , 0, 1, find_debug_signatures(), false);
+        "  - chimera_block_vsync [true/false]"
+    , 0, 1, find_set_resolution_signatures(), true);
 
-    (*commands).emplace_back("chimera_wireframe", wireframe_command, "debug",
-        "Get or set whether or enable or disable wireframe mode. This will not work while in a server.\n\n"
+    (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
+        "Change Halo's resolution. Width and height can be either resolution in pixels or an aspect\n"
+        "ratio.\n\n"
         "Syntax:\n"
-        "  - chimera_wireframe [true/false]"
-    , 0, 1, find_debug_signatures(), false);
+        "  - chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]"
+    , 2, 5, find_set_resolution_signatures(), false);
+
+    (*commands).emplace_back("chimera_throttle_fps", throttle_fps_command, "visuals",
+        "Throttle Halo's framerate.\n\n"
+        "Syntax:\n"
+        "  - chimera_throttle_fps [max FPS]"
+    , 0, 1, find_uncap_cinematic_signatures(), true);
+
+    (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
+        "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
+        "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
+        "Syntax:\n"
+        "  - chimera_vfov [VFOV]"
+    , 0, 1, find_interpolation_signatures(), true);
+
+    // Xbox
+
+    (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
+        "Get or set whether or not to emulate Xbox safe zones.\n\n"
+        "Syntax:\n"
+        "  - chimera_safe_zones [true/false]"
+    , 0, 1, true, true);
+
+    (*commands).emplace_back("chimera_simple_score_screen", simple_score_screen_command, "xbox",
+        "Get or set whether or not to use a simplified in-game score screen.\n\n"
+        "Syntax:\n"
+        "  - chimera_simple_score_screen [true/false]"
+    , 0, 1, find_simple_score_screen_sigs(), true);
+
+    (*commands).emplace_back("chimera_split_screen_hud", split_screen_hud_command, "xbox",
+        "Get or set whether or not to use Halo's split screen HUD.\n\n"
+        "Syntax:\n"
+        "  - chimera_simple_score_screen [true/false]"
+    , 0, 1, find_split_screen_hud_sigs(), true);
 }
 
 void uninitialize_client() noexcept {
