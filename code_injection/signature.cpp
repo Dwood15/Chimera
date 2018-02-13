@@ -1,5 +1,4 @@
 #include "signature.h"
-#include "codefinder.h"
 
 const char *ChimeraSignature::name() {
     return this->i_name.data();

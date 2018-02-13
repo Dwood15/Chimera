@@ -1,5 +1,3 @@
-/// Codefinder.h from HAC2
-
 #pragma once
 
 #ifndef _CODEFINDER_H

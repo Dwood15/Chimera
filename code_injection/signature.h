@@ -3,7 +3,7 @@
 #include <windows.h>
 #include <vector>
 #include <string>
-#include "codefinder.h"
+#include "hacclient/codefinder.h"
 
 class ChimeraSignature {
 private:

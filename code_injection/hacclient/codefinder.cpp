@@ -1,5 +1,3 @@
-/// Codefinder.cpp from HAC2
-
 #include "codefinder.h"
 #define WIN32_MEAN_AND_LEAN
 #include <Windows.h>
