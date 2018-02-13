@@ -66,7 +66,7 @@ ChimeraCommand::ChimeraCommand(const char *name, ChimeraCommandFunctionPointer f
         this->i_max_args = max_args;
 }
 
-static std::vector<std::string> split_arguments(const char *input, bool lowercase_first_argument) {
+std::vector<std::string> split_arguments(const char *input, bool lowercase_first_argument) {
     std::vector<const char *> args;
     std::string input_copy = input;
     char *data = &input_copy[0];

@@ -90,6 +90,9 @@ public:
     ChimeraCommand(const char *name, ChimeraCommandFunctionPointer function, const char *category=nullptr, const char *help=nullptr, size_t min_args=0, size_t max_args=0, bool supported=true, bool saves=false);
 };
 
+/// Split text into arguments.
+std::vector<std::string> split_arguments(const char *input, bool lowercase_first_argument=false);
+
 /// Search for and execute the Chimera command.
 ChimeraCommandError execute_chimera_command(const char *command_input, bool silently=false);
 
