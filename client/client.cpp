@@ -181,7 +181,7 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_auto_center", auto_center_command, "enhancements",
         "Get or set how auto centering of vehicle cameras should behave.\n"
         "Options:\n"
-        "  0: Broken stock behavior (default)\n"
+        "  0: Broken stock behavior\n"
         "  1: Fixed behavior\n"
         "  2: Disable automatic centering\n\n"
         "Syntax:\n"
