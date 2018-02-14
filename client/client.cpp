@@ -42,6 +42,8 @@
 
 #include "messaging/messaging.h"
 
+#include "test/input.h"
+
 #include "visuals/anisotropic_filtering.h"
 #include "visuals/letterbox.h"
 #include "visuals/vertical_field_of_view.h"
@@ -144,6 +146,9 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_verbose_init"
     , 0, 1, true);
+
+    (*commands).emplace_back("chimera_input", test_input_command, nullptr, ""
+    , 0, 1, find_input_sigs(), false);
 
     // Debug
 

@@ -99,7 +99,9 @@ g++ -c client/lua/lua_callback.cpp %ARGS% -o bin/client__lua__lua_callback.o
 g++ -c client/lua/lua_game.cpp %ARGS% -o bin/client__lua__lua_game.o
 g++ -c client/lua/lua_io.cpp %ARGS% -o bin/client__lua__lua_io.o
 
-g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messaging.o
+g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging__messaging.o
+
+g++ -c client/test/input.cpp -masm=intel -o bin/client__test__input.o
 
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
 g++ -c client/visuals/gametype_indicator.cpp %ARGS% -o bin/client__visuals__gametype_indicator.o

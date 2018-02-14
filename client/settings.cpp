@@ -136,8 +136,6 @@ ChimeraCommandError verbose_init_command(size_t argc, const char **argv) noexcep
     if(argc == 1) {
         verbose_init = bool_value(argv[0]);
     }
-    char x[256] = {};
-    sprintf(x, "chimera_verbose_init: %s", verbose_init ? "true" : "false");
-    console_out(x);
+    console_out(verbose_init ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
