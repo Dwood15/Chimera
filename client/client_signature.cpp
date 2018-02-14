@@ -1,11 +1,26 @@
 #include "client_signature.h"
 
+void BasicCodecave::call_virtual_protect() noexcept {
+    DWORD old;
+    VirtualProtect(this->data, sizeof(this->data), PAGE_EXECUTE_READWRITE, &old);
+}
+BasicCodecave::BasicCodecave() noexcept {
+    this->call_virtual_protect();
+}
+BasicCodecave::BasicCodecave(const unsigned char *data, unsigned int length) noexcept {
+    this->call_virtual_protect();
+    memcpy(this->data, data, length);
+}
+BasicCodecave::BasicCodecave(const BasicCodecave &other) noexcept {
+    this->call_virtual_protect();
+    memcpy(this->data, other.data, sizeof(BasicCodecave::data));
+}
+
 void write_jmp_call(void *call_instruction, void *before_function, void *after_function, BasicCodecave &codecave) noexcept {
     auto *call_instruction_char = static_cast<unsigned char *>(call_instruction);
     auto call_instruction_end = reinterpret_cast<int>(call_instruction_char + 5);
 
     DWORD prota, protb;
-    VirtualProtect(&codecave, sizeof(codecave), PAGE_EXECUTE_READWRITE, &prota);
 
     size_t nops = 0;
     size_t whereami = 0;

@@ -1,7 +1,13 @@
 #pragma once
 
 struct BasicCodecave {
+private:
+    void call_virtual_protect() noexcept;
+public:
     unsigned char data[64];
+    BasicCodecave() noexcept;
+    BasicCodecave(const unsigned char *data, unsigned int length) noexcept;
+    BasicCodecave(const BasicCodecave &other) noexcept;
 };
 void write_jmp_call(void *call_instruction, void *before_function, void *after_function, BasicCodecave &codecave) noexcept;
 
