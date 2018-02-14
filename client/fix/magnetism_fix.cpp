@@ -65,7 +65,7 @@ void fix_magnetism() noexcept {
     if(!gamepad_being_used) return;
     enable_magnetism_fix();
 
-    static unsigned char on_gamepad_horizontal_code[] = {
+    const unsigned char fstp_then_call[] {
         // fstp dword ptr - 0x0
         0xD9, 0x1D, 0x00, 0x00, 0x00, 0x00,
 
@@ -82,39 +82,9 @@ void fix_magnetism() noexcept {
         0xC3
     };
 
-    static unsigned char on_gamepad_vertical_code[] = {
-        // fstp dword ptr - 0x0
-        0xD9, 0x1D, 0x00, 0x00, 0x00, 0x00,
-
-        // pushad - 0x6
-        0x60,
-
-        // call my shit - 0x7
-        0xE8, 0x00, 0x00, 0x00, 0x00,
-
-        // popad - 0xC
-        0x61,
-
-        // ret - 0xD
-        0xC3
-    };
-
-    static unsigned char on_mouse_horizontal_code[] = {
-        // fstp dword ptr - 0x0
-        0xD9, 0x1D, 0x00, 0x00, 0x00, 0x00,
-
-        // pushad - 0x6
-        0x60,
-
-        // call my shit - 0x7
-        0xE8, 0x00, 0x00, 0x00, 0x00,
-
-        // popad - 0xC
-        0x61,
-
-        // ret - 0xD
-        0xC3
-    };
+    static BasicCodecave on_gamepad_horizontal_code(fstp_then_call, sizeof(fstp_then_call));
+    static BasicCodecave on_gamepad_vertical_code(fstp_then_call, sizeof(fstp_then_call));
+    static BasicCodecave on_mouse_horizontal_code(fstp_then_call, sizeof(fstp_then_call));
 
     **reinterpret_cast<char **>(get_signature("player_magnetism_enabled_sig").address() + 1) = 1;
 
@@ -124,55 +94,55 @@ void fix_magnetism() noexcept {
     auto *on_gamepad_horizontal_addr1 = get_signature("gamepad_horizontal_0_sig").address();
     auto *on_gamepad_vertical_addr1 = get_signature("gamepad_vertical_0_sig").address();
     float *fah = reinterpret_cast<float *>(*reinterpret_cast<uint32_t *>(on_gamepad_horizontal_addr1 + 2)) + 4;
-    *reinterpret_cast<float **>(on_gamepad_horizontal_code + 2) = fah;
+    *reinterpret_cast<float **>(on_gamepad_horizontal_code.data + 2) = fah;
 
     float *fav = reinterpret_cast<float *>(*reinterpret_cast<uint32_t *>(on_gamepad_vertical_addr1 + 2)) + 4;
-    *reinterpret_cast<float **>(on_gamepad_vertical_code + 2) = fav;
+    *reinterpret_cast<float **>(on_gamepad_vertical_code.data + 2) = fav;
 
     auto *on_mouse_horizontal_addr1 = get_signature("mouse_horizontal_0_sig").address();
-    *reinterpret_cast<float **>(on_mouse_horizontal_code + 2) = reinterpret_cast<float *>(*reinterpret_cast<uint32_t *>(on_mouse_horizontal_addr1 + 2));
+    *reinterpret_cast<float **>(on_mouse_horizontal_code.data + 2) = reinterpret_cast<float *>(*reinterpret_cast<uint32_t *>(on_mouse_horizontal_addr1 + 2));
 
-    *I32PTR(on_gamepad_horizontal_code + 7 + 1) = I32(on_gamepad_movement_horizontal) - I32(on_gamepad_horizontal_code + 7 + 5);
-    *I32PTR(on_gamepad_vertical_code + 7 + 1) = I32(on_gamepad_movement_vertical) - I32(on_gamepad_vertical_code + 7 + 5);
+    *I32PTR(on_gamepad_horizontal_code.data + 7 + 1) = I32(on_gamepad_movement_horizontal) - I32(on_gamepad_horizontal_code.data + 7 + 5);
+    *I32PTR(on_gamepad_vertical_code.data + 7 + 1) = I32(on_gamepad_movement_vertical) - I32(on_gamepad_vertical_code.data + 7 + 5);
 
     VirtualProtect(on_gamepad_horizontal_addr1, 6, PAGE_READWRITE, &old_protect);
     memset(on_gamepad_horizontal_addr1,0x90,6);
     on_gamepad_horizontal_addr1[0] = 0xE8;
-    *I32PTR(on_gamepad_horizontal_addr1 + 1) = I32(on_gamepad_horizontal_code) - I32(on_gamepad_horizontal_addr1 + 1 + 4);
+    *I32PTR(on_gamepad_horizontal_addr1 + 1) = I32(on_gamepad_horizontal_code.data) - I32(on_gamepad_horizontal_addr1 + 1 + 4);
     VirtualProtect(on_gamepad_horizontal_addr1, 6, old_protect, &old_protect_b);
 
     auto *on_gamepad_horizontal_addr2 = get_signature("gamepad_horizontal_1_sig").address();
     VirtualProtect(on_gamepad_horizontal_addr2, 6, PAGE_READWRITE, &old_protect);
     memset(on_gamepad_horizontal_addr2,0x90,6);
     on_gamepad_horizontal_addr2[0] = 0xE8;
-    *I32PTR(on_gamepad_horizontal_addr2 + 1) = I32(on_gamepad_horizontal_code) - I32(on_gamepad_horizontal_addr2 + 1 + 4);
+    *I32PTR(on_gamepad_horizontal_addr2 + 1) = I32(on_gamepad_horizontal_code.data) - I32(on_gamepad_horizontal_addr2 + 1 + 4);
     VirtualProtect(on_gamepad_horizontal_addr2, 6, old_protect, &old_protect_b);
 
     VirtualProtect(on_gamepad_vertical_addr1, 6, PAGE_READWRITE, &old_protect);
     memset(on_gamepad_vertical_addr1,0x90,6);
     on_gamepad_vertical_addr1[0] = 0xE8;
-    *I32PTR(on_gamepad_vertical_addr1 + 1) = I32(on_gamepad_vertical_code) - I32(on_gamepad_vertical_addr1 + 1 + 4);
+    *I32PTR(on_gamepad_vertical_addr1 + 1) = I32(on_gamepad_vertical_code.data) - I32(on_gamepad_vertical_addr1 + 1 + 4);
     VirtualProtect(on_gamepad_vertical_addr1, 6, old_protect, &old_protect_b);
 
     auto *on_gamepad_vertical_addr2 = get_signature("gamepad_vertical_1_sig").address();
     VirtualProtect(on_gamepad_vertical_addr2, 6, PAGE_READWRITE, &old_protect);
     memset(on_gamepad_vertical_addr2,0x90,6);
     on_gamepad_vertical_addr2[0] = 0xE8;
-    *I32PTR(on_gamepad_vertical_addr2 + 1) = I32(on_gamepad_vertical_code) - I32(on_gamepad_vertical_addr2 + 1 + 4);
+    *I32PTR(on_gamepad_vertical_addr2 + 1) = I32(on_gamepad_vertical_code.data) - I32(on_gamepad_vertical_addr2 + 1 + 4);
     VirtualProtect(on_gamepad_vertical_addr2, 6, old_protect, &old_protect_b);
 
-    *I32PTR(on_mouse_horizontal_code + 7 + 1) = I32(on_mouse_movement_horizontal) - I32(on_mouse_horizontal_code + 7 + 5);
+    *I32PTR(on_mouse_horizontal_code.data + 7 + 1) = I32(on_mouse_movement_horizontal) - I32(on_mouse_horizontal_code.data + 7 + 5);
 
     VirtualProtect(on_mouse_horizontal_addr1, 6, PAGE_READWRITE, &old_protect);
     memset(on_mouse_horizontal_addr1,0x90,6);
     on_mouse_horizontal_addr1[0] = 0xE8;
-    *I32PTR(on_mouse_horizontal_addr1 + 1) = I32(on_mouse_horizontal_code) - I32(on_mouse_horizontal_addr1 + 1 + 4);
+    *I32PTR(on_mouse_horizontal_addr1 + 1) = I32(on_mouse_horizontal_code.data) - I32(on_mouse_horizontal_addr1 + 1 + 4);
     VirtualProtect(on_mouse_horizontal_addr1, 6, old_protect, &old_protect_b);
 
     auto *on_mouse_horizontal_addr2 = get_signature("mouse_horizontal_1_sig").address();
     VirtualProtect(on_mouse_horizontal_addr2, 6, PAGE_READWRITE, &old_protect);
     memset(on_mouse_horizontal_addr2,0x90,6);
     on_mouse_horizontal_addr2[0] = 0xE8;
-    *I32PTR(on_mouse_horizontal_addr2 + 1) = I32(on_mouse_horizontal_code) - I32(on_mouse_horizontal_addr2 + 1 + 4);
+    *I32PTR(on_mouse_horizontal_addr2 + 1) = I32(on_mouse_horizontal_code.data) - I32(on_mouse_horizontal_addr2 + 1 + 4);
     VirtualProtect(on_mouse_horizontal_addr2, 6, old_protect, &old_protect_b);
 }
