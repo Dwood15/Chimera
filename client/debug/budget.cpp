@@ -1,7 +1,6 @@
 #include "budget.h"
 #include <string.h>
 #include <math.h>
-#include <sys/time.h>
 #include "../command/console.h"
 #include "../messaging/messaging.h"
 #include "../hooks/frame.h"
@@ -9,7 +8,6 @@
 #include "../client_signature.h"
 #include "../halo_data/table.h"
 
-static struct timespec tickle_time;
 static int active = 0;
 
 #define buffer_size 30
@@ -79,11 +77,12 @@ static void change_colorargb_d(double val, double base, ColorARGB &color, double
 }
 
 static void show_budget() noexcept {
-    struct timespec now_time;
+    static LARGE_INTEGER previous_time;
+    LARGE_INTEGER now_time;
+    QueryPerformanceCounter(&now_time);
+    s_per_tick[0] = counter_time_elapsed(previous_time, now_time);
+    previous_time = now_time;
     static bool clear = false;
-    clock_gettime(CLOCK_MONOTONIC,&now_time);
-    s_per_tick[0] = static_cast<double>(now_time.tv_sec - tickle_time.tv_sec) + static_cast<double>(now_time.tv_nsec - tickle_time.tv_nsec) / 1000000000.0;
-    tickle_time = now_time;
     double total_time = 0;
     size_t total_frames = 0;
 
@@ -187,7 +186,6 @@ ChimeraCommandError budget_command(size_t argc, const char **argv) noexcept {
             if(new_value && !active) {
                 add_tick_event(show_budget);
                 add_frame_event(calculate_fps);
-                clock_gettime(CLOCK_MONOTONIC,&tickle_time);
                 memset(frames_per_tick,0,sizeof(frames_per_tick));
                 memset(s_per_tick,0,sizeof(s_per_tick));
             }

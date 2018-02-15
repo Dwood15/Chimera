@@ -1,18 +1,17 @@
 #include "throttle_fps.h"
-#include <sys/time.h>
 #include "../client_signature.h"
 #include "../hooks/frame.h"
 #include "../messaging/messaging.h"
 
-static struct timespec prev_time;
+static LARGE_INTEGER prev_time;
 static double throttle_fps = 0.0;
 
 static void after_frame() noexcept {
     auto seconds_per_frame = 1.0 / throttle_fps;
     do {
-        struct timespec now_time;
-        clock_gettime(CLOCK_MONOTONIC,&now_time);
-        auto r = static_cast<double>(now_time.tv_sec - prev_time.tv_sec) + static_cast<double>(now_time.tv_nsec - prev_time.tv_nsec) / 1000000000.0;
+        LARGE_INTEGER now_time;
+        QueryPerformanceCounter(&now_time);
+        auto r = counter_time_elapsed(prev_time, now_time);
         if(r >= seconds_per_frame) {
             prev_time = now_time;
             break;
@@ -41,7 +40,7 @@ ChimeraCommandError throttle_fps_command(size_t argc, const char **argv) noexcep
             }
             else {
                 add_frame_event(after_frame, EVENT_PRIORITY_FINAL);
-                clock_gettime(CLOCK_MONOTONIC,&prev_time);
+                QueryPerformanceCounter(&prev_time);
             }
             throttle_fps = new_value;
         }

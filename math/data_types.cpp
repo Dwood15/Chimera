@@ -268,3 +268,9 @@ float distance_squared(float x1, float y1, float z1, float x2, float y2, float z
 float distance_squared(const Vector3D &a, const Vector3D &b) noexcept {
     return distance_squared(a.x, a.y, a.z, b.x, b.y, b.z);
 }
+
+double counter_time_elapsed(const LARGE_INTEGER &before, const LARGE_INTEGER &after) noexcept {
+    static LARGE_INTEGER performance_frequency = {};
+    if(performance_frequency.QuadPart == 0) QueryPerformanceFrequency(&performance_frequency);
+    return static_cast<double>(after.QuadPart - before.QuadPart) / performance_frequency.QuadPart;
+}

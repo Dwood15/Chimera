@@ -1,5 +1,7 @@
 #pragma once
 
+#include <windows.h>
+
 #define CONCAT(x, y) x ## y
 #define CONCAT2(x, y) CONCAT(x, y)
 #define PAD_CHARS(s) char CONCAT2(padding, __LINE__)[s];
@@ -109,3 +111,6 @@ float distance_squared(float x1, float y1, float z1, float x2, float y2, float z
 
 /// Calculate the distance between two 3D points without taking the square root.
 float distance_squared(const Vector3D &a, const Vector3D &b) noexcept;
+
+/// Get the time elapsed between two counters.
+double counter_time_elapsed(const LARGE_INTEGER &before, const LARGE_INTEGER &after) noexcept;

@@ -1,9 +1,8 @@
 #include "lua_callback.h"
 
 #include <memory>
-#include <sys/time.h>
 
-static struct timespec last_time;
+static LARGE_INTEGER last_time;
 
 #include "../messaging/messaging.h"
 #include "../hooks/camera.h"
@@ -39,9 +38,9 @@ int pcall(lua_State *state, int args, int result_count) noexcept {
 extern void load_map_script() noexcept;
 
 static void check_timers() noexcept {
-    struct timespec now_time;
-    clock_gettime(CLOCK_MONOTONIC, &now_time);
-    auto r = static_cast<double>(now_time.tv_sec - last_time.tv_sec) + static_cast<double>(now_time.tv_nsec - last_time.tv_nsec) / 1000000000.0;
+    LARGE_INTEGER now_time;
+    QueryPerformanceCounter(&now_time);
+    auto r = counter_time_elapsed(last_time, now_time);
     last_time = now_time;
     for(size_t i=0;i<scripts.size();i++) {
         auto &script = *scripts[i];
@@ -288,5 +287,5 @@ void setup_callbacks() noexcept {
     add_preframe_event(preframe_callback, EVENT_PRIORITY_BEFORE);
     add_rcon_message_event(rcon_message_callback, EVENT_PRIORITY_BEFORE);
     add_precamera_event(camera_callback, EVENT_PRIORITY_AFTER);
-    clock_gettime(CLOCK_MONOTONIC, &last_time);
+    QueryPerformanceCounter(&last_time);
 }

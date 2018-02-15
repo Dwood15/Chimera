@@ -1,12 +1,10 @@
-#include <sys/time.h>
-
 #include "../client_signature.h"
 #include "../command/command.h"
 #include "../messaging/messaging.h"
 #include "../halo_data/tag_data.h"
 #include "tick.h"
 
-static struct timespec current_tick_time;
+static LARGE_INTEGER current_tick_time;
 
 static void initialize_tick() noexcept;
 static bool tick_initialized = false;
@@ -54,7 +52,7 @@ void remove_tick_event(event_no_args event_function) noexcept {
 }
 
 static void on_tick() noexcept {
-    clock_gettime(CLOCK_MONOTONIC, &current_tick_time);
+    QueryPerformanceCounter(&current_tick_time);
     call_in_order(events);
 }
 
@@ -89,10 +87,9 @@ float effective_tick_rate() noexcept {
 }
 
 double tick_time() noexcept {
-    struct timespec now_time;
-    clock_gettime(CLOCK_MONOTONIC,&now_time);
-    auto r = static_cast<double>(now_time.tv_sec - current_tick_time.tv_sec) + static_cast<double>(now_time.tv_nsec - current_tick_time.tv_nsec) / 1000000000.0;
-    return r;
+    LARGE_INTEGER counter;
+    QueryPerformanceCounter(&counter);
+    return counter_time_elapsed(current_tick_time, counter);
 }
 
 double tick_progress() noexcept {

@@ -58,6 +58,8 @@ std::vector<ChimeraCommand> *commands;
 
 bool initial_tick = true;
 
+LARGE_INTEGER performance_frequency;
+
 static void init() {
     extern bool save_settings;
     extern bool autosave;
@@ -121,6 +123,8 @@ void initialize_client() noexcept {
 
     enable_descope_fix();
 
+    QueryPerformanceFrequency(&performance_frequency);
+
     if(find_magnetism_signatures()) {
         fix_magnetism();
     }
@@ -144,7 +148,7 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_verbose_init"
     , 0, 1, true);
-
+    
     // Debug
 
     (*commands).emplace_back("chimera_budget", budget_command, "debug",
