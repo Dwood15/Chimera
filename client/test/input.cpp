@@ -5,15 +5,55 @@
 
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
-#include "../hooks/frame.h"
+#include "../hooks/tick.h"
 #include "../halo_data/table.h"
 #include "../interpolation/camera.h"
 
 static double sensitivity = 0;
+int *cursor_x;
 
 typedef LRESULT (*window_proc_type)(_In_ HWND hwnd,_In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
 window_proc_type old_proc;
+
+static void set_input(bool input) {
+    static bool current_value = false;
+    if(input != current_value) {
+        current_value = input;
+        if(input) {
+            RAWINPUTDEVICE x = {};
+            x.usUsagePage = 1;
+            x.usUsage = 2;
+            x.dwFlags = RIDEV_NOLEGACY;
+            x.hwndTarget = 0;
+            RegisterRawInputDevices(&x, 1, sizeof(x));
+
+            POINT p;
+            GetCursorPos(&p);
+            RECT r;
+            r.left = p.x;
+            r.right = p.x;
+            r.top = p.y;
+            r.bottom = p.y;
+
+            ClipCursor(&r);
+        }
+        else {
+            RAWINPUTDEVICE x = {};
+            x.usUsagePage = 1;
+            x.usUsage = 2;
+            x.dwFlags = RIDEV_REMOVE;
+            x.hwndTarget = NULL;
+            RegisterRawInputDevices(&x, 1, sizeof(x));
+            ClipCursor(nullptr);
+        }
+    }
+}
+
+static void regain_input() {
+    set_input(true);
+    remove_pretick_event(regain_input);
+}
 
 LRESULT CALLBACK wproc(
   _In_ HWND   hWnd,
@@ -22,6 +62,14 @@ LRESULT CALLBACK wproc(
   _In_ LPARAM lParam
 ) {
     switch(uMsg) {
+        case(WM_KILLFOCUS): {
+            set_input(false);
+            break;
+        }
+        case(WM_SETFOCUS): {
+            add_pretick_event(regain_input);
+            break;
+        }
         case(WM_INPUT): {
             UINT dwsize;
             GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, NULL, &dwsize, sizeof(RAWINPUTHEADER));
@@ -37,17 +85,20 @@ LRESULT CALLBACK wproc(
             yaw -= raw->data.mouse.lLastX * adjusted_sens;
             pitch -= raw->data.mouse.lLastY * adjusted_sens;
 
+            cursor_x[0] += raw->data.mouse.lLastX;
+            cursor_x[1] += raw->data.mouse.lLastY;
+
             while(yaw < 0.0) {
                 yaw += M_PI * 2;
             }
             while(yaw > M_PI * 2) {
                 yaw -= M_PI * 2;
             }
-            while(pitch > M_PI / 2) {
-                pitch -= M_PI / 2;
+            if(pitch > M_PI / 2) {
+                pitch = M_PI / 2;
             }
-            while(pitch < -M_PI / 2) {
-                pitch += M_PI / 2;
+            if(pitch < -M_PI / 2) {
+                pitch = -M_PI / 2;
             }
 
             static bool left = false;
@@ -71,8 +122,15 @@ LRESULT CALLBACK wproc(
 
             return 0;
         }
-        default: return CallWindowProc((WNDPROC)old_proc, hWnd, uMsg, wParam, lParam);
+        default: {}
     }
+    return CallWindowProc((WNDPROC)old_proc, hWnd, uMsg, wParam, lParam);
+}
+
+static void reset_controls() noexcept {
+    auto &mi = get_movement_info();
+    mi.flashlight = 0;
+    mi.melee = 0;
 }
 
 ChimeraCommandError test_input_command(size_t argc, const char **argv) noexcept {
@@ -82,50 +140,39 @@ ChimeraCommandError test_input_command(size_t argc, const char **argv) noexcept 
         auto &sig_2 = get_signature("input_pitch_1_sig");
         auto &sig_3 = get_signature("input_pitch_2_sig");
         auto &sig_4 = get_signature("reset_input_sig");
+        auto &jne = get_signature("select_item_jne_sig");
+
+        auto &cursor_sig = get_signature("cursor_sig");
+        auto *cursor_sig_address = cursor_sig.signature();
+        cursor_x = *reinterpret_cast<int **>(cursor_sig_address + 4);
 
         if((new_value == 0) != (sensitivity == 0)) {
             if(new_value) {
-                RAWINPUTDEVICE x = {};
-                x.usUsagePage = 1;
-                x.usUsage = 2;
-                x.dwFlags = RIDEV_NOLEGACY;
-                x.hwndTarget = 0;
-                RegisterRawInputDevices(&x, 1, sizeof(x));
-
-                POINT p;
-                GetCursorPos(&p);
-                RECT r;
-                r.left = p.x;
-                r.right = p.x;
-                r.top = p.y;
-                r.bottom = p.y;
-
-                ClipCursor(&r);
-
+                set_input(true);
                 const short new_code[] = { 0x90, 0x90, 0x90 };
                 const short new_code2[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
                 write_code_s(sig_1.address(), new_code);
                 write_code_s(sig_2.address(), new_code);
                 write_code_s(sig_3.address(), new_code);
                 write_code_s(sig_4.address(), new_code2);
+                write_code_any_value(jne.address(), static_cast<unsigned char>(0xEB));
 
-                console_out(std::to_string((unsigned long)&get_movement_info().secondary_fire));
+                //console_out(std::to_string((unsigned long)&get_movement_info().secondary_fire));
+                add_tick_event(reset_controls);
 
                 old_proc = reinterpret_cast<window_proc_type>(GetWindowLong(GetActiveWindow(), GWL_WNDPROC));
                 SetWindowLong(GetActiveWindow(), GWL_WNDPROC, reinterpret_cast<LONG>(wproc));
             }
             else {
-                RAWINPUTDEVICE x = {};
-                x.usUsagePage = 1;
-                x.usUsage = 2;
-                x.dwFlags = RIDEV_REMOVE;
-                x.hwndTarget = NULL;
-                RegisterRawInputDevices(&x, 1, sizeof(x));
+                set_input(false);
                 sig_1.undo();
                 sig_2.undo();
                 sig_3.undo();
+                sig_4.undo();
+                jne.undo();
                 SetWindowLong(GetActiveWindow(), GWL_WNDPROC, reinterpret_cast<LONG>(old_proc));
-                ClipCursor(nullptr);
+                remove_tick_event(reset_controls);
+                remove_pretick_event(regain_input);
             }
         }
         sensitivity = new_value;

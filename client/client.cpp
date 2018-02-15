@@ -147,8 +147,8 @@ void initialize_client() noexcept {
         "  - chimera_verbose_init"
     , 0, 1, true);
 
-    (*commands).emplace_back("chimera_input", test_input_command, nullptr, ""
-    , 0, 1, find_input_sigs(), false);
+    (*commands).emplace_back("chimera_raw_mouse_input", test_input_command, nullptr, ""
+    , 0, 1, find_input_sigs() && find_widescreen_fix_signatures(), true);
 
     // Debug
 
