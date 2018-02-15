@@ -8,6 +8,7 @@ cd client\lua\lua
 echo Building Lua...
 
 del bin /Q
+mkdir bin
 for /r %%f in (*.c) do gcc -c %%f -O2 -o bin/%%~nf.o
 ar rcs liblua.a bin/*
 move liblua.a bin
@@ -35,6 +36,7 @@ goto BUILD
 :BUILD
 
 del bin /Q
+mkdir bin
 
 @echo ON
 windres version.rc -o bin/version.o
@@ -116,4 +118,4 @@ g++ -c code_injection/signature.cpp %ARGS% -o bin/code_injection__signature.o
 g++ -c math/data_types.cpp %ARGSFAST% -o bin/math__data_types.o
 
 :END
-g++ bin/* %LARGS% -L client/lua/lua/bin -llua -shared -lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32 -o "C:\Program Files (x86)\Microsoft Games\Halo Custom Edition\controls\chimera.dll"
+g++ bin/* %LARGS% -L client/lua/lua/bin -llua -shared -lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32 -o "bin/chimera.dll"
