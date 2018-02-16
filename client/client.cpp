@@ -18,7 +18,7 @@
 #include "enhancements/auto_center.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
-#include "enhancements/mouse_acceleration.h"
+#include "enhancements/mouse.h"
 #include "enhancements/show_spawn.h"
 #include "enhancements/skip_loading.h"
 #include "enhancements/throttle_fps.h"
@@ -218,7 +218,7 @@ void initialize_client() noexcept {
         "exhibit some mouse acceleration.\n\n"
         "Syntax:\n"
         "  - chimera_block_mouse_acceleration [true/false]"
-    , 0, 1, find_mouse_acceleration_sigs(), true);
+    , 0, 1, find_mouse_sigs(), true);
 
     (*commands).emplace_back("chimera_block_zoom_blur", block_zoom_blur_command, "enhancements",
         "Get or set whether or not to disable the zoom blur.\n\n"
@@ -232,6 +232,14 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_enable_console [true/false]"
     , 0, 1, true, true);
+
+    (*commands).emplace_back("chimera_mouse_sensitivity", mouse_sensitivity_command, "enhancements",
+        "Set the horizontal and vertical mouse sensitivities.\n\n"
+        "Values less than 1 do not work properly if mouse acceleration is enabled.\n\n"
+        "Syntax:\n"
+        "  - chimera_mouse_sensitivity [<vertical> <horizontal>]"
+        "  - chimera_mouse_sensitivity <false>"
+    , 0, 2, find_mouse_sigs(), true);
 
     (*commands).emplace_back("chimera_show_spawns", show_spawns_command, "enhancements",
         "Get or set whether or not to show spawns.\n\n"
