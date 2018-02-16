@@ -177,7 +177,8 @@ Then run the included `build.bat` batch script.
 
 These people were invaluable to the development of Chimera:
 
-* **Kavawuvi** - Mod development and creation; documentation (Hi! It’s me!)
+* **Kavawuvi** - Mod development and creation; documentation
+* **Yumiris** - Markdown documentation
 * **Btcc22** - [Halo Anticheat 2](http://blog.haloanticheat.com/) development; HAC2 was a source of inspiration for Chimera’s development. HAC2’s signature scanning code was also vital for Chimera’s existence.
 * **Oxide** - Phasor development; Phasor had several useful signatures of Halo that proved useful for various things in Chimera. [Phasor source code](https://github.com/urbanyoung/Phasor)
 * **Wizard** - His addresses and offsets file saved a lot of time finding things.
