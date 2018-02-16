@@ -112,9 +112,11 @@ These commands exist to enhance your gameplay experience.
   * `2` - Disable automatic centering
 * `chimera_block_firing_particles [true/false]` - Get or set whether or not to block firing particles.
 * `chimera_block_mo [true/false]` - Get or set whether or not to disable multitexture overlays. This feature is intended to fix the buggy HUD on the stock sniper rifle, but multitexture overlays may be used correctly on some maps.
+* `chimera_block_mouse_acceleration [true/false]` - Get or set whether or not to block mouse acceleration. Note that some mice may still exhibit mouse acceleration.
 * `chimera_block_zoom_blur [true/false]` - Get or set whether or not to disable the zoom blur.
 * `chimera_block_letterbox [true/false]` -  Get or set whether or not to block the letterbox effect in cinematics.
 * `chimera_enable_console [true/false]` - Get or set whether or not to automatically enable the console. Unlike most other features, this feature is enabled by default.
+* `chimera_mouse_sensitivity [<horizontal> <vertical> | <false>]` -  Set the horizontal and vertical mouse sensitivities. Values less than 1 do not work properly if mouse acceleration is enabled.
 * `chimera_show_spawns [true/false]` - Get or set whether or not to show spawns.
 * `chimera_skip_loading [true/false]` - Get or set whether or not to skip the multiplayer loading screen.
 * `chimera_uncap_cinematic [true/false]` - Get or set whether or not to remove the 30 FPS framerate cap in cinematics. This may result in objects jittering during cutscenes if chimera_interpolate is not enabled.
@@ -168,7 +170,7 @@ These commands add enhancements that emulate or restore functionality from the o
 * `chimera_simple_score_screen [true/false]` - Get or set whether or not to use a simplified in-game score screen.
 * `chimera_split_screen_hud [true/false]` - Get or set whether or not to use Halo's split screen HUD. **Note:** This may cause potential crashing issues on HAC2. Also, the health and shield bar is broken on stock Halo.
 
-# Building 
+# Building
 
 To build Chimera, you will need [MinGW32](http://www.mingw.org/) installed and configured properly in your `PATH` environment variable.
 Then run the included `build.bat` batch script.
