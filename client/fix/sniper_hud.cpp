@@ -82,6 +82,7 @@ ChimeraCommandError sniper_hud_fix_command(size_t argc, const char **argv) noexc
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
         if(new_value != active) {
+            console_out("Changes will apply on next map load.");
             if(new_value) {
                 add_map_load_event(sniper_fix, EVENT_PRIORITY_BEFORE);
             }
