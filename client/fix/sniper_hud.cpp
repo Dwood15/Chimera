@@ -48,7 +48,7 @@ static void sniper_fix() noexcept {
         second_item.prelude.position.anchor_offset.y = 124;
         second_item.prelude.position.height_scale = 0.89;
 
-        first_item.colors.default_color = ColorByte(1.0F, 0.75F, 0.55F, 0.95F);
+        first_item.colors.default_color = ColorByte(1.0F, 0.925F, 0.785F, 0.95F);
         second_item.colors.default_color = first_item.colors.default_color;
     }
     catch(...) {
