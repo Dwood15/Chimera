@@ -117,7 +117,10 @@ static void set_mod(bool force) noexcept {
         }
 
         if(new_width_scale >= 1.0) {
+            char modified[65535] = {};
             for(size_t i=0;i<*reinterpret_cast<uint32_t *>(0x4044000C);i++) {
+                if(modified[i]) continue;
+                modified[i] = 1;
                 HaloTag &tag = HaloTag::from_id(i);
                 if(tag.tag_class == 0x44654C61) {
                     auto *data = tag.data;
@@ -131,7 +134,7 @@ static void set_mod(bool force) noexcept {
                         tags[tag.id.index].y = bounds_right;
                     }
 
-                    if(tags[tag.id.index].x <= 0 && tags[tag.id.index].y >= 640) {
+                    if(tags[tag.id.index].x == 0 && tags[tag.id.index].y == 640) {
                         HaloTagID &background = *reinterpret_cast<HaloTagID *>(data + 0x38 + 0xC);
                         if(background.is_valid()) {
                             HaloTag &background_bitmap = HaloTag::from_id(background);
@@ -151,6 +154,26 @@ static void set_mod(bool force) noexcept {
                             if(do_it) {
                                 bounds_left = floor(320.0 - 320.0 * width_scale);
                                 bounds_right = ceil(320.0 + 320.0 * width_scale);
+                            }
+                        }
+
+                        // fix child widgets for universal ui map
+                        auto *child_widgets = *reinterpret_cast<char **>(data + 0x3E0 + 4);
+                        for(size_t c=0;c<*reinterpret_cast<uint32_t *>(data + 0x3E0);c++) {
+                            auto *cw = child_widgets + c * 80;
+                            HaloTagID &widget = *reinterpret_cast<HaloTagID *>(cw + 0xC);
+                            if(!widget.is_valid()) continue;
+                            int16_t &horizontal_offset = *reinterpret_cast<int16_t *>(cw + 0x38);
+                            HaloTag &cwt = HaloTag::from_id(widget);
+                            modified[widget.index] = 1;
+                            auto *cwdata = cwt.data;
+                            int16_t &cwbounds_left = *reinterpret_cast<int16_t *>(cwdata + 0x26);
+                            int16_t &cwbounds_right = *reinterpret_cast<int16_t *>(cwdata + 0x2A);
+                            tags[widget.index].x = cwbounds_left;
+                            tags[widget.index].y = cwbounds_right;
+                            if((cwbounds_right - cwbounds_left) == 640) {
+                                cwbounds_left = -horizontal_offset;
+                                cwbounds_right = cwbounds_left + 640;
                             }
                         }
                     }
