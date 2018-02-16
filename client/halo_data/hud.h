@@ -204,7 +204,7 @@ struct GrenadeHUDInterfaceS {
     HUDElementColors colors;
     uint16_t sequence_index;
     uint32_t multitexture_overlays_count;
-    void *multitexture_overlays;
+    HUDMultitextureOverlay *multitexture_overlays;
     PAD_CHARS(4);
     PAD_CHARS(4);
 };
@@ -288,7 +288,7 @@ struct WeaponHUDInterfaceStaticElement {
 
     uint16_t sequence_index;
     uint32_t multitexture_overlay_count;
-    void *multitexture_overlays;
+    HUDMultitextureOverlay *multitexture_overlays;
     PAD_CHARS(0x4);
     PAD_CHARS(0x2C);
 };
@@ -441,7 +441,7 @@ struct UnitHUDInterfaceBackground {
     uint16_t sequence_index;
     PAD_CHARS(0x2);
     uint32_t multitexture_overlay_count;
-    void *multitexture_overlays;
+    HUDMultitextureOverlay *multitexture_overlays;
     PAD_CHARS(4);
     PAD_CHARS(4);
 };

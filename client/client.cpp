@@ -28,6 +28,7 @@
 #include "fix/descope_fix.h"
 #include "fix/magnetism_fix.h"
 #include "fix/scope_fix.h"
+#include "fix/sniper_hud.h"
 #include "fix/widescreen_fix.h"
 
 #include "halo_data/resolution.h"
@@ -261,6 +262,12 @@ void initialize_client() noexcept {
     , 0, 1, find_uncap_cinematic_signatures(), true);
 
     // Fixes
+
+    (*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
+        "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
+        "Syntax:\n"
+        "  - chimera_sniper_hud_fix [true/false]"
+    , 0, 1, true, true);
 
     (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
         "Get or set whether or not to (mostly) fix the HUD.\n\n"

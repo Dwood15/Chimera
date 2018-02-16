@@ -60,19 +60,19 @@ static void change_xy(AnchorOffset &addr, HUDAnchor anchor, OffsetHudMod &mod) {
 
     AnchorOffset delta = mod.delta;
 
-    #define X_OFFSET 160
-    #define Y_OFFSET 160
+    #define X_OFFSET 188
+    #define Y_OFFSET X_OFFSET
 
     if(anchor == ANCHOR_CENTER) {
-        if(v->original_value.x > - X_OFFSET && v->original_value.x < X_OFFSET) delta.x = 0;
-        if(v->original_value.y > - Y_OFFSET && v->original_value.y < Y_OFFSET) delta.y = 0;
+        if(v->original_value.x >= - X_OFFSET && v->original_value.x < X_OFFSET) delta.x = 0;
+        if(v->original_value.y >= - Y_OFFSET && v->original_value.y < Y_OFFSET) delta.y = 0;
 
         if(v->original_value.x < 0) delta.x *= -1;
         if(v->original_value.y > 0) delta.y *= -1;
     }
     else {
-        if(v->original_value.x > (320 - X_OFFSET) && v->original_value.x < (320 + X_OFFSET)) delta.x = 0;
-        if(v->original_value.y > (240 - Y_OFFSET) && v->original_value.y < (240 + Y_OFFSET)) delta.y = 0;
+        if(v->original_value.x >= (320 - X_OFFSET) && v->original_value.x < (320 + X_OFFSET)) delta.x = 0;
+        if(v->original_value.y >= (240 - Y_OFFSET) && v->original_value.y < (240 + Y_OFFSET)) delta.y = 0;
 
         if(v->original_value.x > 320) delta.x *= -1;
         if(v->original_value.y > 240) delta.y *= -1;
