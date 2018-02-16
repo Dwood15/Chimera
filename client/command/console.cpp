@@ -48,11 +48,11 @@ static void read_command() {
         case CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND: {
             extern bool on_command_lua(const char *command);
             auto command = split_arguments(console_text, true);
-            if(command.size() > 0 && command[0] != "rcon" && on_command_lua(console_text)) {
-                unblock_error();
+            if(command[0] != "rcon" && !on_command_lua(console_text)) {
+                console_text[0] = 0;
             }
             else {
-                console_text[0] = 0;
+                unblock_error();
             }
             break;
         }
