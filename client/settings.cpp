@@ -113,7 +113,8 @@ bool read_init_file(const char *path, const char *name) noexcept {
                     break;
                 }
                 case CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND: {
-                    sprintf(x, "%s:%u: The command was not found.", name, ln);
+                    auto command_name = split_arguments(line.data(), true)[0];
+                    sprintf(x, "%s:%u: Function %s was not found.", name, ln, command_name.data());
                     console_out_error(x);
                     break;
                 }
