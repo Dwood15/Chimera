@@ -2,6 +2,8 @@
 #include "../client_signature.h"
 #include "../messaging/messaging.h"
 
+static bool block_mouse_acceleration = false;
+
 ChimeraCommandError mouse_sensitivity_command(size_t argc, const char **argv) noexcept {
     static bool active = false;
     static float horiz = 0;
@@ -22,6 +24,11 @@ ChimeraCommandError mouse_sensitivity_command(size_t argc, const char **argv) no
         }
         horiz = strtof(argv[0], nullptr) - 2.5;
         vert = strtof(argv[1], nullptr) - 2.5;
+
+        if(!block_mouse_acceleration && (horiz < -0.5 || vert < -0.5)) {
+            console_out_warning("You are using a low sensitivity value.");
+            console_out_warning("Enable chimera_block_mouse_acceleration to prevent issues.");
+        }
     }
     else if(argc == 1) {
         mouse_horiz_1_sig.undo();
@@ -36,10 +43,9 @@ ChimeraCommandError mouse_sensitivity_command(size_t argc, const char **argv) no
 }
 
 ChimeraCommandError block_mouse_acceleration_command(size_t argc, const char **argv) noexcept {
-    static auto active = false;
     if(argc == 1) {
         bool new_value = bool_value(argv[0]);
-        if(new_value != active) {
+        if(new_value != block_mouse_acceleration) {
             auto &mouse_accel_1_sig = get_signature("mouse_accel_1_sig");
             auto &mouse_accel_2_sig = get_signature("mouse_accel_2_sig");
             if(new_value) {
@@ -50,9 +56,9 @@ ChimeraCommandError block_mouse_acceleration_command(size_t argc, const char **a
                 mouse_accel_1_sig.undo();
                 mouse_accel_2_sig.undo();
             }
-            active = new_value;
+            block_mouse_acceleration = new_value;
         }
     }
-    console_out(active ? "true" : "false");
+    console_out(block_mouse_acceleration ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }
