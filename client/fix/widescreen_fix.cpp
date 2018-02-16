@@ -164,8 +164,8 @@ static void set_mod(bool force) noexcept {
                             HaloTagID &widget = *reinterpret_cast<HaloTagID *>(cw + 0xC);
                             if(!widget.is_valid()) continue;
                             int16_t &horizontal_offset = *reinterpret_cast<int16_t *>(cw + 0x38);
+                            if(horizontal_offset == 0) continue;
                             HaloTag &cwt = HaloTag::from_id(widget);
-                            modified[widget.index] = 1;
                             auto *cwdata = cwt.data;
                             int16_t &cwbounds_left = *reinterpret_cast<int16_t *>(cwdata + 0x26);
                             int16_t &cwbounds_right = *reinterpret_cast<int16_t *>(cwdata + 0x2A);
@@ -174,6 +174,7 @@ static void set_mod(bool force) noexcept {
                             if((cwbounds_right - cwbounds_left) == 640) {
                                 cwbounds_left = -horizontal_offset;
                                 cwbounds_right = cwbounds_left + 640;
+                                modified[widget.index] = 1;
                             }
                         }
                     }
