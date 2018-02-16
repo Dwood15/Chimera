@@ -18,6 +18,7 @@
 #include "enhancements/auto_center.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
+#include "enhancements/mouse_acceleration.h"
 #include "enhancements/show_spawn.h"
 #include "enhancements/skip_loading.h"
 #include "enhancements/throttle_fps.h"
@@ -148,7 +149,7 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_verbose_init"
     , 0, 1, true);
-    
+
     // Debug
 
     (*commands).emplace_back("chimera_budget", budget_command, "debug",
@@ -211,6 +212,13 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_block_mo [true/false]"
     , 0, 1, find_multitexture_overlay_signature(), true);
+
+    (*commands).emplace_back("chimera_block_mouse_acceleration", block_mouse_acceleration_command, "enhancements",
+        "Get or set whether or not to block mouse acceleration. Note that some mice may still\n"
+        "exhibit some mouse acceleration.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_mouse_acceleration [true/false]"
+    , 0, 1, find_mouse_acceleration_sigs(), true);
 
     (*commands).emplace_back("chimera_block_zoom_blur", block_zoom_blur_command, "enhancements",
         "Get or set whether or not to disable the zoom blur.\n\n"
