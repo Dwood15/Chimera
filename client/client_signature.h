@@ -32,6 +32,7 @@ bool find_devmode_sig() noexcept;
 bool find_simple_score_screen_sigs() noexcept;
 bool find_split_screen_hud_sigs() noexcept;
 bool find_mouse_acceleration_sigs() noexcept;
+bool find_mouse_sigs() noexcept;
 
 #define I32(x) reinterpret_cast<int32_t>(x)
 #define I32PTR(x) reinterpret_cast<int32_t *>(x)
