@@ -7,12 +7,12 @@
 #include "../hooks/map_load.h"
 #include "../halo_data/tag_data.h"
 #include "../halo_data/hud.h"
+#include "../../math/data_types.h"
 
 static void sniper_fix() noexcept {
     try {
         auto &tag = HaloTag::lookup("wphi", "weapons\\sniper rifle\\sniper rifle");
         WeaponHUDInterface &hud_interface = *reinterpret_cast<WeaponHUDInterface *>(tag.data);
-        #define assert_or_bail(v) if(!(v)) return;
         assert_or_bail(hud_interface.anchor == ANCHOR_TOP_LEFT);
 
         #define STATIC_ELEMENTS_COUNT 3

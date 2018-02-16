@@ -2,6 +2,8 @@
 
 #include <windows.h>
 
+#define assert_or_bail(v) if(!(v)) return;
+
 #define CONCAT(x, y) x ## y
 #define CONCAT2(x, y) CONCAT(x, y)
 #define PAD_CHARS(s) char CONCAT2(padding, __LINE__)[s];
