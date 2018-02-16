@@ -1,5 +1,7 @@
 #include "sniper_hud.h"
 #include "../../version.h"
+#include "../open_sauce.h"
+#include "../halo_data/resolution.h"
 
 #include "../messaging/messaging.h"
 #include "../hooks/map_load.h"
@@ -10,7 +12,7 @@ static void sniper_fix() noexcept {
     try {
         auto &tag = HaloTag::lookup("wphi", "weapons\\sniper rifle\\sniper rifle");
         WeaponHUDInterface &hud_interface = *reinterpret_cast<WeaponHUDInterface *>(tag.data);
-        #define assert_or_bail(v) if(!(v)) { console_out_warning("Error " STR(v)); return; }
+        #define assert_or_bail(v) if(!(v)) return;
         assert_or_bail(hud_interface.anchor == ANCHOR_TOP_LEFT);
 
         #define STATIC_ELEMENTS_COUNT 3
@@ -40,19 +42,38 @@ static void sniper_fix() noexcept {
         first_item.multitexture_overlays->blending_function_0_to_1 = MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_SUBTRACT;
         second_item.multitexture_overlays->blending_function_0_to_1 = MULTITEXTURE_OVERLAY_BLENDING_FUNCTION_SUBTRACT;
 
-        first_item.prelude.position.anchor_offset.x = 132;
+        int16_t center_x = 320;
+        int16_t right_offset = 0;
+        int16_t left_offset = 0;
+
+        if(open_sauce_present()) {
+            auto &resolution = get_resolution();
+            auto ar = static_cast<double>(resolution.width) / resolution.height;
+            center_x = 320.0 / (4.0 / 3.0) * ar;
+            if(ar != (4.0 / 3.0)) {
+                right_offset = 34;
+            }
+            if(ar > (8.0 / 2.76217)) {
+                left_offset = 32;
+            }
+        }
+
+        first_item.prelude.position.anchor_offset.x = center_x - 188 + left_offset;
         first_item.prelude.position.anchor_offset.y = 124;
         first_item.prelude.position.height_scale = 0.89;
 
-        second_item.prelude.position.anchor_offset.x = 484;
+        second_item.prelude.position.anchor_offset.x = center_x + 164 + right_offset;
         second_item.prelude.position.anchor_offset.y = 124;
         second_item.prelude.position.height_scale = 0.89;
 
         first_item.colors.default_color = ColorByte(1.0F, 0.925F, 0.785F, 0.95F);
+        first_item.colors.flashing_color = first_item.colors.default_color;
+        first_item.colors.disabled_color = first_item.colors.default_color;
         second_item.colors.default_color = first_item.colors.default_color;
+        second_item.colors.flashing_color = first_item.colors.default_color;
+        second_item.colors.disabled_color = first_item.colors.default_color;
     }
     catch(...) {
-        console_out_warning("No tag.");
     }
 }
 

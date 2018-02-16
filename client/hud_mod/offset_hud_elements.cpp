@@ -61,7 +61,7 @@ static void change_xy(AnchorOffset &addr, HUDAnchor anchor, OffsetHudMod &mod) {
     AnchorOffset delta = mod.delta;
 
     #define X_OFFSET 188
-    #define Y_OFFSET X_OFFSET
+    #define Y_OFFSET 141
 
     if(anchor == ANCHOR_CENTER) {
         if(v->original_value.x >= - X_OFFSET && v->original_value.x < X_OFFSET) delta.x = 0;
