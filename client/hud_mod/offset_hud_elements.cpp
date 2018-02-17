@@ -2,9 +2,11 @@
 #include "../halo_data/table.h"
 #include "../hooks/map_load.h"
 #include "../hooks/tick.h"
+#include "../messaging/messaging.h"
 
 #include <vector>
 #include <string.h>
+#include <math.h>
 
 struct OriginalHudValue {
     HUDAnchor anchor;
@@ -60,22 +62,41 @@ static void change_xy(AnchorOffset &addr, HUDAnchor anchor, OffsetHudMod &mod) {
 
     AnchorOffset delta = mod.delta;
 
-    #define X_OFFSET 188
-    #define Y_OFFSET 141
+    #define X_OFFSET 150
+    #define Y_OFFSET 140
 
-    if(anchor == ANCHOR_CENTER) {
-        if(v->original_value.x >= - X_OFFSET && v->original_value.x < X_OFFSET) delta.x = 0;
-        if(v->original_value.y >= - Y_OFFSET && v->original_value.y < Y_OFFSET) delta.y = 0;
+    int x_offset_from_center = v->original_value.x;
+    int y_offset_from_center = v->original_value.y;
 
-        if(v->original_value.x < 0) delta.x *= -1;
-        if(v->original_value.y > 0) delta.y *= -1;
+    if(anchor != ANCHOR_CENTER) {
+        x_offset_from_center -= 320;
+        y_offset_from_center -= 240;
     }
-    else {
-        if(v->original_value.x >= (320 - X_OFFSET) && v->original_value.x < (320 + X_OFFSET)) delta.x = 0;
-        if(v->original_value.y >= (240 - Y_OFFSET) && v->original_value.y < (240 + Y_OFFSET)) delta.y = 0;
 
-        if(v->original_value.x > 320) delta.x *= -1;
-        if(v->original_value.y > 240) delta.y *= -1;
+    if(x_offset_from_center > 0) delta.x *= -1;
+    if(y_offset_from_center > 0) delta.y *= -1;
+
+    if(anchor == ANCHOR_TOP_LEFT || anchor == ANCHOR_TOP_RIGHT) {
+        y_offset_from_center *= -1;
+    }
+    if(anchor == ANCHOR_TOP_RIGHT) {
+        x_offset_from_center *= -1;
+    }
+    if(anchor == ANCHOR_BOTTOM_RIGHT) {
+        x_offset_from_center *= -1;
+    }
+
+    if(x_offset_from_center >= -X_OFFSET && x_offset_from_center <= X_OFFSET) delta.x = 0;
+    if(y_offset_from_center >= -Y_OFFSET && y_offset_from_center <= Y_OFFSET) delta.y = 0;
+
+    if((x_offset_from_center == -188 || x_offset_from_center == 164) && y_offset_from_center == 116) {
+        delta.x = 0;
+        delta.y = 0;
+    }
+
+    if(distance_squared(0,0,x_offset_from_center,y_offset_from_center) < 195*195) {
+        delta.x = 0;
+        delta.y = 0;
     }
 
     v->total_delta.x += delta.x;
