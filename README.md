@@ -9,6 +9,26 @@ Chimera is a mod for Halo Custom Edition which contributes a wide variety of ess
 This documentation should assist in setting up Chimera while hopefully providing more useful information than what a forum post may bring.
 For general information on Chimera, go to https://chimera.opencarnage.net
 
+# Table of Contents
+
+* [Requirements](#requirements)
+  * [Reasons of Requirements](#reasons-of-requirements)
+* [Getting Started](#getting-started)
+  * [Chimera Directory Structure](#chimera-directory-structure)
+    * [chimerainit.txt and chimerasave.txt](#chimerainittxt-and-chimerasavetxt)
+    * [Lua Scripting](#lua-scripting)
+* [Commands](#commands)
+  * [Uncategorized](#uncategorized)
+  * [Debug](#debug)
+  * [Enhancements](#enhancements)
+  * [Fixes](#fixes)
+  * [Interpolation](#interpolation)
+  * [Visuals](#visuals)
+  * [Xbox](#xbox)
+* [Building](#building)
+* [Credits](#credits)
+* [Links](#links)
+
 # Requirements
 
 Chimera supports Halo Custom Edition version 1.10. If you use an older version of the game or use the retail version, no guarantees can be made on how stable or compatible Chimera will be.
