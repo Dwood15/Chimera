@@ -49,8 +49,12 @@ ChimeraCommandError block_mouse_acceleration_command(size_t argc, const char **a
             auto &mouse_accel_1_sig = get_signature("mouse_accel_1_sig");
             auto &mouse_accel_2_sig = get_signature("mouse_accel_2_sig");
             if(new_value) {
+                static float zero = 0;
                 write_code_any_value(mouse_accel_1_sig.address(), static_cast<unsigned char>(0xEB));
-                write_code_any_value(mouse_accel_2_sig.address(), static_cast<unsigned short>(0x9090));
+                write_code_any_value(mouse_accel_2_sig.address() + 1, static_cast<unsigned char>(0x05));
+                write_code_any_value(mouse_accel_2_sig.address() + 2, &zero);
+                write_code_any_value(mouse_accel_2_sig.address() + 6 + 1, static_cast<unsigned char>(0x25));
+                write_code_any_value(mouse_accel_2_sig.address() + 6 + 2, &zero);
             }
             else {
                 mouse_accel_1_sig.undo();
