@@ -1,5 +1,4 @@
-#define STRA(x) #x
-#define STR(x) STRA(x)
+#include "math/data_types.h"
 
 #define CHIMERA_AUTHOR "Kavawuvi ^v^"
 #define CHIMERA_BUILD_NUMBER 50

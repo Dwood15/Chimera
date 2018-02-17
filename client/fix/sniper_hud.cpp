@@ -25,10 +25,10 @@ static void sniper_fix() noexcept {
         assert_or_bail(first_item.multitexture_overlay_count == 1);
         assert_or_bail(second_item.multitexture_overlay_count == 1);
 
-        assert_or_bail(first_item.prelude.position.anchor_offset.x == 92);
-        assert_or_bail(first_item.prelude.position.anchor_offset.y == 85);
-        assert_or_bail(second_item.prelude.position.anchor_offset.x == 445);
-        assert_or_bail(second_item.prelude.position.anchor_offset.y == 85);
+        assert_or_bail(first_item.position.anchor_offset.x == 92);
+        assert_or_bail(first_item.position.anchor_offset.y == 85);
+        assert_or_bail(second_item.position.anchor_offset.x == 445);
+        assert_or_bail(second_item.position.anchor_offset.y == 85);
 
         assert_or_bail(first_item.multitexture_overlays->blend_function == HUDMultitextureOverlay::FRAMEBUFFER_BLEND_ALPHA_BLEND);
         assert_or_bail(second_item.multitexture_overlays->blend_function == HUDMultitextureOverlay::FRAMEBUFFER_BLEND_ALPHA_BLEND);
@@ -58,13 +58,13 @@ static void sniper_fix() noexcept {
             }
         }
 
-        first_item.prelude.position.anchor_offset.x = center_x - 188 + left_offset;
-        first_item.prelude.position.anchor_offset.y = 124;
-        first_item.prelude.position.height_scale = 0.89;
+        first_item.position.anchor_offset.x = center_x - 188 + left_offset;
+        first_item.position.anchor_offset.y = 124;
+        first_item.position.height_scale = 0.89;
 
-        second_item.prelude.position.anchor_offset.x = center_x + 164 + right_offset;
-        second_item.prelude.position.anchor_offset.y = 124;
-        second_item.prelude.position.height_scale = 0.89;
+        second_item.position.anchor_offset.x = center_x + 164 + right_offset;
+        second_item.position.anchor_offset.y = 124;
+        second_item.position.height_scale = 0.89;
 
         first_item.colors.default_color = ColorByte(1.0F, 0.925F, 0.785F, 0.95F);
         first_item.colors.flashing_color = first_item.colors.default_color;

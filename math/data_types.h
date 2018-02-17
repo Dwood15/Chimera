@@ -2,7 +2,16 @@
 
 #include <windows.h>
 
+#define STRA(x) #x
+#define STR(x) STRA(x)
+
+//#define ALSO_OUTPUT_WHAT_HAPPENED_WHEN_IT_BAILED
+
+#ifdef ALSO_OUTPUT_WHAT_HAPPENED_WHEN_IT_BAILED
+#define assert_or_bail(v) if(!(v)) { console_outconsole_out_warning(STR(v)); return; }
+#else
 #define assert_or_bail(v) if(!(v)) return;
+#endif
 
 #define CONCAT(x, y) x ## y
 #define CONCAT2(x, y) CONCAT(x, y)

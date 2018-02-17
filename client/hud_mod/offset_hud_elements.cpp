@@ -100,13 +100,13 @@ static void do_things_to_wphi_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept 
         auto &tdata = *reinterpret_cast<WeaponHUDInterface *>(HaloTag::from_id(tag_id).data);
         do_things_to_wphi_tag(tdata.child.tag_id, mod);
         for(int i=0;i<tdata.static_elements_count;i++) {
-            change_xy(tdata.static_elements[i].prelude.position, tdata.anchor, mod);
+            change_xy(tdata.static_elements[i].position, tdata.anchor, mod);
         }
         for(int i=0;i<tdata.meter_elements_count;i++) {
-            change_xy(tdata.meter_elements[i].prelude.position, tdata.anchor, mod);
+            change_xy(tdata.meter_elements[i].position, tdata.anchor, mod);
         }
         for(int i=0;i<tdata.number_elements_count;i++) {
-            change_xy(tdata.number_elements[i].prelude.position, tdata.anchor, mod);
+            change_xy(tdata.number_elements[i].position, tdata.anchor, mod);
         }
         for(int o=0;o<tdata.overlay_elements_count;o++) {
             auto &overlay = tdata.overlay_elements[o];
@@ -124,15 +124,15 @@ static void do_things_to_unhi_tag(HaloTagID tag_id, OffsetHudMod &mod) noexcept 
         auto &tdata = *reinterpret_cast<UnitHUDInterface *>(unhi_tag.data);
         change_xy(tdata.unit_hud_background.position, tdata.anchor, mod);
         change_xy(tdata.shield_panel_background.position, tdata.anchor, mod);
-        change_xy(tdata.shield_panel_meter.prelude.position, tdata.anchor, mod);
+        change_xy(tdata.shield_panel_meter.position, tdata.anchor, mod);
         change_xy(tdata.health_panel_background.position, tdata.anchor, mod);
-        change_xy(tdata.health_panel_meter.prelude.position, tdata.anchor, mod);
+        change_xy(tdata.health_panel_meter.position, tdata.anchor, mod);
         change_xy(tdata.motion_sensor_background.position, ANCHOR_BOTTOM_LEFT, mod);
         change_xy(tdata.motion_sensor_foreground.position, ANCHOR_BOTTOM_LEFT, mod);
         change_xy(tdata.motion_sensor_center, ANCHOR_BOTTOM_LEFT, mod);
         for(uint32_t i=0;i<tdata.auxiliary_hud_meters_count;i++) {
             change_xy(tdata.auxiliary_hud_meters[i].background.position, tdata.anchor, mod);
-            change_xy(tdata.auxiliary_hud_meters[i].meter.prelude.position, tdata.anchor, mod);
+            change_xy(tdata.auxiliary_hud_meters[i].meter.position, tdata.anchor, mod);
         }
         for(uint32_t i=0;i<tdata.auxiliary_overlays.overlays_count;i++) {
             change_xy(tdata.auxiliary_overlays.overlays[i].position, tdata.auxiliary_overlays.anchor, mod);

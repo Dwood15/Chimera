@@ -2,7 +2,40 @@
 
 #include "../client_signature.h"
 #include "../hac2.h"
+#include "../halo_data/hud.h"
+#include "../halo_data/tag_data.h"
+#include "../hooks/map_load.h"
 #include "../messaging/messaging.h"
+
+static void fix_hud() noexcept {
+    try {
+        HaloTag &tag = HaloTag::lookup("unit_hud_interface", "ui\\hud\\cyborg_mp");
+        auto &unhi = *reinterpret_cast<UnitHUDInterface *>(tag.data);
+        assert_or_bail(unhi.anchor == ANCHOR_TOP_RIGHT);
+        assert_or_bail(unhi.auxiliary_overlays.anchor == ANCHOR_TOP_LEFT);
+        assert_or_bail(unhi.unit_hud_background.position.anchor_offset.x == 0);
+        assert_or_bail(unhi.unit_hud_background.position.anchor_offset.y == 0);
+        assert_or_bail(unhi.shield_panel_background.position.anchor_offset.x == -7);
+        assert_or_bail(unhi.shield_panel_background.position.anchor_offset.y == 1);
+        assert_or_bail(unhi.shield_panel_meter.position.anchor_offset.x == 0);
+        assert_or_bail(unhi.shield_panel_meter.position.anchor_offset.y == 0);
+        assert_or_bail(unhi.health_panel_background.position.anchor_offset.x == 28);
+        assert_or_bail(unhi.health_panel_background.position.anchor_offset.y == -3);
+        assert_or_bail(unhi.health_panel_meter.position.anchor_offset.x == 29);
+        assert_or_bail(unhi.health_panel_meter.position.anchor_offset.y == 11);
+
+        unhi.shield_panel_background.position.scaling_flags.use_high_resolution_scale = 0;
+        unhi.shield_panel_meter.position.scaling_flags.use_high_resolution_scale = 0;
+        unhi.health_panel_background.position.scaling_flags.use_high_resolution_scale = 0;
+        unhi.health_panel_meter.position.scaling_flags.use_high_resolution_scale = 0;
+
+        for(size_t i=0;i<unhi.auxiliary_hud_meters_count;i++) {
+            unhi.auxiliary_hud_meters[i].background.position.scaling_flags.use_high_resolution_scale = 0;
+            unhi.auxiliary_hud_meters[i].meter.position.scaling_flags.use_high_resolution_scale = 0;
+        }
+    }
+    catch(...) {}
+}
 
 ChimeraCommandError split_screen_hud_command(size_t argc, const char **argv) noexcept {
     static auto active = false;
@@ -51,6 +84,9 @@ ChimeraCommandError split_screen_hud_command(size_t argc, const char **argv) noe
                     *reinterpret_cast<uint32_t *>(bytecode + 11 + 1) = reinterpret_cast<uint32_t>(hac2_workaround_ss_address + 5) - reinterpret_cast<uint32_t>(bytecode + 11 + 5);
                     write_code_any_value(hac2_workaround_ss_address + 0, static_cast<unsigned char>(0xE9));
                     write_code_any_value(hac2_workaround_ss_address + 1, reinterpret_cast<uint32_t>(bytecode) - reinterpret_cast<uint32_t>(hac2_workaround_ss_address + 5));
+
+                    add_map_load_event(fix_hud, EVENT_PRIORITY_BEFORE);
+                    console_out("Changes will fully take effect on next map load.");
                 }
             }
             else {
@@ -61,6 +97,8 @@ ChimeraCommandError split_screen_hud_command(size_t argc, const char **argv) noe
                 if(hac2_present()) {
                     hac2_workaround_ss_sig.undo();
                 }
+
+                remove_map_load_event(fix_hud);
             }
             active = new_value;
         }

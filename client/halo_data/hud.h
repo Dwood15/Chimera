@@ -281,8 +281,7 @@ struct WeaponHUDInterfaceElementPrelude {
 
 static_assert(sizeof(WeaponHUDInterfaceElementPrelude) == 0x48);
 
-struct WeaponHUDInterfaceStaticElement {
-    WeaponHUDInterfaceElementPrelude prelude;
+struct WeaponHUDInterfaceStaticElement : WeaponHUDInterfaceElementPrelude {
     HaloTagDependency interface_bitmap;
     HUDElementColors colors;
 
@@ -295,8 +294,7 @@ struct WeaponHUDInterfaceStaticElement {
 
 static_assert(sizeof(WeaponHUDInterfaceStaticElement) == 0xB4);
 
-struct WeaponHUDInterfaceMeterElement {
-    WeaponHUDInterfaceElementPrelude prelude;
+struct WeaponHUDInterfaceMeterElement : WeaponHUDInterfaceElementPrelude {
     HaloTagDependency meter_bitmap;
     HUDMeterColors colors;
     PAD_CHARS(0x38);
@@ -304,8 +302,7 @@ struct WeaponHUDInterfaceMeterElement {
 
 static_assert(sizeof(WeaponHUDInterfaceMeterElement) == 0xB4);
 
-struct WeaponHUDInterfaceNumberElement {
-    WeaponHUDInterfaceElementPrelude prelude;
+struct WeaponHUDInterfaceNumberElement : WeaponHUDInterfaceElementPrelude {
     HUDElementColors colors;
     int8_t maximum_number_of_digits;
     HUDNumberElementFlags flags;
@@ -472,8 +469,7 @@ struct UnitHUDInterfaceWarningSoundLatchedTo {
 struct UnitHUDInterfaceAuxiliaryHUDMeter {
     PAD_CHARS(0x14);
     UnitHUDInterfaceBackground background;
-    struct {
-        UnitHUDInterfaceMeterPrelude prelude;
+    struct : UnitHUDInterfaceMeterPrelude {
         float minimum_fraction_cutoff;
         struct {
             uint16_t show_only_when_active : 1;
@@ -492,8 +488,7 @@ struct UnitHUDInterface {
     PAD_CHARS(0x22);
     UnitHUDInterfaceBackground unit_hud_background;
     UnitHUDInterfaceBackground shield_panel_background;
-    struct {
-        UnitHUDInterfaceMeterPrelude prelude;
+    struct : UnitHUDInterfaceMeterPrelude {
         ColorByte overcharge_minimum_color;
         ColorByte overcharge_maximum_color;
         ColorByte overcharge_flash_color;
@@ -501,8 +496,7 @@ struct UnitHUDInterface {
         PAD_CHARS(0x10);
     } shield_panel_meter;
     UnitHUDInterfaceBackground health_panel_background;
-    struct {
-        UnitHUDInterfaceMeterPrelude prelude;
+    struct : UnitHUDInterfaceMeterPrelude {
         ColorByte medium_health_left_color;
         float maximum_color_health_fraction_cutoff;
         float minumum_color_health_fraction_cutoff;
