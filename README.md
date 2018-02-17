@@ -125,6 +125,7 @@ These commands exist to enhance your gameplay experience.
 
 These commands fix various problems with Halo. Some fixes, such as the magnetism fix and the descope fix, are enabled by default and have no commands to disable them.
 
+* `chimera_sniper_hud_fix [true/false]` - Get or set whether or not to fix the sniper HUD. This may not work on protected maps.
 * `chimera_widescreen_fix [0-2]` - Get or set whether or not to (mostly) fix the HUD. **Note:** This will break the HUD if you are using any other widescreen fix.
   * `0` - Off
   * `1` - On
@@ -168,7 +169,7 @@ These commands add enhancements that emulate or restore functionality from the o
 
 * `chimera_safe_zones [true/false]` - Get or set whether or not to emulate Xbox safe zones.
 * `chimera_simple_score_screen [true/false]` - Get or set whether or not to use a simplified in-game score screen.
-* `chimera_split_screen_hud [true/false]` - Get or set whether or not to use Halo's split screen HUD. **Note:** This may cause potential crashing issues on HAC2. Also, the health and shield bar is broken on stock Halo.
+* `chimera_split_screen_hud [true/false]` - Get or set whether or not to use Halo's split screen HUD. **Note:** This may cause potential crashing issues on HAC2.
 
 # Building
 
