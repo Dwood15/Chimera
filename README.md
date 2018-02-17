@@ -11,13 +11,13 @@ For general information on Chimera, go to https://chimera.opencarnage.net
 
 # Table of Contents
 
-* [Requirements](#requirements)
+* [**Requirements**](#requirements)
   * [Reasons of Requirements](#reasons-of-requirements)
-* [Getting Started](#getting-started)
+* [**Getting Started**](#getting-started)
   * [Chimera Directory Structure](#chimera-directory-structure)
     * [chimerainit.txt and chimerasave.txt](#chimerainittxt-and-chimerasavetxt)
     * [Lua Scripting](#lua-scripting)
-* [Commands](#commands)
+* [**Commands**](#commands)
   * [Uncategorized](#uncategorized)
   * [Debug](#debug)
   * [Enhancements](#enhancements)
@@ -25,9 +25,9 @@ For general information on Chimera, go to https://chimera.opencarnage.net
   * [Interpolation](#interpolation)
   * [Visuals](#visuals)
   * [Xbox](#xbox)
-* [Building](#building)
-* [Credits](#credits)
-* [Links](#links)
+* [**Building**](#building)
+* [**Credits**](#credits)
+* [**Links**](#links)
 
 # Requirements
 
