@@ -2,6 +2,7 @@
 
 #include "../client_signature.h"
 #include "../command/console.h"
+#include "../halo_data/table.h"
 #include "../messaging/messaging.h"
 
 void chat_out(const char *message, uint32_t channel) noexcept {
@@ -26,6 +27,12 @@ void chat_out(const char *message, uint32_t channel) noexcept {
     delete[] bullshit2;
 }
 
+bool player_can_use_vehicle_chat() noexcept {
+    BaseHaloObject *object_data = reinterpret_cast<BaseHaloObject *>(HaloObject(HaloPlayer().object_id()).object_data());
+    if(!object_data) return false;
+    return HaloObject(object_data->parent_object_id).object_data() != nullptr;
+}
+
 ChimeraCommandError chat_command(size_t argc, const char **argv) noexcept {
     if(argc == 1) {
         console_is_out(false);
@@ -35,14 +42,14 @@ ChimeraCommandError chat_command(size_t argc, const char **argv) noexcept {
     int channel;
     if(method == "all") channel = 0;
     else if(method == "team") channel = 1;
-    else if(method == "vehicle") channel = 2;
+    else if(method == "vehicle") channel = player_can_use_vehicle_chat() ? 2 : 1;
     else {
         console_out_error("Expected all, team, or vehicle for argument #1.");
         return CHIMERA_COMMAND_ERROR_FAILURE;
     }
     auto message = std::string(argv[1]);
     for(size_t i=2;i<argc;i++) {
-        message = message + " " + argv[2];
+        message = message + " " + argv[i];
     }
     chat_out(message.data(), channel);
     console_is_out(false);

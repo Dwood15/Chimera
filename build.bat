@@ -62,6 +62,7 @@ g++ -c client/enhancements/firing_particle.cpp %ARGS% -o bin/client__enhancement
 g++ -c client/enhancements/gamepad_vertical_scale.cpp %ARGS% -o bin/client__enhancements__gamepad_vertical_scale.o
 g++ -c client/enhancements/multitexture_overlay.cpp %ARGS% -o bin/client__enhancements__mo.o
 g++ -c client/enhancements/mouse.cpp %ARGS% -o bin/client__enhancements__mouse.o
+g++ -c client/enhancements/server_messages.cpp %ARGS% -o bin/client__enhancements__server_messages.o
 g++ -c client/enhancements/show_spawn.cpp %ARGS% -o bin/client__enhancements__show_spawn.o
 g++ -c client/enhancements/skip_loading.cpp %ARGS% -o bin/client__enhancements__skip_loading.o
 g++ -c client/enhancements/throttle_fps.cpp %ARGS% -o bin/client__enhancements__throttle_fps.o

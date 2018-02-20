@@ -4,6 +4,7 @@
 
 #include "../client_signature.h"
 #include "../messaging/messaging.h"
+#include "../../math/data_types.h"
 
 static BasicCodecave rcon_message_code;
 
@@ -32,6 +33,12 @@ static void on_rprint(uint32_t a, uint32_t b, uint32_t c, char **d, uint32_t e) 
     bool allow = true;
     call_in_order_allow(events, allow, text);
     if(!allow) return;
+
+    extern bool block_server_messages_active;
+    extern LARGE_INTEGER last_time_rcon_was_used;
+    if(block_server_messages_active && counter_time_elapsed(last_time_rcon_was_used) > 5) {
+        return;
+    }
 
     if(len > 4 && text[len - 4] == '|' && text[len - 3] == 'n' && text[len - 2] == 'c') {
         char color = text[len - 1];

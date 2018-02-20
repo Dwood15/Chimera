@@ -20,6 +20,7 @@
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
 #include "enhancements/mouse.h"
+#include "enhancements/server_messages.h"
 #include "enhancements/show_spawn.h"
 #include "enhancements/skip_loading.h"
 #include "enhancements/throttle_fps.h"
@@ -235,6 +236,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_block_mouse_acceleration [true/false]"
     , 0, 1, find_mouse_sigs(), true);
+
+    (*commands).emplace_back("chimera_block_server_messages", block_server_messages_command, "enhancements",
+        "Get or set whether or not to block inbound server messages.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_server_messages [true/false]"
+    , 0, 1, find_server_message_sig(), true);
 
     (*commands).emplace_back("chimera_block_zoom_blur", block_zoom_blur_command, "enhancements",
         "Get or set whether or not to disable the zoom blur.\n\n"

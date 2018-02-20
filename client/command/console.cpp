@@ -19,6 +19,8 @@ static void unblock_error() {
     get_signature("console_block_error_sig").undo();
 }
 
+LARGE_INTEGER last_time_rcon_was_used;
+
 static void read_command() {
     block_error();
     if(strlen(console_text) > 127) {
@@ -50,7 +52,11 @@ static void read_command() {
         case CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND: {
             extern bool on_command_lua(const char *command);
             auto command = split_arguments(console_text, true);
-            if(command[0] != "rcon" && !on_command_lua(console_text)) {
+            bool rcon = command[0] == "rcon";
+            if(rcon) {
+                QueryPerformanceCounter(&last_time_rcon_was_used);
+            }
+            if(!rcon && !on_command_lua(console_text)) {
                 console_text[0] = 0;
             }
             else {
