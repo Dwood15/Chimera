@@ -1,6 +1,8 @@
 #include "console.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
+#include "../halo_data/chat.h"
+#include "../hooks/frame.h"
 
 static char *console_text = NULL;
 
@@ -68,7 +70,15 @@ void initialize_console() {
     write_jmp_call(console_call_s.address(), reinterpret_cast<void *>(read_command), nullptr, console_codecave);
 }
 
-bool console_is_out() {
+bool console_is_out(int change, const char *with_text) {
+    if(change != -1) {
+        reinterpret_cast<void (*)(int out)>(get_signature("toggle_console_sig").address())(change ? 1 : 2);
+        if(change == 1 && with_text) {
+            auto len = strlen(with_text);
+            memcpy(console_text, with_text, len + 1);
+            *reinterpret_cast<short *>(console_text + 0x106) = len;
+        }
+    }
     static auto *out = *reinterpret_cast<char **>(get_signature("console_is_out_sig").address() + 2);
     return *out;
 }

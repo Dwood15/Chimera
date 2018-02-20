@@ -74,6 +74,7 @@ g++ -c client/fix/scope_fix.cpp %ARGS% -o bin/client__fix__scope_fix.o
 g++ -c client/fix/sniper_hud.cpp %ARGS% -o bin/client__fix__sniper_hud.o
 g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
+g++ -c client/halo_data/chat.cpp %ARGS% -o bin/client__halo_data__chat.o
 g++ -c client/halo_data/global.cpp %ARGS% -o bin/client__halo_data__global.o
 g++ -c client/halo_data/map.cpp %ARGS% -o bin/client__halo_data__map.o
 g++ -c client/halo_data/resolution.cpp -masm=intel -o bin/client__halo_data__resolution.o
