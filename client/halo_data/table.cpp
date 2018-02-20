@@ -55,8 +55,12 @@ bool unichar_equal(const short *a, const short *b, size_t size) noexcept {
     if(a == b) return true;
     if(a == nullptr || b == nullptr) return false;
     size_t i = 0;
-    while(i++ < size && *a == *b) {
-        if(a[i] == 0) return true;
+    while(i++ < size && *(a++) == *(b++)) {
+        if(*a == 0) return true;
+    }
+    return false;
+}
+
     }
     return false;
 }
