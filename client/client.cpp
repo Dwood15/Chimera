@@ -48,6 +48,7 @@
 #include "visuals/letterbox.h"
 #include "visuals/vertical_field_of_view.h"
 
+#include "xbox/hud_kill_feed.h"
 #include "xbox/safe_zone.h"
 #include "xbox/simple_score_screen.h"
 #include "xbox/split_screen_hud.h"
@@ -351,6 +352,12 @@ void initialize_client() noexcept {
     , 0, 1, find_interpolation_signatures(), true);
 
     // Xbox
+
+    (*commands).emplace_back("chimera_hud_kill_feed", hud_kill_feed_command, "xbox",
+        "Get or set whether or not to emit kills and deaths messages as HUD text.\n\n"
+        "Syntax:\n"
+        "  - chimera_hud_kill_feed [true/false]"
+    , 0, 1, find_hud_kill_feed_sig(), true);
 
     (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
         "Get or set whether or not to emulate Xbox safe zones.\n\n"

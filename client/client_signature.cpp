@@ -550,5 +550,11 @@ bool find_mouse_sigs() noexcept {
 
     set_result
 }
+bool find_hud_kill_feed_sig() noexcept {
+    check_result
+
+    const short hud_kill_feed_sig[] = { 0xE8, -1, -1, -1, -1, 0xEB, 0x0E, 0x66, 0x8B, 0x46, 0x02, 0x8D, 0x54, 0x24, 0x0C, 0x52 };
+    add_signature_s2(hud_kill_feed_sig);
+
     set_result
 }

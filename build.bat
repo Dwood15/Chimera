@@ -110,6 +110,7 @@ g++ -c client/visuals/gametype_indicator.cpp %ARGS% -o bin/client__visuals__game
 g++ -c client/visuals/letterbox.cpp %ARGS% -o bin/client__visuals__letterbox.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
+g++ -c client/xbox/hud_kill_feed.cpp %ARGS% -o bin/client__xbox__hud_kill_feed.o
 g++ -c client/xbox/safe_zone.cpp %ARGS% -o bin/client__xbox__safe_zone.o
 g++ -c client/xbox/simple_score_screen.cpp %ARGS% -o bin/client__xbox__simple_score_screen.o
 g++ -c client/xbox/split_screen_hud.cpp %ARGS% -o bin/client__xbox__split_screen_hud.o

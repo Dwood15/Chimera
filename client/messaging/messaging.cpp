@@ -55,16 +55,9 @@ void console_out_error(const std::string &text) noexcept {
     return console_out_error(text.data());
 }
 
-void hud_message(const char *message) noexcept {
+void hud_message(const short *message) noexcept {
     if(silence_all_messages) return;
     static auto *hud_message_address = get_signature("hud_message_sig").address();
-
-    size_t mlen = strlen(message);
-    short copy[64] = {};
-    if(mlen + 1 > sizeof(copy)/sizeof(copy[0])) return;
-    for(int i=0;i<mlen;i++) {
-        copy[i] = (short)message[i];
-    }
 
     asm (
         "pushad;"
@@ -74,8 +67,21 @@ void hud_message(const char *message) noexcept {
         "add esp, 4;"
         "popad;"
         :
-        : "r" (copy), "r" (hud_message_address)
+        : "r" (message), "r" (hud_message_address)
     );
+}
+
+void hud_message(const char *message) noexcept {
+    if(silence_all_messages) return;
+
+    size_t mlen = strlen(message);
+    short copy[64] = {};
+    if(mlen + 1 > sizeof(copy)/sizeof(copy[0])) return;
+    for(int i=0;i<mlen;i++) {
+        copy[i] = (short)message[i];
+    }
+
+    hud_message(copy);
 }
 
 void hud_message(const std::string &message) noexcept {
