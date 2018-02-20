@@ -32,6 +32,7 @@
 #include "fix/sniper_hud.h"
 #include "fix/widescreen_fix.h"
 
+#include "halo_data/chat.h"
 #include "halo_data/resolution.h"
 
 #include "hooks/camera.h"
