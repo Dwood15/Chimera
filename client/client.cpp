@@ -165,6 +165,10 @@ void initialize_client() noexcept {
         "  - chimera_budget [0-2]"
     , 0, 1, find_debug_signatures(), false);
 
+    (*commands).emplace_back("chimera_player_info", player_info_command, "debug",
+        "Show player information.\n\n"
+    , 0, 0, true, false);
+
     (*commands).emplace_back("chimera_devmode", devmode_command, "debug",
         "Get or set whether or not to enable Halo's developer commands.\n\n"
         "\n"
