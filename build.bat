@@ -59,6 +59,7 @@ g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o
 
 g++ -c client/enhancements/auto_center.cpp %ARGS% -o bin/client__enhancements__auto_center.o
 g++ -c client/enhancements/firing_particle.cpp %ARGS% -o bin/client__enhancements__firing_particle.o
+g++ -c client/enhancements/gamepad_vertical_scale.cpp %ARGS% -o bin/client__enhancements__gamepad_vertical_scale.o
 g++ -c client/enhancements/multitexture_overlay.cpp %ARGS% -o bin/client__enhancements__mo.o
 g++ -c client/enhancements/mouse.cpp %ARGS% -o bin/client__enhancements__mouse.o
 g++ -c client/enhancements/show_spawn.cpp %ARGS% -o bin/client__enhancements__show_spawn.o

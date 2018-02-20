@@ -16,6 +16,7 @@
 #include "debug/wireframe.h"
 
 #include "enhancements/auto_center.h"
+#include "enhancements/gamepad_vertical_scale.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
 #include "enhancements/mouse.h"
@@ -234,6 +235,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_enable_console [true/false]"
     , 0, 1, true, true);
+
+    (*commands).emplace_back("chimera_gamepad_vertical_scale", gamepad_vertical_scale_command, "enhancements",
+        "Get or set whether or not to scale gamepad vertical sensitivity.\n\n"
+        "Syntax:\n"
+        "  - chimera_gamepad_vertical_scale [value]"
+    , 0, 1, find_gamepad_vertical_scale_signatures(), true);
 
     (*commands).emplace_back("chimera_mouse_sensitivity", mouse_sensitivity_command, "enhancements",
         "Set the horizontal and vertical mouse sensitivities.\n\n"
