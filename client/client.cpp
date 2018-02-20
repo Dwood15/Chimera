@@ -141,6 +141,14 @@ void initialize_client() noexcept {
         "  - chimera <command> - Display help for a command."
     , 0, 1, true);
 
+    (*commands).emplace_back("chimera_chat", chat_command, nullptr,
+        "Send a chat message.\n\n"
+        "Syntax:\n"
+        "  - chimera_chat all <message> - Send a message to all players.\n"
+        "  - chimera_chat team <message> - Send a message to your team.\n"
+        "  - chimera_chat vehicle <message> - Send a message to your vehicle."
+    , 1, 1000, true, false);
+
     (*commands).emplace_back("chimera_reload_lua", reload_lua_command, "lua",
         "Reload all Lua scripts.\n\n"
         "Syntax:\n"
