@@ -271,6 +271,12 @@ void initialize_client() noexcept {
 
     // Fixes
 
+    (*commands).emplace_back("chimera_aim_assist", aim_assist_command, "fixes",
+        "Get or set whether or not fix aim assist for gamepads. This feature is on by default.\n\n"
+        "Syntax:\n"
+        "  - chimera_aim_assist [true/false]"
+    , 0, 1, true, true);
+
     (*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
         "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
         "Syntax:\n"
