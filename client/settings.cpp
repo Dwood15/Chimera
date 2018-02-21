@@ -73,7 +73,7 @@ void commit_command(const char *command, size_t argc, const char **argv) noexcep
 
 void save_all_changes() noexcept {
     if(do_not_save_startup) return;
-    std::ofstream init(std::string(halo_path()) + "\\chimera\\chimerainit.txt");
+    std::ofstream init(std::string(halo_path()) + "\\chimera\\chimerasave.txt");
     if(init.is_open()) {
         init << "###" << std::endl;
         init << "### Chimera build " << CHIMERA_BUILD_STRING << std::endl;
