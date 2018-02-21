@@ -45,7 +45,9 @@ g++ -c main.cpp %ARGS% -o bin/main.o
 
 g++ -c client/client_signature.cpp %ARGS% -o bin/client__client_signature.o
 g++ -c client/client.cpp %ARGS% -o bin/client__client.o
+g++ -c client/controls.cpp %ARGS% -o bin/client__controls.o
 g++ -c client/hac2.cpp %ARGS% -o bin/client__hac2.o
+g++ -c client/keystone.cpp %ARGS% -o bin/client__keystone.o
 g++ -c client/open_sauce.cpp %ARGS% -o bin/client__open_sauce.o
 g++ -c client/path.cpp %ARGS% -o bin/client__path.o
 g++ -c client/settings.cpp %ARGS% -o bin/client__settings.o
@@ -77,6 +79,7 @@ g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
 g++ -c client/halo_data/chat.cpp %ARGS% -o bin/client__halo_data__chat.o
 g++ -c client/halo_data/global.cpp %ARGS% -o bin/client__halo_data__global.o
+g++ -c client/halo_data/keyboard.cpp %ARGS% -o bin/client__halo_data__keyboard.o
 g++ -c client/halo_data/map.cpp %ARGS% -o bin/client__halo_data__map.o
 g++ -c client/halo_data/resolution.cpp -masm=intel -o bin/client__halo_data__resolution.o
 g++ -c client/halo_data/server.cpp %ARGS% -o bin/client__halo_data__server.o

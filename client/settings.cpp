@@ -11,12 +11,23 @@
 bool save_settings = true;
 bool autosave = true;
 
+const char *startup_path() {
+    static std::string startup_path_s;
+    static bool set = false;
+    if(!set) {
+        char p[MAX_PATH] = {};
+        GetTempPath(MAX_PATH, p);
+        startup_path_s = std::string(p) + "\\chimerastartup.bin";
+    }
+    return startup_path_s.data();
+}
+
 std::vector<std::vector<std::string>> save_data;
 static ChimeraStartupParameters startup;
 ChimeraStartupParameters &startup_parameters() noexcept {
     static bool loaded = false;
     if(!loaded) {
-        FILE *f = fopen((std::string(halo_path()) + "\\chimera\\startup.bin").data(), "rb");
+        FILE *f = fopen(startup_path(), "rb");
         if(f) {
             fseek(f, 0, SEEK_END);
             size_t size = ftell(f);
@@ -31,9 +42,13 @@ ChimeraStartupParameters &startup_parameters() noexcept {
     return startup;
 }
 
+bool do_not_save_startup = true;
+
 void execute_startup_parameters() noexcept {
     auto &params = startup_parameters();
-    if(params.fast_startup) execute_chimera_command("chimera_fast_startup true");
+
+    if(params.fast_startup) execute_chimera_command("chimera_fast_startup true", true);
+    if(params.keystone) execute_chimera_command("chimera_keystone true", true);
 }
 
 void commit_command(const char *command, size_t argc, const char **argv) noexcept {
@@ -57,7 +72,8 @@ void commit_command(const char *command, size_t argc, const char **argv) noexcep
 }
 
 void save_all_changes() noexcept {
-    std::ofstream init(std::string(halo_path()) + "\\chimera\\chimerasave.txt");
+    if(do_not_save_startup) return;
+    std::ofstream init(std::string(halo_path()) + "\\chimera\\chimerainit.txt");
     if(init.is_open()) {
         init << "###" << std::endl;
         init << "### Chimera build " << CHIMERA_BUILD_STRING << std::endl;
@@ -81,7 +97,7 @@ void save_all_changes() noexcept {
             init << line << std::endl;
         }
     }
-    FILE *f = fopen((std::string(halo_path()) + "\\chimera\\startup.bin").data(), "wb");
+    FILE *f = fopen(startup_path(), "wb");
     if(f) {
         fwrite(&startup, sizeof(startup), 1, f);
         fclose(f);

@@ -6,6 +6,8 @@
 #include "../version.h"
 
 #include "client_signature.h"
+#include "controls.h"
+#include "keystone.h"
 #include "path.h"
 #include "settings.h"
 #include "command/console.h"
@@ -35,6 +37,7 @@
 
 #include "halo_data/chat.h"
 #include "halo_data/resolution.h"
+#include "halo_data/keyboard.h"
 
 #include "hooks/camera.h"
 #include "hooks/frame.h"
@@ -64,13 +67,13 @@ extern std::vector<ChimeraSignature> *signatures;
 extern std::vector<std::string> *missing_signatures;
 std::vector<ChimeraCommand> *commands;
 
-bool initial_tick = true;
-
 LARGE_INTEGER performance_frequency;
 
 static void init() {
-    extern bool save_settings;
     extern bool autosave;
+    extern bool save_settings;
+    extern bool do_not_save_startup;
+
     extern bool already_set;
     auto &enabled = **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1);
     already_set = enabled != 0;
@@ -106,9 +109,9 @@ static void init() {
     autosave = false;
     read_init_file(z, "[-path]/chimerasave.txt");
     autosave = true;
-    save_all_changes();
     save_settings = settings_before;
-    initial_tick = false;
+    do_not_save_startup = false;
+    save_all_changes();
 
     setup_lua();
 }
@@ -132,6 +135,8 @@ void initialize_client() noexcept {
     enable_descope_fix();
 
     QueryPerformanceFrequency(&performance_frequency);
+
+    add_frame_event(check_keys);
 
     if(find_magnetism_signatures()) {
         fix_magnetism();
@@ -419,6 +424,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_fast_startup [true/false]"
     , 0, 1, find_fast_startup_sigs(), true);
+
+    (*commands).emplace_back("chimera_keystone", keystone_command, "startup",
+        "Take over various functions of Keystone.dll such as chat.\n\n"
+        "Syntax:\n"
+        "  - chimera_keystone_override [true/false]"
+    , 0, 1, find_keystone_sigs() && !controls_present(), true);
 
     execute_startup_parameters();
 }

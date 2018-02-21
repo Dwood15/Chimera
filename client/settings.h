@@ -4,7 +4,8 @@
 
 struct ChimeraStartupParameters {
     char fast_startup = 0;
-    char unused[0x1FF] = {};
+    char keystone = 0;
+    char unused[0x1FE] = {};
 };
 static_assert(sizeof(ChimeraStartupParameters) == 0x200);
 

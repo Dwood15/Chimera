@@ -33,6 +33,7 @@ bool find_simple_score_screen_sigs() noexcept;
 bool find_split_screen_hud_sigs() noexcept;
 bool find_mouse_sigs() noexcept;
 bool find_gamepad_vertical_scale_signatures() noexcept;
+bool find_keystone_sigs() noexcept;
 bool find_hud_kill_feed_sig() noexcept;
 bool find_server_message_sig() noexcept;
 bool find_fast_startup_sigs() noexcept;

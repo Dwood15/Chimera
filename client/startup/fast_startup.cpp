@@ -116,9 +116,9 @@ ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcep
                     write_code_any_value(on_get_crc.data + 0xE + 1, reinterpret_cast<int>(get_crc_sig.address() + 5) - reinterpret_cast<int>(on_get_crc.data + 0xE + 5));
                 }
             }
+            active = new_value;
             startup_parameters().fast_startup = active;
             save_all_changes();
-            active = new_value;
         }
     }
     console_out(active ? "true" : "false");
