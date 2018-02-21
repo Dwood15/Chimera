@@ -2,7 +2,7 @@
 
 #include "../client_signature.h"
 #include "../command/console.h"
-#include "../controls.h"
+#include "../keystone.h"
 #include "chat.h"
 #include "server.h"
 #include "../messaging/messaging.h"
@@ -17,7 +17,7 @@ KeyboardKeys &get_keyboard_keys() noexcept {
 
 void check_keys() noexcept {
     extern bool keystone_enabled;
-    if(server_type() != SERVER_NONE && !controls_present() && !console_is_out() && keystone_enabled) {
+    if(server_type() != SERVER_NONE && !console_is_out() && keystone_enabled) {
         static char chat_key = 0;
         if(get_keyboard_keys().t) {
             chat_key = 1;

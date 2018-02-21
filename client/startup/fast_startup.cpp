@@ -85,7 +85,42 @@ static void do_crc_things() noexcept {
     }
 }
 
-ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcept {
+void enable_fast_startup() {
+    auto &fast_startup_sig = get_signature("crc32_call_sig");
+    auto &get_crc_sig = get_signature("get_crc_sig");
+    static unsigned char nop5[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
+    write_code_c(fast_startup_sig.address(), nop5);
+
+    unsigned char code[] = {
+        // shl eax, 0x04
+        0xC1, 0xE0, 0x04,
+
+        // pushad
+        0x60,
+
+        // call do_crc_things
+        0xE8, 0xFF, 0xFF, 0xFF, 0xFF,
+
+        // popad
+        0x61,
+
+        // mov ecx, [eax+edx+0C]
+        0x8B, 0x4C, 0x10, 0x0C,
+
+        // jmp back
+        0xE9, 0xFF, 0xFF, 0xFF, 0xFF
+    };
+
+    static BasicCodecave on_get_crc(code, sizeof(code));
+    static unsigned char nop7[7] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    write_code_c(get_crc_sig.address(), nop7);
+    write_code_any_value(get_crc_sig.address(), static_cast<unsigned char>(0xE9));
+    write_code_any_value(get_crc_sig.address() + 1, reinterpret_cast<int>(on_get_crc.data) - reinterpret_cast<int>(get_crc_sig.address() + 5));
+    write_code_any_value(on_get_crc.data + 4 + 1, reinterpret_cast<int>(do_crc_things) - reinterpret_cast<int>(on_get_crc.data + 4 + 5));
+    write_code_any_value(on_get_crc.data + 0xE + 1, reinterpret_cast<int>(get_crc_sig.address() + 5) - reinterpret_cast<int>(on_get_crc.data + 0xE + 5));
+}
+
+/*ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcept {
     static bool active = false;
     extern bool first_tick;
     if(argc == 1) {
@@ -133,4 +168,4 @@ ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcep
     }
     console_out(active ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
-}
+}*/

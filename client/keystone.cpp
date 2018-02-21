@@ -4,6 +4,22 @@
 #include "messaging/messaging.h"
 #include "settings.h"
 
+bool custom_keystone_in_use() noexcept {
+    static int found = -1;
+    if(found == -1) {
+        auto *module = GetModuleHandle("keystone.dll");
+        if(!module) return false;
+        for(int i=0;i<0x5000;i++) {
+            if(memcmp(reinterpret_cast<char *>(module) + i, "(^)>", 4) == 0) {
+                found = 1;
+                return true;
+            }
+        }
+        found = 0;
+    }
+    return found;
+}
+
 static void handle_keystone_text(const short *text) {
     char b[128] = {};
     for(int i=0;i<sizeof(b)-1;i++) {
@@ -15,28 +31,12 @@ static void handle_keystone_text(const short *text) {
     console_out(b);
 }
 
+bool keystone_enabled = false;
+
 void setup_keystone_override() noexcept {
+    if(!custom_keystone_in_use()) return;
+    keystone_enabled = true;
     auto &on_keystone_message_sig = get_signature("on_keystone_message_sig");
     write_code_any_value(on_keystone_message_sig.address(), static_cast<unsigned char>(0xE9));
     write_code_any_value(on_keystone_message_sig.address() + 1, reinterpret_cast<int>(handle_keystone_text) - reinterpret_cast<int>(on_keystone_message_sig.address() + 5));
-}
-
-bool keystone_enabled = false;
-
-ChimeraCommandError keystone_command(size_t argc, const char **argv) noexcept {
-    static bool active = false;
-    extern bool first_tick;
-    if(argc == 1) {
-        bool new_value = bool_value(argv[0]);
-        if(new_value != active) {
-            if(!first_tick) {
-                setup_keystone_override();
-                keystone_enabled = true;
-            }
-            active = new_value;
-            startup_parameters().keystone = active;
-        }
-    }
-    console_out(active ? "true" : "false");
-    return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

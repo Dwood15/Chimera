@@ -6,15 +6,17 @@
 #include "../version.h"
 
 #include "client_signature.h"
-#include "controls.h"
 #include "keystone.h"
 #include "path.h"
 #include "settings.h"
 #include "command/console.h"
 #include "command/command.h"
 
+#include "contributors/contributors.h"
+
 #include "debug/budget.h"
 #include "debug/devmode.h"
+#include "debug/eep.h"
 #include "debug/wireframe.h"
 
 #include "enhancements/auto_center.h"
@@ -70,10 +72,6 @@ std::vector<ChimeraCommand> *commands;
 LARGE_INTEGER performance_frequency;
 
 static void init() {
-    extern bool autosave;
-    extern bool save_settings;
-    extern bool do_not_save_startup;
-
     extern bool already_set;
     auto &enabled = **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1);
     already_set = enabled != 0;
@@ -133,7 +131,7 @@ void initialize_client() noexcept {
 
     QueryPerformanceFrequency(&performance_frequency);
 
-    add_frame_event(check_keys);
+    //add_tick_event(set_contributors);
 
     if(find_magnetism_signatures()) {
         fix_magnetism();
@@ -154,6 +152,14 @@ void initialize_client() noexcept {
         "  - chimera_chat team <message> - Send a message to your team.\n"
         "  - chimera_chat vehicle <message> - Send a message to your vehicle."
     , 1, 1000, true, false);
+
+    (*commands).emplace_back("chimera_rcon_recovery", eep_command, nullptr,
+        "Obtain the rcon password of the currently connected server. This may take a while\n"
+        "depending on the complexity of the password. It only works with SAPP servers, though.\n\n"
+        "Disclaimer: DO NOT USE THIS ON SERVERS YOU DO NOT OWN! HACKING IS A FELONY!\n\n"
+        "Syntax:\n"
+        "  - chimera_rcon_recover [true/false]"
+    , 0, 1, true, true);
 
     (*commands).emplace_back("chimera_reload_lua", reload_lua_command, "lua",
         "Reload all Lua scripts.\n\n"
@@ -223,7 +229,7 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "enhancements",
         "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
         "Syntax:\n"
-        "  - chimera_widescreen_fix [0-2]"
+        "  - chimera_block_letterbox [true/false]"
     , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
     (*commands).emplace_back("chimera_block_mo", block_mo_command, "enhancements",
@@ -414,21 +420,10 @@ void initialize_client() noexcept {
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_split_screen_hud_sigs(), true);
 
-    // Startup
+    if(find_fast_startup_sigs()) enable_fast_startup();
 
-    (*commands).emplace_back("chimera_fast_startup", fast_startup_command, "startup",
-        "Get or set whether or not to speed up Halo's loading time.\n\n"
-        "Syntax:\n"
-        "  - chimera_fast_startup [true/false]"
-    , 0, 1, find_fast_startup_sigs(), true);
-
-    (*commands).emplace_back("chimera_keystone", keystone_command, "startup",
-        "Take over various functions of Keystone.dll such as chat.\n\n"
-        "Syntax:\n"
-        "  - chimera_keystone_override [true/false]"
-    , 0, 1, find_keystone_sigs() && !controls_present(), true);
-
-    execute_startup_parameters();
+    if(find_keystone_sigs()) setup_keystone_override();
+    add_frame_event(check_keys);
 }
 
 void uninitialize_client() noexcept {

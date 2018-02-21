@@ -33,33 +33,6 @@ const char *startup_path() {
 
 static std::vector<std::vector<std::string>> save_data;
 
-ChimeraStartupParameters &startup_parameters() noexcept {
-    static ChimeraStartupParameters startup;
-    static bool loaded = false;
-    if(!loaded) {
-        FILE *f = fopen(startup_path(), "rb");
-        if(f) {
-            fseek(f, 0, SEEK_END);
-            size_t size = ftell(f);
-            if(size == sizeof(startup)) {
-                fseek(f, 0, SEEK_SET);
-                fread(&startup, size, 1, f);
-            }
-            fclose(f);
-        }
-        loaded = true;
-    }
-    return startup;
-}
-
-void execute_startup_parameters() noexcept {
-    auto &params = startup_parameters();
-    settings_read_only(1);
-    if(params.fast_startup) execute_chimera_command("chimera_fast_startup true", true);
-    if(params.keystone) execute_chimera_command("chimera_keystone true", true);
-    settings_read_only(0);
-}
-
 void commit_command(const char *command, size_t argc, const char **argv) noexcept {
     if(settings_read_only()) return;
     std::vector<std::string> new_data;
@@ -104,11 +77,6 @@ void save_all_changes() noexcept {
             }
             init << line << std::endl;
         }
-    }
-    FILE *f = fopen(startup_path(), "wb");
-    if(f) {
-        fwrite(&startup_parameters(), sizeof(startup_parameters()), 1, f);
-        fclose(f);
     }
 }
 

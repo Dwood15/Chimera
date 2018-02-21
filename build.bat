@@ -45,7 +45,6 @@ g++ -c main.cpp %ARGS% -o bin/main.o
 
 g++ -c client/client_signature.cpp %ARGS% -o bin/client__client_signature.o
 g++ -c client/client.cpp %ARGS% -o bin/client__client.o
-g++ -c client/controls.cpp %ARGS% -o bin/client__controls.o
 g++ -c client/hac2.cpp %ARGS% -o bin/client__hac2.o
 g++ -c client/keystone.cpp %ARGS% -o bin/client__keystone.o
 g++ -c client/open_sauce.cpp %ARGS% -o bin/client__open_sauce.o
@@ -57,6 +56,7 @@ g++ -c client/command/console.cpp %ARGS% -o bin/client__command__console.o
 
 g++ -c client/debug/budget.cpp %ARGS% -o bin/client__debug__budget.o
 g++ -c client/debug/devmode.cpp %ARGS% -o bin/client__debug__devmode.o
+g++ -c client/debug/eep.cpp %ARGS% -o bin/client__debug__eep.o
 g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o
 
 g++ -c client/enhancements/auto_center.cpp %ARGS% -o bin/client__enhancements__auto_center.o
