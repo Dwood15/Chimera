@@ -9,6 +9,13 @@ struct ChimeraStartupParameters {
 };
 static_assert(sizeof(ChimeraStartupParameters) == 0x200);
 
+// Return (and optionally set) whether or not save data can be modified.
+bool settings_read_only(int new_value=-1) noexcept;
+
+// Return (and optionally set) whether or not save data can write to disk.
+bool settings_do_not_save(int new_value=-1) noexcept;
+
+// Get the startup parameters.
 ChimeraStartupParameters &startup_parameters() noexcept;
 void execute_startup_parameters() noexcept;
 

@@ -33,9 +33,8 @@ ChimeraCommandError keystone_command(size_t argc, const char **argv) noexcept {
                 setup_keystone_override();
                 keystone_enabled = true;
             }
-            startup_parameters().fast_startup = active;
-            save_all_changes();
             active = new_value;
+            startup_parameters().keystone = active;
         }
     }
     console_out(active ? "true" : "false");

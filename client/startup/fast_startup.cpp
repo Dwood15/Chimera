@@ -3,6 +3,8 @@
 #include "../halo_data/map.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
+#include "../hac2.h"
+#include "../open_sauce.h"
 #include "../path.h"
 #include "../settings.h"
 #include "../halo_data/tag_data.h"
@@ -64,7 +66,11 @@ static void do_crc_things() noexcept {
                 char map_path[MAX_PATH] = {};
                 sprintf(map_path, "maps\\%s.map", indices[i].file_name);
                 FILE *f = fopen(map_path, "rb");
-                if(!f) {
+                if(!f && open_sauce_present()) {
+                    sprintf(map_path, "maps\\%s.yelo", indices[i].file_name);
+                    f = fopen(map_path, "rb");
+                }
+                if(!f && hac2_present()) {
                     sprintf(map_path, "%s\\hac\\maps\\%s.map", halo_path(), indices[i].file_name);
                     f = fopen(map_path, "rb");
                 }
@@ -123,7 +129,6 @@ ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcep
             }
             active = new_value;
             startup_parameters().fast_startup = active;
-            save_all_changes();
         }
     }
     console_out(active ? "true" : "false");

@@ -80,18 +80,17 @@ static void init() {
     if(!already_set)
         enabled = 1;
     remove_tick_event(init);
-    auto settings_before = save_settings;
-    save_settings = false;
-    read_init_file("chimerainit.txt", "chimerainit.txt");
-    save_settings = true;
+
+    settings_read_only(1);
     char z[512] = {};
     sprintf(z,"%s\\chimera", halo_path());
     CreateDirectory(z, nullptr);
-    save_settings = false;
+    read_init_file("chimerainit.txt", "chimerainit.txt");
     sprintf(z,"%s\\chimera\\chimerainit.txt", halo_path());
     auto *f = fopen(z, "r");
     if(f) {
         fclose(f);
+        read_init_file(z, "[-path]/chimerainit.txt");
     }
     else {
         std::ofstream init(z);
@@ -103,16 +102,14 @@ static void init() {
         init << "###" << std::endl;
         init << std::endl;
     }
-    read_init_file(z, "[-path]/chimerainit.txt");
-    save_settings = true;
-    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
-    autosave = false;
-    read_init_file(z, "[-path]/chimerasave.txt");
-    autosave = true;
-    save_settings = settings_before;
-    do_not_save_startup = false;
-    save_all_changes();
+    settings_read_only(0);
 
+    settings_do_not_save(1);
+    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
+    read_init_file(z, "[-path]/chimerasave.txt");
+    settings_do_not_save(0);
+
+    save_all_changes();
     setup_lua();
 }
 

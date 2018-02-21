@@ -27,7 +27,7 @@ static void read_command() {
         unblock_error();
         return;
     }
-    switch(execute_chimera_command(console_text)) {
+    switch(execute_chimera_command(console_text, false, true)) {
         case CHIMERA_COMMAND_ERROR_NOT_ENOUGH_ARGUMENTS: {
             auto &f = find_chimera_command(console_text);
             char text[256] = {};
