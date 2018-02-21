@@ -3,6 +3,7 @@
 #include "../halo_data/map.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
+#include "../path.h"
 #include "../settings.h"
 #include "../halo_data/tag_data.h"
 
@@ -60,9 +61,13 @@ static void do_crc_things() noexcept {
     for(size_t i=0;i<maps_count();i++) {
         if(strcmp(indices[i].file_name, loading_map) == 0) {
             if(!crc_already[i]) {
-                char map_path[MAX_PATH];
+                char map_path[MAX_PATH] = {};
                 sprintf(map_path, "maps\\%s.map", indices[i].file_name);
                 FILE *f = fopen(map_path, "rb");
+                if(!f) {
+                    sprintf(map_path, "%s\\hac\\maps\\%s.map", halo_path(), indices[i].file_name);
+                    f = fopen(map_path, "rb");
+                }
                 if(f) {
                     indices[i].crc32 = ~calculate_crc32_of_map_file(f);
                     crc_already[i] = 1;
