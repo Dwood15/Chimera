@@ -92,18 +92,14 @@ bool console_is_out(int change, const char *with_text) {
 bool already_set = false;
 
 ChimeraCommandError enable_console_command(size_t argc, const char **argv) noexcept {
-    extern bool initial_tick;
     static bool active = true;
     if(argc == 1) {
         auto new_value = bool_value(argv[0]);
         if(!already_set && new_value != active) {
-            if(!initial_tick) {
-                console_out("Changes will take effect after you relaunch Halo.");
-                already_set = true;
+            if(console_is_out()) {
+                console_is_out(false);
             }
-            else {
-                **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1) = new_value;
-            }
+            **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1) = new_value;
         }
         active = new_value;
     }
