@@ -89,7 +89,7 @@ static void random_quack_function()
                 "QUAAACK!!! ^v^"
             };
 
-            if((tick_count()) % 4 == 1) {
+            if((tick_count()) % 3 == 1) {
                 int random_index = rand() % items;
                 chat_out(random[random_index], 0);
             }
