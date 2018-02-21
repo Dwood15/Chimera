@@ -34,4 +34,15 @@ struct MapHeader {
     uint32_t foot = 0x666F6F74;
 };
 
-MapHeader &get_map_header();
+MapHeader &get_map_header() noexcept;
+
+
+struct MapIndex {
+    const char *file_name;
+    uint32_t loaded;
+    uint32_t unknown;
+    uint32_t crc32;
+};
+
+MapIndex *map_indices() noexcept;
+uint32_t maps_count() noexcept;

@@ -12,6 +12,29 @@ bool save_settings = true;
 bool autosave = true;
 
 std::vector<std::vector<std::string>> save_data;
+static ChimeraStartupParameters startup;
+ChimeraStartupParameters &startup_parameters() noexcept {
+    static bool loaded = false;
+    if(!loaded) {
+        FILE *f = fopen((std::string(halo_path()) + "\\chimera\\startup.bin").data(), "rb");
+        if(f) {
+            fseek(f, 0, SEEK_END);
+            size_t size = ftell(f);
+            if(size == sizeof(startup)) {
+                fseek(f, 0, SEEK_SET);
+                fread(&startup, size, 1, f);
+            }
+            fclose(f);
+        }
+        loaded = true;
+    }
+    return startup;
+}
+
+void execute_startup_parameters() noexcept {
+    auto &params = startup_parameters();
+    if(params.fast_startup) execute_chimera_command("chimera_fast_startup true");
+}
 
 void commit_command(const char *command, size_t argc, const char **argv) noexcept {
     if(save_settings) {
@@ -34,9 +57,7 @@ void commit_command(const char *command, size_t argc, const char **argv) noexcep
 }
 
 void save_all_changes() noexcept {
-    char z[512] = {};
-    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
-    std::ofstream init(z);
+    std::ofstream init(std::string(halo_path()) + "\\chimera\\chimerasave.txt");
     if(init.is_open()) {
         init << "###" << std::endl;
         init << "### Chimera build " << CHIMERA_BUILD_STRING << std::endl;
@@ -59,6 +80,11 @@ void save_all_changes() noexcept {
             }
             init << line << std::endl;
         }
+    }
+    FILE *f = fopen((std::string(halo_path()) + "\\chimera\\startup.bin").data(), "wb");
+    if(f) {
+        fwrite(&startup, sizeof(startup), 1, f);
+        fclose(f);
     }
 }
 

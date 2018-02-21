@@ -35,6 +35,7 @@ bool find_mouse_sigs() noexcept;
 bool find_gamepad_vertical_scale_signatures() noexcept;
 bool find_hud_kill_feed_sig() noexcept;
 bool find_server_message_sig() noexcept;
+bool find_fast_startup_sigs() noexcept;
 
 #define I32(x) reinterpret_cast<int32_t>(x)
 #define I32PTR(x) reinterpret_cast<int32_t *>(x)

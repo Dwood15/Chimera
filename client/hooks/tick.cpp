@@ -11,6 +11,8 @@ static bool tick_initialized = false;
 
 static std::vector<Event<event_no_args>> preevents;
 
+bool first_tick = false;
+
 void add_pretick_event(event_no_args event_function, EventPriority priority) noexcept {
     for(size_t i=0;i<preevents.size();i++) {
         if(preevents[i].function == event_function) return;
@@ -29,6 +31,7 @@ void remove_pretick_event(event_no_args event_function) noexcept {
 }
 
 static void on_pretick() noexcept {
+    first_tick = true;
     call_in_order(preevents);
 }
 

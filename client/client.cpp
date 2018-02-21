@@ -47,6 +47,8 @@
 
 #include "messaging/messaging.h"
 
+#include "startup/fast_startup.h"
+
 #include "visuals/anisotropic_filtering.h"
 #include "visuals/letterbox.h"
 #include "visuals/vertical_field_of_view.h"
@@ -409,6 +411,16 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_split_screen_hud_sigs(), true);
+
+    // Startup
+
+    (*commands).emplace_back("chimera_fast_startup", fast_startup_command, "startup",
+        "Get or set whether or not to speed up Halo's loading time.\n\n"
+        "Syntax:\n"
+        "  - chimera_fast_startup [true/false]"
+    , 0, 1, find_fast_startup_sigs(), true);
+
+    execute_startup_parameters();
 }
 
 void uninitialize_client() noexcept {
