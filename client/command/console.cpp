@@ -113,15 +113,18 @@ static void on_console() {
             if(entries[i].color.alpha > 1.0) entries[i].color.alpha = 1.0;
         }
         else {
-            if(entries[i].frames_out_fade == -100) {
+            if(entries[i].frames_out_fade < 0 || entries[i].color.alpha < 0.075) {
                 entries[i].color.alpha -= time_since * 10;
+                entries[i].frames_out_fade = -100;
                 if(entries[i].color.alpha < 0.0) entries[i].color.alpha = 0.0;
             }
             else {
-                entries[i].color.alpha -= time_since / 2.0;
+                entries[i].color.alpha -= time_since / 6.0;
+                if(entries[i].color.alpha < 0.80) {
+                    entries[i].color.alpha -= time_since / 3.0;
+                }
                 if(entries[i].color.alpha < 0.0) {
                     entries[i].color.alpha = 0.0;
-                    entries[i].frames_out_fade = -100;
                 }
             }
         }
