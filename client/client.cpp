@@ -390,6 +390,9 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
         "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
         "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
+        "FOVs:\n"
+        "55.41 - Halo PC and Master Chief Collection\n"
+        "62.73 - OG Xbox FOV\n\n"
         "Syntax:\n"
         "  - chimera_vfov [VFOV]"
     , 0, 1, find_interpolation_signatures(), true);
@@ -421,8 +424,9 @@ void initialize_client() noexcept {
     , 0, 1, find_split_screen_hud_sigs(), true);
 
     if(find_fast_startup_sigs()) enable_fast_startup();
-
     if(find_keystone_sigs()) setup_keystone_override();
+    if(find_console_fade_fix_sig()) setup_console_text_fix();
+    
     add_frame_event(check_keys);
 }
 

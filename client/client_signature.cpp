@@ -621,3 +621,15 @@ bool find_fast_startup_sigs() noexcept {
 
     set_result
 }
+
+bool find_console_fade_fix_sig() noexcept {
+    check_result
+
+    const short console_text_table_sig[] = { 0x8B, 0x15, -1, -1, -1, -1, 0x3B, 0xD3, 0x74, 0x16, 0x38, 0x5A, 0x24, 0x74, 0x03, 0x88, 0x5A, 0x24 };
+    add_signature_s2(console_text_table_sig);
+
+    const short console_fade_sig[] = { 0x89, 0x88, 0x20, 0x01, 0x00, 0x00, 0x7E, 0x05, 0xE8 };
+    add_signature_s2(console_fade_sig);
+
+    set_result
+}

@@ -3,10 +3,11 @@
 #include "../client_signature.h"
 #include "../halo_data/chat.h"
 #include "../hooks/frame.h"
+#include "../halo_data/table.h"
 
 static char *console_text = NULL;
 
-static void block_error() {
+static void block_error() noexcept {
     auto *push_req = get_signature("console_block_error_sig").address();
     DWORD old_protect = 0;
     DWORD old_protect_b = 0;
@@ -15,13 +16,13 @@ static void block_error() {
     VirtualProtect(push_req, 5, old_protect, &old_protect_b);
 }
 
-static void unblock_error() {
+static void unblock_error() noexcept {
     get_signature("console_block_error_sig").undo();
 }
 
 LARGE_INTEGER last_time_rcon_was_used;
 
-static void read_command() {
+static void read_command() noexcept {
     block_error();
     if(strlen(console_text) > 127) {
         unblock_error();
@@ -68,7 +69,7 @@ static void read_command() {
     }
 }
 
-void initialize_console() {
+void initialize_console() noexcept {
     auto &console_call_s = get_signature("console_call_sig");
     auto *console_ptr = console_call_s.address();
     console_text = I8PTR(*reinterpret_cast<uint32_t *>(console_ptr - 4));
@@ -76,7 +77,7 @@ void initialize_console() {
     write_jmp_call(console_call_s.address(), reinterpret_cast<void *>(read_command), nullptr, console_codecave);
 }
 
-bool console_is_out(int change, const char *with_text) {
+bool console_is_out(int change, const char *with_text) noexcept {
     if(change != -1) {
         reinterpret_cast<void (*)(int out)>(get_signature("toggle_console_sig").address())(change ? 1 : 2);
         if(change == 1 && with_text) {
@@ -87,6 +88,52 @@ bool console_is_out(int change, const char *with_text) {
     }
     static auto *out = *reinterpret_cast<char **>(get_signature("console_is_out_sig").address() + 2);
     return *out;
+}
+
+struct ConsoleEntry {
+    uint32_t idents[3];
+    char zero2;
+    char text[0x103];
+    ColorARGB color;
+    int32_t frames_out_fade; // goes up to 151
+};
+
+static void on_console() {
+    static GenericTable *&table = **reinterpret_cast<GenericTable ***>(get_signature("console_text_table_sig").address() + 2);
+    static LARGE_INTEGER last_frame = {};
+    if(last_frame.QuadPart == 0) QueryPerformanceCounter(&last_frame);
+    LARGE_INTEGER now_frame;
+    QueryPerformanceCounter(&now_frame);
+    auto time_since = counter_time_elapsed(last_frame, now_frame);
+    last_frame = now_frame;
+    ConsoleEntry *entries = reinterpret_cast<ConsoleEntry *>(table->first);
+    for(size_t i=0;i<table->size;i++) {
+        if(console_is_out()) {
+            entries[i].color.alpha += time_since * 10;
+            if(entries[i].color.alpha > 1.0) entries[i].color.alpha = 1.0;
+        }
+        else {
+            if(entries[i].frames_out_fade == -100) {
+                entries[i].color.alpha -= time_since * 10;
+                if(entries[i].color.alpha < 0.0) entries[i].color.alpha = 0.0;
+            }
+            else {
+                entries[i].color.alpha -= time_since / 2.0;
+                if(entries[i].color.alpha < 0.0) {
+                    entries[i].color.alpha = 0.0;
+                    entries[i].frames_out_fade = -100;
+                }
+            }
+        }
+    }
+}
+
+/// Fix the console text
+void setup_console_text_fix() noexcept {
+    auto &fade = get_signature("console_fade_sig");
+    const unsigned char nop[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    write_code_c(fade.address(), nop);
+    add_frame_event(on_console);
 }
 
 bool already_set = false;
