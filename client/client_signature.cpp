@@ -633,3 +633,27 @@ bool find_console_fade_fix_sig() noexcept {
 
     set_result
 }
+
+bool find_pc_map_compat_sig() noexcept {
+    check_result
+
+    const short pc_map_compatibility_sig[] = { 0x81, 0x3D, -1, -1, -1, -1, 0x61, 0x02, 0x00, 0x00, 0x0F, 0x85, -1, -1, 0x00, 0x00 };
+    add_signature_s2(pc_map_compatibility_sig);
+
+    const short compare_ce_sig[] = { 0x81, 0x7E, 0x04, 0x61, 0x02, 0x00, 0x00, 0x75, 0x02 };
+    add_signature_s2(compare_ce_sig);
+
+    const short compare_ce_load_sig[] = { 0x81, 0x7F, 0x04, 0x61, 0x02, 0x00, 0x00, 0x74, 0x7A };
+    add_signature_s2(compare_ce_load_sig);
+
+    const short bitmaps_string_sig[] = { 0x68, -1, -1, -1, -1, 0x8D, 0x44, 0x24, 0x10, 0x68, -1, -1, -1, -1, 0x33, 0xDB, 0x50, 0x66, 0xC7, 0x05, -1, -1, -1, -1, 0xFF, 0xFF };
+    add_signature_s2(bitmaps_string_sig);
+
+    const short sounds_string_sig[] = { 0x68, -1, -1, -1, -1, 0x8D, 0x4C, 0x24, 0x14, 0x68, -1, -1, -1, -1, 0x51, 0xC7, 0x05, -1, -1, -1, -1 };
+    add_signature_s2(sounds_string_sig);
+
+    const short on_read_sig[] = { 0x89, 0x3D, -1, -1, -1, -1, 0x8B, 0x07, 0xA3, -1, -1, -1, -1, 0xA0, -1, -1, -1, -1, 0x84, 0xC0 };
+    add_signature_s2(on_read_sig);
+
+    set_result
+}

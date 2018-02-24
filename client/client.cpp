@@ -38,8 +38,9 @@
 #include "fix/widescreen_fix.h"
 
 #include "halo_data/chat.h"
-#include "halo_data/resolution.h"
 #include "halo_data/keyboard.h"
+#include "halo_data/map.h"
+#include "halo_data/resolution.h"
 
 #include "hooks/camera.h"
 #include "hooks/frame.h"
@@ -424,9 +425,11 @@ void initialize_client() noexcept {
     , 0, 1, find_split_screen_hud_sigs(), true);
 
     if(find_fast_startup_sigs()) setup_fast_startup();
+    if(find_pc_map_compat_sig()) setup_pc_map_compatibility();
     if(find_keystone_sigs()) setup_keystone_override();
     if(find_console_fade_fix_sig()) setup_console_text_fix();
-    
+
+
     add_frame_event(check_keys);
 }
 

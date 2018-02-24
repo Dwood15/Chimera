@@ -46,3 +46,4 @@ struct MapIndex {
 
 MapIndex *map_indices() noexcept;
 uint32_t maps_count() noexcept;
+void setup_pc_map_compatibility() noexcept;
