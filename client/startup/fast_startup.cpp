@@ -85,7 +85,7 @@ static void do_crc_things() noexcept {
     }
 }
 
-void enable_fast_startup() {
+void setup_fast_startup() {
     auto &fast_startup_sig = get_signature("crc32_call_sig");
     auto &get_crc_sig = get_signature("get_crc_sig");
     static unsigned char nop5[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };

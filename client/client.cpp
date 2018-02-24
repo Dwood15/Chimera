@@ -423,7 +423,7 @@ void initialize_client() noexcept {
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_split_screen_hud_sigs(), true);
 
-    if(find_fast_startup_sigs()) enable_fast_startup();
+    if(find_fast_startup_sigs()) setup_fast_startup();
     if(find_keystone_sigs()) setup_keystone_override();
     if(find_console_fade_fix_sig()) setup_console_text_fix();
     

@@ -224,9 +224,6 @@ bool find_required_signatures() noexcept {
     const short keyboard_keys_sig[] = { 0xB8, -1, -1, -1, -1, 0xBA, 0x6D, 0x00, 0x00, 0x00, 0x8D, 0x49, 0x00, 0x80, -1, 0x6D, 0x01, 0x75, 0x05 };
     add_signature_s2(keyboard_keys_sig);
 
-    const short map_index_sig[] = { 0x8B, 0x15, -1, -1, -1, -1, 0x5F, 0xC1, 0xE1, 0x04, 0x5E };
-    add_signature_s2(map_index_sig);
-
     set_result
 }
 
@@ -618,6 +615,9 @@ bool find_fast_startup_sigs() noexcept {
 
     const short loading_map_sig[] = { 0xB8, -1, -1, -1, -1, 0xE8, 0xB6, 0xB0, 0x03, 0x00, 0x32, 0xC9, 0x83, 0xF8, 0x13 };
     add_signature_s2(loading_map_sig);
+
+    const short map_index_sig[] = { 0x8B, 0x15, -1, -1, -1, -1, 0x5F, 0xC1, 0xE1, 0x04, 0x5E };
+    add_signature_s2(map_index_sig);
 
     set_result
 }

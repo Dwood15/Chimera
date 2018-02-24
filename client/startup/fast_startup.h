@@ -2,7 +2,7 @@
 
 #include "../command/command.h"
 
-void enable_fast_startup();
+void setup_fast_startup();
 
 /// Function for command chimera_fast_startup
 // ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcept;
