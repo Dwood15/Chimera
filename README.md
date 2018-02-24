@@ -100,10 +100,10 @@ A Lua scripting section will be added to this documentation in a future date.
 
 Chimera can enable Halo Custom Edition to load retail Halo maps. This feature requires a small amount of setup in order to be enabled:
 
-1. Create a folder chimera in your maps folder. Make sure you have write access to this folder.
-2. Copy your retail (Halo PC) bitmaps.map and sounds.map files into this folder. Make sure you COPY them; these files WILL be deleted.
+1. Create a folder chimera in your `maps` folder. Make sure you have write access to this folder.
+2. Copy your retail (Halo PC) `bitmaps.map` and `sounds.map` files into this folder. ***Make sure you *COPY* them; these files *WILL* be deleted.***
 3. Copy any maps you wish to run with Halo Custom Edition into your Halo Custom Edition Maps folder.
-4. Start up Chimera. Chimera will patch the bitmaps.map and sounds.map files in the chimera folder, replacing them with ce_bitmaps.map and sounds.map, respectively. Halo Custom Edition will then load these files.
+4. Start up Chimera. Chimera will patch the `bitmaps.map` and `sounds.map` files in the `chimera` folder, replacing them with `ce_bitmaps.map` and `sounds.map`, respectively. Halo Custom Edition will then load these files.
 
 Once finished, you will be able to run maps (such as the original Halo: Combat Evolved campaign) without having to convert them with a program such as Combustion.
 
