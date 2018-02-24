@@ -109,7 +109,8 @@ Once finished, you will be able to run maps (such as the original Halo: Combat E
 
 **Notes**
 
-* If you want to play the Halo: Combat Evolved campaign, there are other ways to do this than this way:
+If you want to play the Halo: Combat Evolved campaign, there are other ways to do this than this way:
+
 * Moses’s Refined Campaign: http://forum.halomaps.org/index.cfm?page=topic&topicID=50277
 * SPV3 (requires installing stuff like a launcher): https://www.reddit.com/r/halospv3/
 * Converted maps (scattered around on Halo Maps): http://hce.halomaps.org/?nid=386
