@@ -31,8 +31,14 @@ bool find_gametype_indicator_sig() noexcept;
 bool find_devmode_sig() noexcept;
 bool find_simple_score_screen_sigs() noexcept;
 bool find_split_screen_hud_sigs() noexcept;
-bool find_mouse_acceleration_sigs() noexcept;
 bool find_mouse_sigs() noexcept;
+bool find_gamepad_vertical_scale_signatures() noexcept;
+bool find_keystone_sigs() noexcept;
+bool find_hud_kill_feed_sig() noexcept;
+bool find_server_message_sig() noexcept;
+bool find_fast_startup_sigs() noexcept;
+bool find_console_fade_fix_sig() noexcept;
+bool find_pc_map_compat_sig() noexcept;
 
 #define I32(x) reinterpret_cast<int32_t>(x)
 #define I32PTR(x) reinterpret_cast<int32_t *>(x)

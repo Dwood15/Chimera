@@ -25,5 +25,8 @@ void console_out_error(const std::string &text) noexcept;
 /// Output a C string to the HUD.
 void hud_message(const char *message) noexcept;
 
+/// Output a wide string to the HUD.
+void hud_message(const short *message) noexcept;
+
 /// Output a C++ string to the HUD.
-void hud_message(const char *message) noexcept;
+void hud_message(std::string message) noexcept;

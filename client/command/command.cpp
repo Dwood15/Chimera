@@ -110,7 +110,7 @@ std::vector<std::string> split_arguments(const char *input, bool lowercase_first
 }
 
 extern std::vector<ChimeraCommand> *commands;
-ChimeraCommandError execute_chimera_command(const char *command_input, bool silently) {
+ChimeraCommandError execute_chimera_command(const char *command_input, bool silently, bool save) {
     if(commands != nullptr && command_input != nullptr) {
         auto args_cleaned = split_arguments(command_input, true);
         if(args_cleaned.size() == 0) return CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND;
@@ -130,10 +130,14 @@ ChimeraCommandError execute_chimera_command(const char *command_input, bool sile
                     silence_all_messages = true;
                 }
                 auto rval = CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND;
+
+                auto read_only = settings_read_only();
+                if(!save) settings_read_only(1);
                 if(args.size() == 1)
                     rval = command.execute();
                 else
                     rval = command.execute(args.size() - 1, &args[1]);
+                if(!save) settings_read_only(read_only);
                 if(silently && !already_silent) {
                     silence_all_messages = false;
                 }
@@ -316,9 +320,6 @@ ChimeraCommandError chimera_command(size_t argc, const char **argv) noexcept {
                 }
             }
         }
-    }
-    else if(argc == 2) {
-
     }
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

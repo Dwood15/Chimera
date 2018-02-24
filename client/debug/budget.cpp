@@ -1,4 +1,5 @@
 #include "budget.h"
+#include <ios>
 #include <string.h>
 #include <math.h>
 #include "../command/console.h"
@@ -197,5 +198,27 @@ ChimeraCommandError budget_command(size_t argc, const char **argv) noexcept {
         active = new_value;
     }
     console_out(std::to_string(active));
+    return CHIMERA_COMMAND_ERROR_SUCCESS;
+}
+
+template <class T>
+static std::string int_to_hex(T i) {
+    char buff[2 + sizeof(i) + 1];
+    sprintf(buff, "0x%X", reinterpret_cast<uintptr_t>(i));
+    return std::string(buff);
+}
+
+ChimeraCommandError player_info_command(size_t argc, const char **argv) noexcept {
+    HaloPlayer player;
+    console_out(std::string("Player index: ") + std::to_string(player.index()));
+    auto *data = player.player_data();
+    console_out(std::string("Player data address: ") + int_to_hex(data));
+    auto object_id = player.object_id();
+    auto object = HaloObject(object_id);
+    auto *object_data = object.object_data();
+    if(object_data) {
+        console_out(std::string("Player object ID: ") + int_to_hex(object_id));
+        console_out(std::string("Player object data address: ") + int_to_hex(object_data));
+    }
     return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

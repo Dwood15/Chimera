@@ -6,19 +6,25 @@
 #include "../version.h"
 
 #include "client_signature.h"
+#include "keystone.h"
 #include "path.h"
 #include "settings.h"
 #include "command/console.h"
 #include "command/command.h"
 
+#include "contributors/contributors.h"
+
 #include "debug/budget.h"
 #include "debug/devmode.h"
+#include "debug/eep.h"
 #include "debug/wireframe.h"
 
 #include "enhancements/auto_center.h"
+#include "enhancements/gamepad_vertical_scale.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
 #include "enhancements/mouse.h"
+#include "enhancements/server_messages.h"
 #include "enhancements/show_spawn.h"
 #include "enhancements/skip_loading.h"
 #include "enhancements/throttle_fps.h"
@@ -31,6 +37,9 @@
 #include "fix/sniper_hud.h"
 #include "fix/widescreen_fix.h"
 
+#include "halo_data/chat.h"
+#include "halo_data/keyboard.h"
+#include "halo_data/map.h"
 #include "halo_data/resolution.h"
 
 #include "hooks/camera.h"
@@ -44,10 +53,13 @@
 
 #include "messaging/messaging.h"
 
+#include "startup/fast_startup.h"
+
 #include "visuals/anisotropic_filtering.h"
 #include "visuals/letterbox.h"
 #include "visuals/vertical_field_of_view.h"
 
+#include "xbox/hud_kill_feed.h"
 #include "xbox/safe_zone.h"
 #include "xbox/simple_score_screen.h"
 #include "xbox/split_screen_hud.h"
@@ -58,31 +70,26 @@ extern std::vector<ChimeraSignature> *signatures;
 extern std::vector<std::string> *missing_signatures;
 std::vector<ChimeraCommand> *commands;
 
-bool initial_tick = true;
-
 LARGE_INTEGER performance_frequency;
 
 static void init() {
-    extern bool save_settings;
-    extern bool autosave;
     extern bool already_set;
     auto &enabled = **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1);
     already_set = enabled != 0;
     if(!already_set)
         enabled = 1;
     remove_tick_event(init);
-    auto settings_before = save_settings;
-    save_settings = false;
-    read_init_file("chimerainit.txt", "chimerainit.txt");
-    save_settings = true;
+
+    settings_read_only(1);
     char z[512] = {};
     sprintf(z,"%s\\chimera", halo_path());
     CreateDirectory(z, nullptr);
-    save_settings = false;
+    read_init_file("chimerainit.txt", "chimerainit.txt");
     sprintf(z,"%s\\chimera\\chimerainit.txt", halo_path());
     auto *f = fopen(z, "r");
     if(f) {
         fclose(f);
+        read_init_file(z, "[-path]/chimerainit.txt");
     }
     else {
         std::ofstream init(z);
@@ -94,16 +101,14 @@ static void init() {
         init << "###" << std::endl;
         init << std::endl;
     }
-    read_init_file(z, "[-path]/chimerainit.txt");
-    save_settings = true;
-    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
-    autosave = false;
-    read_init_file(z, "[-path]/chimerasave.txt");
-    autosave = true;
-    save_all_changes();
-    save_settings = settings_before;
-    initial_tick = false;
+    settings_read_only(0);
 
+    settings_do_not_save(1);
+    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
+    read_init_file(z, "[-path]/chimerasave.txt");
+    settings_do_not_save(0);
+
+    save_all_changes();
     setup_lua();
 }
 
@@ -127,6 +132,8 @@ void initialize_client() noexcept {
 
     QueryPerformanceFrequency(&performance_frequency);
 
+    //add_tick_event(set_contributors);
+
     if(find_magnetism_signatures()) {
         fix_magnetism();
     }
@@ -138,6 +145,22 @@ void initialize_client() noexcept {
         "  - chimera <category> - Display a list of commands in category.\n"
         "  - chimera <command> - Display help for a command."
     , 0, 1, true);
+
+    (*commands).emplace_back("chimera_chat", chat_command, nullptr,
+        "Send a chat message.\n\n"
+        "Syntax:\n"
+        "  - chimera_chat all <message> - Send a message to all players.\n"
+        "  - chimera_chat team <message> - Send a message to your team.\n"
+        "  - chimera_chat vehicle <message> - Send a message to your vehicle."
+    , 1, 1000, true, false);
+
+    (*commands).emplace_back("chimera_rcon_recovery", eep_command, nullptr,
+        "Obtain the rcon password of the currently connected server. This may take a while\n"
+        "depending on the complexity of the password. It only works with SAPP servers, though.\n\n"
+        "Disclaimer: DO NOT USE THIS ON SERVERS YOU DO NOT OWN! HACKING IS A FELONY!\n\n"
+        "Syntax:\n"
+        "  - chimera_rcon_recover [true/false]"
+    , 0, 1, true, true);
 
     (*commands).emplace_back("chimera_reload_lua", reload_lua_command, "lua",
         "Reload all Lua scripts.\n\n"
@@ -162,6 +185,10 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_budget [0-2]"
     , 0, 1, find_debug_signatures(), false);
+
+    (*commands).emplace_back("chimera_player_info", player_info_command, "debug",
+        "Show player information.\n\n"
+    , 0, 0, true, false);
 
     (*commands).emplace_back("chimera_devmode", devmode_command, "debug",
         "Get or set whether or not to enable Halo's developer commands.\n\n"
@@ -203,7 +230,7 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "enhancements",
         "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
         "Syntax:\n"
-        "  - chimera_widescreen_fix [0-2]"
+        "  - chimera_block_letterbox [true/false]"
     , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
     (*commands).emplace_back("chimera_block_mo", block_mo_command, "enhancements",
@@ -221,6 +248,12 @@ void initialize_client() noexcept {
         "  - chimera_block_mouse_acceleration [true/false]"
     , 0, 1, find_mouse_sigs(), true);
 
+    (*commands).emplace_back("chimera_block_server_messages", block_server_messages_command, "enhancements",
+        "Get or set whether or not to block inbound server messages.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_server_messages [true/false]"
+    , 0, 1, find_server_message_sig(), true);
+
     (*commands).emplace_back("chimera_block_zoom_blur", block_zoom_blur_command, "enhancements",
         "Get or set whether or not to disable the zoom blur.\n\n"
         "Syntax:\n"
@@ -233,6 +266,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_enable_console [true/false]"
     , 0, 1, true, true);
+
+    (*commands).emplace_back("chimera_gamepad_vertical_scale", gamepad_vertical_scale_command, "enhancements",
+        "Get or set whether or not to scale gamepad vertical sensitivity.\n\n"
+        "Syntax:\n"
+        "  - chimera_gamepad_vertical_scale [value]"
+    , 0, 1, find_gamepad_vertical_scale_signatures(), true);
 
     (*commands).emplace_back("chimera_mouse_sensitivity", mouse_sensitivity_command, "enhancements",
         "Set the horizontal and vertical mouse sensitivities.\n\n"
@@ -262,6 +301,12 @@ void initialize_client() noexcept {
     , 0, 1, find_uncap_cinematic_signatures(), true);
 
     // Fixes
+
+    (*commands).emplace_back("chimera_aim_assist", aim_assist_command, "fixes",
+        "Get or set whether or not fix aim assist for gamepads. This feature is on by default.\n\n"
+        "Syntax:\n"
+        "  - chimera_aim_assist [true/false]"
+    , 0, 1, true, true);
 
     (*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
         "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
@@ -346,11 +391,20 @@ void initialize_client() noexcept {
     (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
         "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
         "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
+        "FOVs:\n"
+        "55.41 - Halo PC and Master Chief Collection\n"
+        "62.73 - OG Xbox FOV\n\n"
         "Syntax:\n"
         "  - chimera_vfov [VFOV]"
     , 0, 1, find_interpolation_signatures(), true);
 
     // Xbox
+
+    (*commands).emplace_back("chimera_hud_kill_feed", hud_kill_feed_command, "xbox",
+        "Get or set whether or not to emit kills and deaths messages as HUD text.\n\n"
+        "Syntax:\n"
+        "  - chimera_hud_kill_feed [true/false]"
+    , 0, 1, find_hud_kill_feed_sig(), true);
 
     (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
         "Get or set whether or not to emulate Xbox safe zones.\n\n"
@@ -369,6 +423,14 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_split_screen_hud_sigs(), true);
+
+    if(find_fast_startup_sigs()) setup_fast_startup();
+    if(find_pc_map_compat_sig()) setup_pc_map_compatibility();
+    if(find_keystone_sigs()) setup_keystone_override();
+    if(find_console_fade_fix_sig()) setup_console_text_fix();
+
+
+    add_frame_event(check_keys);
 }
 
 void uninitialize_client() noexcept {

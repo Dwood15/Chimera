@@ -1,10 +1,13 @@
 #include "console.h"
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
+#include "../halo_data/chat.h"
+#include "../hooks/frame.h"
+#include "../halo_data/table.h"
 
 static char *console_text = NULL;
 
-static void block_error() {
+static void block_error() noexcept {
     auto *push_req = get_signature("console_block_error_sig").address();
     DWORD old_protect = 0;
     DWORD old_protect_b = 0;
@@ -13,17 +16,19 @@ static void block_error() {
     VirtualProtect(push_req, 5, old_protect, &old_protect_b);
 }
 
-static void unblock_error() {
+static void unblock_error() noexcept {
     get_signature("console_block_error_sig").undo();
 }
 
-static void read_command() {
+LARGE_INTEGER last_time_rcon_was_used;
+
+static void read_command() noexcept {
     block_error();
     if(strlen(console_text) > 127) {
         unblock_error();
         return;
     }
-    switch(execute_chimera_command(console_text)) {
+    switch(execute_chimera_command(console_text, false, true)) {
         case CHIMERA_COMMAND_ERROR_NOT_ENOUGH_ARGUMENTS: {
             auto &f = find_chimera_command(console_text);
             char text[256] = {};
@@ -48,7 +53,11 @@ static void read_command() {
         case CHIMERA_COMMAND_ERROR_COMMAND_NOT_FOUND: {
             extern bool on_command_lua(const char *command);
             auto command = split_arguments(console_text, true);
-            if(command[0] != "rcon" && !on_command_lua(console_text)) {
+            bool rcon = command[0] == "rcon";
+            if(rcon) {
+                QueryPerformanceCounter(&last_time_rcon_was_used);
+            }
+            if(!rcon && !on_command_lua(console_text)) {
                 console_text[0] = 0;
             }
             else {
@@ -60,7 +69,7 @@ static void read_command() {
     }
 }
 
-void initialize_console() {
+void initialize_console() noexcept {
     auto &console_call_s = get_signature("console_call_sig");
     auto *console_ptr = console_call_s.address();
     console_text = I8PTR(*reinterpret_cast<uint32_t *>(console_ptr - 4));
@@ -68,26 +77,79 @@ void initialize_console() {
     write_jmp_call(console_call_s.address(), reinterpret_cast<void *>(read_command), nullptr, console_codecave);
 }
 
-bool console_is_out() {
+bool console_is_out(int change, const char *with_text) noexcept {
+    if(change != -1) {
+        reinterpret_cast<void (*)(int out)>(get_signature("toggle_console_sig").address())(change ? 1 : 2);
+        if(change == 1 && with_text) {
+            auto len = strlen(with_text);
+            memcpy(console_text, with_text, len + 1);
+            *reinterpret_cast<short *>(console_text + 0x106) = len;
+        }
+    }
     static auto *out = *reinterpret_cast<char **>(get_signature("console_is_out_sig").address() + 2);
     return *out;
+}
+
+struct ConsoleEntry {
+    uint32_t idents[3];
+    char zero2;
+    char text[0x103];
+    ColorARGB color;
+    int32_t frames_out_fade; // goes up to 151
+};
+
+static void on_console() {
+    static GenericTable *&table = **reinterpret_cast<GenericTable ***>(get_signature("console_text_table_sig").address() + 2);
+    static LARGE_INTEGER last_frame = {};
+    if(last_frame.QuadPart == 0) QueryPerformanceCounter(&last_frame);
+    LARGE_INTEGER now_frame;
+    QueryPerformanceCounter(&now_frame);
+    auto time_since = counter_time_elapsed(last_frame, now_frame);
+    last_frame = now_frame;
+    ConsoleEntry *entries = reinterpret_cast<ConsoleEntry *>(table->first);
+    for(size_t i=0;i<table->size;i++) {
+        if(console_is_out()) {
+            entries[i].color.alpha += time_since * 10;
+            if(entries[i].color.alpha > 1.0) entries[i].color.alpha = 1.0;
+        }
+        else {
+            if(entries[i].frames_out_fade < 0 || entries[i].color.alpha < 0.075) {
+                entries[i].color.alpha -= time_since * 10;
+                entries[i].frames_out_fade = -100;
+                if(entries[i].color.alpha < 0.0) entries[i].color.alpha = 0.0;
+            }
+            else {
+                entries[i].color.alpha -= time_since / 6.0;
+                if(entries[i].color.alpha < 0.80) {
+                    entries[i].color.alpha -= time_since / 3.0;
+                }
+                if(entries[i].color.alpha < 0.0) {
+                    entries[i].color.alpha = 0.0;
+                }
+            }
+        }
+    }
+}
+
+/// Fix the console text
+void setup_console_text_fix() noexcept {
+    auto &fade = get_signature("console_fade_sig");
+    const unsigned char nop[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+    write_code_c(fade.address(), nop);
+    add_frame_event(on_console);
 }
 
 bool already_set = false;
 
 ChimeraCommandError enable_console_command(size_t argc, const char **argv) noexcept {
-    extern bool initial_tick;
     static bool active = true;
     if(argc == 1) {
         auto new_value = bool_value(argv[0]);
         if(!already_set && new_value != active) {
-            if(!initial_tick) {
-                console_out("Changes will take effect after you relaunch Halo.");
-                already_set = true;
+            if(console_is_out()) {
+                console_is_out(false);
             }
-            else {
-                **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1) = new_value;
-            }
+            **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1) = new_value;
         }
         active = new_value;
     }

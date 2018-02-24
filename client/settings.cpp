@@ -8,35 +8,53 @@
 
 #include "messaging/messaging.h"
 
-bool save_settings = true;
-bool autosave = true;
+bool settings_read_only(int new_value) noexcept {
+    static bool value = 0;
+    if(new_value > -1) value = new_value == 1;
+    return value;
+}
 
-std::vector<std::vector<std::string>> save_data;
+bool settings_do_not_save(int new_value) noexcept {
+    static bool value = 0;
+    if(new_value > -1) value = new_value == 1;
+    return value;
+}
+
+const char *startup_path() {
+    static std::string startup_path_s;
+    static bool set = false;
+    if(!set) {
+        char p[MAX_PATH] = {};
+        GetTempPath(MAX_PATH, p);
+        startup_path_s = std::string(p) + "\\chimerastartup.bin";
+    }
+    return startup_path_s.data();
+}
+
+static std::vector<std::vector<std::string>> save_data;
 
 void commit_command(const char *command, size_t argc, const char **argv) noexcept {
-    if(save_settings) {
-        std::vector<std::string> new_data;
-        new_data.push_back(command);
-        for(size_t i=0;i<argc;i++) {
-            new_data.push_back(argv[i]);
-        }
-        bool found = false;
-        for(size_t i=0;i<save_data.size();i++) {
-            if(save_data[i][0] == command) {
-                save_data[i] = new_data;
-                found = true;
-                break;
-            }
-        }
-        if(!found) save_data.push_back(new_data);
-        if(autosave) save_all_changes();
+    if(settings_read_only()) return;
+    std::vector<std::string> new_data;
+    new_data.push_back(command);
+    for(size_t i=0;i<argc;i++) {
+        new_data.push_back(argv[i]);
     }
+    bool found = false;
+    for(size_t i=0;i<save_data.size();i++) {
+        if(save_data[i][0] == command) {
+            save_data[i] = new_data;
+            found = true;
+            break;
+        }
+    }
+    if(!found) save_data.push_back(new_data);
+    save_all_changes();
 }
 
 void save_all_changes() noexcept {
-    char z[512] = {};
-    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
-    std::ofstream init(z);
+    if(settings_do_not_save()) return;
+    std::ofstream init(std::string(halo_path()) + "\\chimera\\chimerasave.txt");
     if(init.is_open()) {
         init << "###" << std::endl;
         init << "### Chimera build " << CHIMERA_BUILD_STRING << std::endl;
@@ -93,7 +111,7 @@ bool read_init_file(const char *path, const char *name) noexcept {
                 continue;
             }
             char x[256] = {};
-            switch(execute_chimera_command(line2.data(), !verbose_init)) {
+            switch(execute_chimera_command(line2.data(), !verbose_init, true)) {
                 case CHIMERA_COMMAND_ERROR_TOO_MANY_ARGUMENTS: {
                     auto &command = find_chimera_command(line.data());
                     sprintf(x, "%s:%u: Function %s takes at least %u arguments.", name, ln, command.name(), command.max_args());

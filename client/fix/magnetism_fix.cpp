@@ -2,6 +2,7 @@
 #include "magnetism_fix.h"
 #include "../client_signature.h"
 #include "../halo_data/table.h"
+#include "../messaging/messaging.h"
 
 bool gamepad_plugged_in() noexcept {
     static char *joybutt = *reinterpret_cast<char **>(get_signature("joybutt_sig").address() + 2);
@@ -59,10 +60,12 @@ static void on_mouse_movement_horizontal() noexcept {
     disable_magnetism_fix();
 }
 
+static bool enabled_before = false;
 
 void fix_magnetism() noexcept {
     gamepad_being_used = gamepad_plugged_in();
     if(!gamepad_being_used) return;
+    enabled_before = **reinterpret_cast<char **>(get_signature("player_magnetism_enabled_sig").address() + 1) == 1;
     enable_magnetism_fix();
 
     const unsigned char fstp_then_call[] {
@@ -145,4 +148,30 @@ void fix_magnetism() noexcept {
     on_mouse_horizontal_addr2[0] = 0xE8;
     *I32PTR(on_mouse_horizontal_addr2 + 1) = I32(on_mouse_horizontal_code.data) - I32(on_mouse_horizontal_addr2 + 1 + 4);
     VirtualProtect(on_mouse_horizontal_addr2, 6, old_protect, &old_protect_b);
+}
+
+
+ChimeraCommandError aim_assist_command(size_t argc, const char **argv) noexcept {
+    static bool active = true;
+    if(argc == 1) {
+        bool new_value = bool_value(argv[0]);
+        if(new_value != active) {
+            if(new_value) {
+                fix_magnetism();
+            }
+            else {
+                **reinterpret_cast<char **>(get_signature("player_magnetism_enabled_sig").address() + 1) = enabled_before ? 1 : 0;
+                get_signature("gamepad_horizontal_0_sig").undo();
+                get_signature("gamepad_vertical_0_sig").undo();
+                get_signature("mouse_horizontal_0_sig").undo();
+                get_signature("gamepad_horizontal_1_sig").undo();
+                get_signature("gamepad_vertical_1_sig").undo();
+                get_signature("mouse_horizontal_1_sig").undo();
+                get_signature("magnetism_sig").undo();
+            }
+            active = new_value;
+        }
+    }
+    console_out(active ? "true" : "false");
+    return CHIMERA_COMMAND_ERROR_SUCCESS;
 }

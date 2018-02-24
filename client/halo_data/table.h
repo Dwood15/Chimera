@@ -88,6 +88,9 @@ uint32_t client_player_index() noexcept;
 /// Check if two wide strings are equal, optionally up to a maximum length.
 bool unichar_equal(const short *a, const short *b, size_t size = SIZE_MAX) noexcept;
 
+/// Check if a char string is equal to a wide string, optionally up to a maximum length.
+bool unichar_equal(const char *a, const short *b, size_t size = SIZE_MAX) noexcept;
+
 class HaloPlayer {
 private:
     uint32_t player_index;
@@ -97,6 +100,7 @@ public:
     char *player_data() noexcept;
     HaloPlayer(uint32_t player_index=client_player_index()) noexcept;
     HaloPlayer(const short *name) noexcept;
+    HaloPlayer(const char *name) noexcept;
 };
 
 struct BaseHaloObject {

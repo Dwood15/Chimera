@@ -94,7 +94,7 @@ public:
 std::vector<std::string> split_arguments(const char *input, bool lowercase_first_argument=false);
 
 /// Search for and execute the Chimera command.
-ChimeraCommandError execute_chimera_command(const char *command_input, bool silently=false);
+ChimeraCommandError execute_chimera_command(const char *command_input, bool silently=false, bool save=true);
 
 /// Return the Chimera command that would be executed if command_input was given.
 ChimeraCommand &find_chimera_command(const char *command_input);

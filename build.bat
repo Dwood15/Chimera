@@ -46,6 +46,7 @@ g++ -c main.cpp %ARGS% -o bin/main.o
 g++ -c client/client_signature.cpp %ARGS% -o bin/client__client_signature.o
 g++ -c client/client.cpp %ARGS% -o bin/client__client.o
 g++ -c client/hac2.cpp %ARGS% -o bin/client__hac2.o
+g++ -c client/keystone.cpp %ARGS% -o bin/client__keystone.o
 g++ -c client/open_sauce.cpp %ARGS% -o bin/client__open_sauce.o
 g++ -c client/path.cpp %ARGS% -o bin/client__path.o
 g++ -c client/settings.cpp %ARGS% -o bin/client__settings.o
@@ -55,12 +56,15 @@ g++ -c client/command/console.cpp %ARGS% -o bin/client__command__console.o
 
 g++ -c client/debug/budget.cpp %ARGS% -o bin/client__debug__budget.o
 g++ -c client/debug/devmode.cpp %ARGS% -o bin/client__debug__devmode.o
+g++ -c client/debug/eep.cpp %ARGS% -o bin/client__debug__eep.o
 g++ -c client/debug/wireframe.cpp %ARGS% -o bin/client__debug__wireframe.o
 
 g++ -c client/enhancements/auto_center.cpp %ARGS% -o bin/client__enhancements__auto_center.o
 g++ -c client/enhancements/firing_particle.cpp %ARGS% -o bin/client__enhancements__firing_particle.o
+g++ -c client/enhancements/gamepad_vertical_scale.cpp %ARGS% -o bin/client__enhancements__gamepad_vertical_scale.o
 g++ -c client/enhancements/multitexture_overlay.cpp %ARGS% -o bin/client__enhancements__mo.o
 g++ -c client/enhancements/mouse.cpp %ARGS% -o bin/client__enhancements__mouse.o
+g++ -c client/enhancements/server_messages.cpp %ARGS% -o bin/client__enhancements__server_messages.o
 g++ -c client/enhancements/show_spawn.cpp %ARGS% -o bin/client__enhancements__show_spawn.o
 g++ -c client/enhancements/skip_loading.cpp %ARGS% -o bin/client__enhancements__skip_loading.o
 g++ -c client/enhancements/throttle_fps.cpp %ARGS% -o bin/client__enhancements__throttle_fps.o
@@ -73,7 +77,9 @@ g++ -c client/fix/scope_fix.cpp %ARGS% -o bin/client__fix__scope_fix.o
 g++ -c client/fix/sniper_hud.cpp %ARGS% -o bin/client__fix__sniper_hud.o
 g++ -c client/fix/widescreen_fix.cpp %ARGS% -o bin/client__fix__widescreen_fix.o
 
+g++ -c client/halo_data/chat.cpp %ARGS% -o bin/client__halo_data__chat.o
 g++ -c client/halo_data/global.cpp %ARGS% -o bin/client__halo_data__global.o
+g++ -c client/halo_data/keyboard.cpp %ARGS% -o bin/client__halo_data__keyboard.o
 g++ -c client/halo_data/map.cpp %ARGS% -o bin/client__halo_data__map.o
 g++ -c client/halo_data/resolution.cpp -masm=intel -o bin/client__halo_data__resolution.o
 g++ -c client/halo_data/server.cpp %ARGS% -o bin/client__halo_data__server.o
@@ -103,13 +109,17 @@ g++ -c client/lua/lua_callback.cpp %ARGS% -o bin/client__lua__lua_callback.o
 g++ -c client/lua/lua_game.cpp %ARGS% -o bin/client__lua__lua_game.o
 g++ -c client/lua/lua_io.cpp %ARGS% -o bin/client__lua__lua_io.o
 
-g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging_messaging.o
+g++ -c client/messaging/messaging.cpp -masm=intel -o bin/client__messaging__messaging.o
+
+gcc -c client/startup/crc32.c %ARGS% -o bin/client__startup__crc32.o
+g++ -c client/startup/fast_startup.cpp %ARGS% -o bin/client__startup__fast_startup.o
 
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
 g++ -c client/visuals/gametype_indicator.cpp %ARGS% -o bin/client__visuals__gametype_indicator.o
 g++ -c client/visuals/letterbox.cpp %ARGS% -o bin/client__visuals__letterbox.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
+g++ -c client/xbox/hud_kill_feed.cpp %ARGS% -o bin/client__xbox__hud_kill_feed.o
 g++ -c client/xbox/safe_zone.cpp %ARGS% -o bin/client__xbox__safe_zone.o
 g++ -c client/xbox/simple_score_screen.cpp %ARGS% -o bin/client__xbox__simple_score_screen.o
 g++ -c client/xbox/split_screen_hud.cpp %ARGS% -o bin/client__xbox__split_screen_hud.o

@@ -26,8 +26,11 @@ ChimeraCommandError vfov_command(size_t argc, const char **argv) noexcept {
         if(new_value == 0) {
             remove_precamera_event(on_precamera);
         }
-        else if(new_value < 1 || new_value > 179) {
-            console_out_error("FOV must be between 1 and 179");
+        else if(new_value == 1) {
+            new_value = 55.41;
+        }
+        else if(new_value < 2 || new_value > 179) {
+            console_out_error("FOV must be between 2 and 179");
             return CHIMERA_COMMAND_ERROR_FAILURE;
         }
         if(vfov == 0 && new_value != 0) {
