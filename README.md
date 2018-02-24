@@ -17,6 +17,7 @@ For general information on Chimera, go to https://chimera.opencarnage.net
   * [Chimera Directory Structure](#chimera-directory-structure)
     * [chimerainit.txt and chimerasave.txt](#chimerainittxt-and-chimerasavetxt)
     * [Lua Scripting](#lua-scripting)
+* [**Retail Map Compatibility**](#retail-map-compatibility)
 * [**Commands**](#commands)
   * [Uncategorized](#uncategorized)
   * [Debug](#debug)
@@ -94,6 +95,27 @@ You can also put `chimerainit.txt` in the root directory of Halo (that is, the s
 Chimera also supports Lua scripting. Scripts in the `global` folder are loaded on startup. They remain permanently loaded unless the user uses `chimera_reload_lua`.
 Scripts in the map folder is loaded when a map is loaded and unloaded when a map is unloaded. Scripts may also be contained inside of map files.
 A Lua scripting section will be added to this documentation in a future date.
+
+# Retail Map Compatibility
+
+Chimera can enable Halo Custom Edition to load retail Halo maps. This feature requires a small amount of setup in order to be enabled:
+
+1. Create a folder chimera in your maps folder. Make sure you have write access to this folder.
+2. Copy your retail (Halo PC) bitmaps.map and sounds.map files into this folder. Make sure you COPY them; these files WILL be deleted.
+3. Copy any maps you wish to run with Halo Custom Edition into your Halo Custom Edition Maps folder.
+4. Start up Chimera. Chimera will patch the bitmaps.map and sounds.map files in the chimera folder, replacing them with ce_bitmaps.map and sounds.map, respectively. Halo Custom Edition will then load these files.
+
+Once finished, you will be able to run maps (such as the original Halo: Combat Evolved campaign) without having to convert them with a program such as Combustion.
+
+**Notes**
+
+* If you want to play the Halo: Combat Evolved campaign, there are other ways to do this than this way:
+* Moses’s Refined Campaign: http://forum.halomaps.org/index.cfm?page=topic&topicID=50277
+* SPV3 (requires installing stuff like a launcher): https://www.reddit.com/r/halospv3/
+* Converted maps (scattered around on Halo Maps): http://hce.halomaps.org/?nid=386
+
+Replacing any multiplayer maps may prevent you from joining servers with those maps.
+Chimera does NOT allow you to join retail servers regardless of if you are using a retail map or a Custom Edition map.
 
 # Commands
 
