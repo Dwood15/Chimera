@@ -38,7 +38,8 @@ bool find_hud_kill_feed_sig() noexcept;
 bool find_server_message_sig() noexcept;
 bool find_fast_startup_sigs() noexcept;
 bool find_console_fade_fix_sig() noexcept;
-bool find_pc_map_compat_sig() noexcept;
+bool find_pc_map_compat_sigs() noexcept;
+bool find_disable_buffering_sig() noexcept;
 
 #define I32(x) reinterpret_cast<int32_t>(x)
 #define I32PTR(x) reinterpret_cast<int32_t *>(x)

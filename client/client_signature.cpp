@@ -634,7 +634,7 @@ bool find_console_fade_fix_sig() noexcept {
     set_result
 }
 
-bool find_pc_map_compat_sig() noexcept {
+bool find_pc_map_compat_sigs() noexcept {
     check_result
 
     const short pc_map_compatibility_sig[] = { 0x81, 0x3D, -1, -1, -1, -1, 0x61, 0x02, 0x00, 0x00, 0x0F, 0x85, -1, -1, 0x00, 0x00 };
@@ -654,6 +654,15 @@ bool find_pc_map_compat_sig() noexcept {
 
     const short on_read_sig[] = { 0x89, 0x3D, -1, -1, -1, -1, 0x8B, 0x07, 0xA3, -1, -1, -1, -1, 0xA0, -1, -1, -1, -1, 0x84, 0xC0 };
     add_signature_s2(on_read_sig);
+
+    set_result
+}
+
+bool find_disable_buffering_sig() noexcept {
+    check_result
+
+    const short disable_buffering_sig[] = { 0xA1, -1, -1, -1, -1, 0x85, 0xC0, 0x74, 0x74, 0xA1, -1, -1, -1, -1, 0x8D, 0x54, 0x24, 0x08, 0x52 };
+    add_signature_s2(disable_buffering_sig);
 
     set_result
 }

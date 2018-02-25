@@ -20,6 +20,7 @@
 #include "debug/wireframe.h"
 
 #include "enhancements/auto_center.h"
+#include "enhancements/disable_buffering.h"
 #include "enhancements/gamepad_vertical_scale.h"
 #include "enhancements/firing_particle.h"
 #include "enhancements/multitexture_overlay.h"
@@ -260,6 +261,12 @@ void initialize_client() noexcept {
         "  - chimera_block_zoom_blur [true/false]"
     , 0, 1, find_zoom_blur_signatures(), true);
 
+    (*commands).emplace_back("chimera_disable_buffering", disable_buffering_command, "enhancements",
+        "Get or set whether or not to disable buffering. This may improve input latency.\n\n"
+        "Syntax:\n"
+        "  - chimera_disable_buffering [true/false]"
+    , 0, 1, find_disable_buffering_sig(), true);
+
     (*commands).emplace_back("chimera_enable_console", enable_console_command, "enhancements",
         "Get or set whether or not to automatically enable the console.\n"
         "Unlike most other features, this feature is enabled by default.\n\n"
@@ -425,7 +432,7 @@ void initialize_client() noexcept {
     , 0, 1, find_split_screen_hud_sigs(), true);
 
     if(find_fast_startup_sigs()) setup_fast_startup();
-    if(find_pc_map_compat_sig()) setup_pc_map_compatibility();
+    if(find_pc_map_compat_sigs()) setup_pc_map_compatibility();
     if(find_keystone_sigs()) setup_keystone_override();
     if(find_console_fade_fix_sig()) setup_console_text_fix();
 
