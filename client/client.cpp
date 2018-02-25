@@ -12,7 +12,7 @@
 #include "command/console.h"
 #include "command/command.h"
 
-#include "contributors/contributors.h"
+//#include "contributors/contributors.h"
 
 #include "debug/budget.h"
 #include "debug/devmode.h"
@@ -32,6 +32,7 @@
 #include "enhancements/uncap_cinematic.h"
 #include "enhancements/zoom_blur.h"
 
+#include "fix/camo_fix.h"
 #include "fix/descope_fix.h"
 #include "fix/magnetism_fix.h"
 #include "fix/scope_fix.h"
@@ -128,6 +129,8 @@ void initialize_client() noexcept {
     initialize_console();
     initialize_rcon_message();
     add_tick_event(init);
+    add_tick_event(camo_fix);
+    dart_fix();
 
     enable_descope_fix();
 
