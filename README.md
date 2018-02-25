@@ -99,6 +99,7 @@ These commands are primarily for assisting map developers or modders.
   * `1` - On (Modded budgets if a mod is installed such as HAC2)
   * `2` - On (Stock budgets)
 * `chimera_devmode [true/false]` - Get or set whether or not to enable Halo’s developer commands.
+* `chimera_player_info` - Show player information.
 * `chimera_tps [ticks per second]` - Get or set tick rate. This value cannot be set below 0.01.
 * `chimera_wireframe [true/false]` - Get or set whether or not to enable or disable wireframe mode. This will not work while in a server.
 
@@ -111,12 +112,15 @@ These commands exist to enhance your gameplay experience.
   * `1` - Fixed behavior
   * `2` - Disable automatic centering
 * `chimera_block_firing_particles [true/false]` - Get or set whether or not to block firing particles.
+* `chimera_block_letterbox [true/false]` - Get or set whether or not to block the letterbox effect in cinematics.
 * `chimera_block_mo [true/false]` - Get or set whether or not to disable multitexture overlays. This feature is intended to fix the buggy HUD on the stock sniper rifle, but multitexture overlays may be used correctly on some maps.
 * `chimera_block_mouse_acceleration [true/false]` - Get or set whether or not to block mouse acceleration. Note that some mice may still exhibit mouse acceleration.
+* `chimera_block_server_messages [true/false]` - Get or set whether or not to block inbound server messages.
 * `chimera_block_zoom_blur [true/false]` - Get or set whether or not to disable the zoom blur.
-* `chimera_block_letterbox [true/false]` -  Get or set whether or not to block the letterbox effect in cinematics.
+* `chimera_disable_buffering [true/false]` - Get or set whether or not to disable buffering. This may improve input latency.
 * `chimera_enable_console [true/false]` - Get or set whether or not to automatically enable the console. Unlike most other features, this feature is enabled by default.
-* `chimera_mouse_sensitivity [<horizontal> <vertical> | <false>]` -  Set the horizontal and vertical mouse sensitivities. Values less than 1 do not work properly if mouse acceleration is enabled.
+* `chimera_gamepad_vertical_scale [value]` - Get or set whether or not to scale gamepad vertical sensitivity.
+* `chimera_mouse_sensitivity [<horizontal> <vertical> | <false>]` - Set the horizontal and vertical mouse sensitivities. Values less than 1 do not work properly if mouse acceleration is enabled.
 * `chimera_show_spawns [true/false]` - Get or set whether or not to show spawns.
 * `chimera_skip_loading [true/false]` - Get or set whether or not to skip the multiplayer loading screen.
 * `chimera_uncap_cinematic [true/false]` - Get or set whether or not to remove the 30 FPS framerate cap in cinematics. This may result in objects jittering during cutscenes if chimera_interpolate is not enabled.
@@ -125,6 +129,7 @@ These commands exist to enhance your gameplay experience.
 
 These commands fix various problems with Halo. Some fixes, such as the magnetism fix and the descope fix, are enabled by default and have no commands to disable them.
 
+* `chimera_aim_assist [true/false]` - Get or set whether or not fix aim assist for gamepads. This feature is on by default.
 * `chimera_sniper_hud_fix [true/false]` - Get or set whether or not to fix the sniper HUD. This may not work on protected maps.
 * `chimera_widescreen_fix [0-2]` - Get or set whether or not to (mostly) fix the HUD. **Note:** This will break the HUD if you are using any other widescreen fix.
   * `0` - Off
@@ -167,6 +172,7 @@ These features offer some modifications for visuals such as HUD.
 
 These commands add enhancements that emulate or restore functionality from the original console release of the game.
 
+* `chimera_hud_kill_feed [true/false]` - Get or set whether or not to emit kills and deaths messages as HUD text.
 * `chimera_safe_zones [true/false]` - Get or set whether or not to emulate Xbox safe zones.
 * `chimera_simple_score_screen [true/false]` - Get or set whether or not to use a simplified in-game score screen.
 * `chimera_split_screen_hud [true/false]` - Get or set whether or not to use Halo's split screen HUD. **Note:** This may cause potential crashing issues on HAC2.
