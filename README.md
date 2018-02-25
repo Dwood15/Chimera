@@ -99,7 +99,7 @@ These commands are primarily for assisting map developers or modders.
   * `1` - On (Modded budgets if a mod is installed such as HAC2)
   * `2` - On (Stock budgets)
 * `chimera_devmode [true/false]` - Get or set whether or not to enable Halo’s developer commands.
-* `chimera_set_tps [ticks per second]` - Get or set tick rate. This value cannot be set below 0.01.
+* `chimera_tps [ticks per second]` - Get or set tick rate. This value cannot be set below 0.01.
 * `chimera_wireframe [true/false]` - Get or set whether or not to enable or disable wireframe mode. This will not work while in a server.
 
 ## Enhancements

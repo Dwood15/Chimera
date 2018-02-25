@@ -197,10 +197,10 @@ void initialize_client() noexcept {
         "  - chimera_devmode [true/false]"
     , 0, 1, find_devmode_sig(), true);
 
-    (*commands).emplace_back("chimera_set_tps", set_tps_command, "debug",
+    (*commands).emplace_back("chimera_tps", tps_command, "debug",
         "Get or set tick rate. This value cannot be set below 0.01.\n\n"
         "Syntax:\n"
-        "  - chimera_set_tps [ticks per second]"
+        "  - chimera_tps [ticks per second]"
     , 0, 1, find_debug_signatures(), false);
 
     (*commands).emplace_back("chimera_wireframe", wireframe_command, "debug",

@@ -101,7 +101,7 @@ double tick_progress() noexcept {
     else return 1.0;
 }
 
-ChimeraCommandError set_tps_command(size_t argc, const char **argv) noexcept {
+ChimeraCommandError tps_command(size_t argc, const char **argv) noexcept {
     if(argc == 1) {
         auto new_rate = atof(argv[0]);
         if(new_rate < 0.01) {

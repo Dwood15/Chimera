@@ -17,5 +17,5 @@ int32_t tick_count() noexcept;
 double tick_time() noexcept;
 double tick_progress() noexcept;
 
-/// Function for command chimera_set_tps
-ChimeraCommandError set_tps_command(size_t argc, const char **argv) noexcept;
+/// Function for command chimera_tps
+ChimeraCommandError tps_command(size_t argc, const char **argv) noexcept;
