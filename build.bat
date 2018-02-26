@@ -74,6 +74,7 @@ g++ -c client/enhancements/zoom_blur.cpp %ARGS% -o bin/client__enhancements__zoo
 
 g++ -c client/fix/camo_fix.cpp %ARGS% -o bin/client__fix__camo_fix.o
 g++ -c client/fix/descope_fix.cpp %ARGS% -o bin/client__fix__descope_fix.o
+g++ -c client/fix/fov_fix.cpp %ARGS% -o bin/client__fix__fov_fix.o
 g++ -c client/fix/magnetism_fix.cpp %ARGS% -o bin/client__fix__magnetism_fix.o
 g++ -c client/fix/scope_fix.cpp %ARGS% -o bin/client__fix__scope_fix.o
 g++ -c client/fix/sniper_hud.cpp %ARGS% -o bin/client__fix__sniper_hud.o

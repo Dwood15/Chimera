@@ -34,6 +34,7 @@
 
 #include "fix/camo_fix.h"
 #include "fix/descope_fix.h"
+#include "fix/fov_fix.h"
 #include "fix/magnetism_fix.h"
 #include "fix/scope_fix.h"
 #include "fix/sniper_hud.h"
@@ -318,6 +319,12 @@ void initialize_client() noexcept {
         "  - chimera_aim_assist [true/false]"
     , 0, 1, true, true);
 
+    (*commands).emplace_back("chimera_fov_fix", fov_fix_command, "fixes",
+        "Get or set whether or not to fix the FOV. This will make FOV mods more accurate.\n\n"
+        "Syntax:\n"
+        "  - chimera_fov_fix [true/false]"
+    , 0, 1, find_fov_fix_sigs(), true);
+
     (*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
         "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
         "Syntax:\n"
@@ -402,8 +409,7 @@ void initialize_client() noexcept {
         "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
         "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
         "FOVs:\n"
-        "55.41 - Halo PC and Master Chief Collection\n"
-        "62.73 - OG Xbox FOV\n\n"
+        "55.41 - Stock FOV\n"
         "Syntax:\n"
         "  - chimera_vfov [VFOV]"
     , 0, 1, find_interpolation_signatures(), true);
