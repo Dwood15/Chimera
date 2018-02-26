@@ -441,8 +441,11 @@ void initialize_client() noexcept {
     , 0, 1, find_split_screen_hud_sigs(), true);
 
     if(find_fast_startup_sigs()) setup_fast_startup();
-    if(find_pc_map_compat_sigs()) setup_pc_map_compatibility();
-    if(find_keystone_sigs()) setup_keystone_override();
+
+    if(custom_keystone_in_use()) {
+        if(find_pc_map_compat_sigs()) setup_pc_map_compatibility();
+        if(find_keystone_sigs()) setup_keystone_override();
+    }
     if(find_console_fade_fix_sig()) setup_console_text_fix();
 
 

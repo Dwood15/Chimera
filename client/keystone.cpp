@@ -9,13 +9,9 @@ bool custom_keystone_in_use() noexcept {
     if(found == -1) {
         auto *module = GetModuleHandle("keystone.dll");
         if(!module) return false;
-        for(int i=0;i<0x5000;i++) {
-            if(memcmp(reinterpret_cast<char *>(module) + i, "(^)>", 4) == 0) {
-                found = 1;
-                return true;
-            }
-        }
-        found = 0;
+        auto **bird = reinterpret_cast<const char **>(GetProcAddress(module, "bird"));
+        found = (bird != 0 && strcmp(*bird, "(^)>") == 0);
+        CloseHandle(module);
     }
     return found;
 }

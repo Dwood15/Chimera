@@ -2,6 +2,7 @@
 #include "../client_signature.h"
 #include "../hooks/tick.h"
 #include "../halo_data/table.h"
+#include "../messaging/messaging.h"
 #include "../interpolation/camera.h"
 
 void camo_fix() noexcept {
