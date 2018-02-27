@@ -157,6 +157,14 @@ Here is what each level of interpolation does:
 * `B` = Interpolation (with rotation) (better)
 * `A` = Interpolation (with rotation) and no distance optimization (best)
 
+## Startup
+
+These commands modify aspects of Chimera's fast startup feature.
+
+* `chimera_cache [true/false]` - Get or set whether or not to use a cache for fast startup.
+* `chimera_cache_clear` - Clear the cache.
+* `chimera_modded_stock_maps [true/false]` - Get or set whether or not stock maps will use hardcoded CRC32s. This may be required for some maps to work.
+
 ## Visuals
 
 These features offer some modifications for visuals such as HUD.

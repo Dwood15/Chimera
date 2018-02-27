@@ -11,6 +11,44 @@
 
 #include "crc32.h"
 
+struct CacheEntry {
+    char name[64] = {};
+    uint32_t crc32;
+};
+std::vector<CacheEntry> cache;
+static bool use_cache = false;
+static bool modded_stock_maps = false;
+
+static bool save_cache() noexcept {
+    char path[MAX_PATH] = {};
+    sprintf(path, "%s\\chimera\\cache.bin", halo_path());
+    FILE *f = fopen(path, "wb");
+    if(f) {
+        fwrite(&cache[0], sizeof(cache[0])*cache.size(), 1, f);
+        fclose(f);
+    }
+    return f != NULL;
+}
+
+static bool load_cache() noexcept {
+    char path[MAX_PATH] = {};
+    sprintf(path, "%s\\chimera\\cache.bin", halo_path());
+    FILE *f = fopen(path, "rb");
+    if(f) {
+        fseek(f, 0, SEEK_END);
+        size_t cache_items = ftell(f) / sizeof(CacheEntry);
+        fseek(f, 0, SEEK_SET);
+        cache.clear();
+        for(size_t i=0;i<cache_items;i++) {
+            CacheEntry ce;
+            fread(&ce, sizeof(ce), 1, f);
+            cache.push_back(ce);
+        }
+        fclose(f);
+    }
+    return f != NULL;
+}
+
 // CRC of map = CRC of BSPs, model data, and tag data
 static uint32_t calculate_crc32_of_map_file(FILE *f) noexcept {
     uint32_t crc = 0;
@@ -56,13 +94,65 @@ static uint32_t calculate_crc32_of_map_file(FILE *f) noexcept {
     return crc;
 }
 
+static uint32_t stock_crc32(const std::string &name) {
+    if(name == "beavercreek")
+        return 0x07B3876A;
+    else if(name == "sidewinder")
+        return 0xBD95CF55;
+    else if(name == "damnation")
+        return 0x0FBA059D;
+    else if(name == "ratrace")
+        return 0xF7F8E14C;
+    else if(name == "prisoner")
+        return 0x43B81A8B;
+    else if(name == "hangemhigh")
+        return 0xA7C8B9C6;
+    else if(name == "chillout")
+        return 0x93C53C27;
+    else if(name == "carousel")
+        return 0x9C301A08;
+    else if(name == "boardingaction")
+        return 0xF4DEEF94;
+    else if(name == "bloodgulch")
+        return 0x7B309554;
+    else if(name == "wizard")
+        return 0xCF3359B1;
+    else if(name == "putput")
+        return 0xAF2F0B84;
+    else if(name == "longest")
+        return 0xC8F48FF6;
+    else if(name == "dangercanyon")
+        return 0xC410CD74;
+    else if(name == "deathisland")
+        return 0x1DF8C97F;
+    else if(name == "gephyrophobia")
+        return 0xD2872165;
+    else if(name == "infinity")
+        return 0x0E7F7FE7;
+    else if(name == "timberland")
+        return 0x54446470;
+    else
+        return 0xFFFFFFFF;
+}
+
 static void do_crc_things() noexcept {
     static char *loading_map = *reinterpret_cast<char **>(get_signature("loading_map_sig").address() + 1);
-    static char crc_already[65536] = {};
     auto *indices = map_indices();
     for(size_t i=0;i<maps_count();i++) {
         if(strcmp(indices[i].file_name, loading_map) == 0) {
-            if(!crc_already[i]) {
+            if(indices[i].crc32 == 0xFFFFFFFF && modded_stock_maps) {
+                indices[i].crc32 = stock_crc32(indices[i].file_name);
+            }
+
+            if(indices[i].crc32 == 0xFFFFFFFF && use_cache) {
+                for(size_t c=0;c<cache.size();c++) {
+                    if(strcmp(indices[i].file_name, cache[c].name) == 0) {
+                        indices[i].crc32 = cache[c].crc32;
+                    }
+                }
+            }
+
+            if(indices[i].crc32 == 0xFFFFFFFF) {
                 char map_path[MAX_PATH] = {};
                 sprintf(map_path, "maps\\%s.map", indices[i].file_name);
                 FILE *f = fopen(map_path, "rb");
@@ -76,11 +166,20 @@ static void do_crc_things() noexcept {
                 }
                 if(f) {
                     indices[i].crc32 = ~calculate_crc32_of_map_file(f);
-                    crc_already[i] = 1;
                     fclose(f);
-                    break;
+                    if(use_cache) {
+                        CacheEntry ce;
+                        strcpy(ce.name, indices[i].file_name);
+                        ce.crc32 = indices[i].crc32;
+                        cache.push_back(ce);
+                        if(!save_cache()) {
+                            console_out_error("Error: Unable to save to cache.");
+                        }
+                    }
                 }
             }
+
+            if(indices[i].crc32 != 0xFFFFFFFF) break;
         }
     }
 }
@@ -120,52 +219,37 @@ void setup_fast_startup() {
     write_code_any_value(on_get_crc.data + 0xE + 1, reinterpret_cast<int>(get_crc_sig.address() + 5) - reinterpret_cast<int>(on_get_crc.data + 0xE + 5));
 }
 
-/*ChimeraCommandError fast_startup_command(size_t argc, const char **argv) noexcept {
-    static bool active = false;
-    extern bool first_tick;
+/// Function for command chimera_cache
+ChimeraCommandError cache_command(size_t argc, const char **argv) noexcept {
     if(argc == 1) {
-        bool new_value = bool_value(argv[0]);
-        if(new_value != active) {
-            if(!first_tick) {
-                auto &fast_startup_sig = get_signature("crc32_call_sig");
-                auto &get_crc_sig = get_signature("get_crc_sig");
-                if(new_value) {
-                    static unsigned char nop5[5] = { 0x90, 0x90, 0x90, 0x90, 0x90 };
-                    write_code_c(fast_startup_sig.address(), nop5);
-
-                    unsigned char code[] = {
-                        // shl eax, 0x04
-                        0xC1, 0xE0, 0x04,
-
-                        // pushad
-                        0x60,
-
-                        // call do_crc_things
-                        0xE8, 0xFF, 0xFF, 0xFF, 0xFF,
-
-                        // popad
-                        0x61,
-
-                        // mov ecx, [eax+edx+0C]
-                        0x8B, 0x4C, 0x10, 0x0C,
-
-                        // jmp back
-                        0xE9, 0xFF, 0xFF, 0xFF, 0xFF
-                    };
-
-                    static BasicCodecave on_get_crc(code, sizeof(code));
-                    static unsigned char nop7[7] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-                    write_code_c(get_crc_sig.address(), nop7);
-                    write_code_any_value(get_crc_sig.address(), static_cast<unsigned char>(0xE9));
-                    write_code_any_value(get_crc_sig.address() + 1, reinterpret_cast<int>(on_get_crc.data) - reinterpret_cast<int>(get_crc_sig.address() + 5));
-                    write_code_any_value(on_get_crc.data + 4 + 1, reinterpret_cast<int>(do_crc_things) - reinterpret_cast<int>(on_get_crc.data + 4 + 5));
-                    write_code_any_value(on_get_crc.data + 0xE + 1, reinterpret_cast<int>(get_crc_sig.address() + 5) - reinterpret_cast<int>(on_get_crc.data + 0xE + 5));
-                }
-            }
-            active = new_value;
-            startup_parameters().fast_startup = active;
-        }
+        use_cache = bool_value(argv[0]);
+        load_cache();
     }
-    console_out(active ? "true" : "false");
+    console_out(use_cache ? "true" : "false");
     return CHIMERA_COMMAND_ERROR_SUCCESS;
-}*/
+}
+
+/// Function for command chimera_cache_clear
+ChimeraCommandError cache_clear_command(size_t argc, const char **argv) noexcept {
+    console_out("Erasing cache...");
+    cache.clear();
+    auto *indices = map_indices();
+    for(size_t i=0;i<maps_count();i++) {
+        indices[i].crc32 = 0xFFFFFFFF;
+    }
+    if(!save_cache()) {
+        console_out_error("Error: Unable to save to cache.");
+    }
+    else {
+        console_out("Done!");
+    }
+    return CHIMERA_COMMAND_ERROR_SUCCESS;
+}
+
+ChimeraCommandError modded_stock_maps_command(size_t argc, const char **argv) noexcept {
+    if(argc == 1) {
+        modded_stock_maps = bool_value(argv[0]);
+    }
+    console_out(modded_stock_maps ? "true" : "false");
+    return CHIMERA_COMMAND_ERROR_SUCCESS;
+}

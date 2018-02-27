@@ -440,6 +440,27 @@ void initialize_client() noexcept {
         "  - chimera_simple_score_screen [true/false]"
     , 0, 1, find_split_screen_hud_sigs(), true);
 
+    // Startup
+
+    (*commands).emplace_back("chimera_cache", cache_command, "startup",
+        "Get or set whether or not to use a cache for fast startup.\n\n"
+        "Syntax:\n"
+        "  - chimera_cache [true/false]"
+    , 0, 1, find_fast_startup_sigs(), true);
+
+    (*commands).emplace_back("chimera_cache_clear", cache_clear_command, "startup",
+        "Clear the cache.\n\n"
+        "Syntax:\n"
+        "  - chimera_cache_clear"
+    , 0, 0, find_fast_startup_sigs(), false);
+
+    (*commands).emplace_back("chimera_modded_stock_maps", modded_stock_maps_command, "startup",
+        "Get or set whether or not stock maps will use hardcoded CRC32s. This may be required for\n"
+        "some maps to work.\n\n"
+        "Syntax:\n"
+        "  - chimera_modded_stock_maps [true/false]"
+    , 0, 1, find_fast_startup_sigs(), true);
+
     if(find_fast_startup_sigs()) setup_fast_startup();
 
     if(custom_keystone_in_use()) {
