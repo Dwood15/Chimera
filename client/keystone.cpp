@@ -11,7 +11,6 @@ bool custom_keystone_in_use() noexcept {
         if(!module) return false;
         auto **bird = reinterpret_cast<const char **>(GetProcAddress(module, "bird"));
         found = (bird != 0 && strcmp(*bird, "(^)>") == 0);
-        CloseHandle(module);
     }
     return found;
 }
