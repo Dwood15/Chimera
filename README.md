@@ -111,7 +111,6 @@ These commands exist to enhance your gameplay experience.
   * `0` - Broken stock behavior
   * `1` - Fixed behavior
   * `2` - Disable automatic centering
-* `chimera_block_firing_particles [true/false]` - Get or set whether or not to block firing particles.
 * `chimera_block_letterbox [true/false]` - Get or set whether or not to block the letterbox effect in cinematics.
 * `chimera_block_mo [true/false]` - Get or set whether or not to disable multitexture overlays. This feature is intended to fix the buggy HUD on the stock sniper rifle, but multitexture overlays may be used correctly on some maps.
 * `chimera_block_mouse_acceleration [true/false]` - Get or set whether or not to block mouse acceleration. Note that some mice may still exhibit mouse acceleration.
@@ -170,6 +169,7 @@ These commands modify aspects of Chimera's fast startup feature.
 These features offer some modifications for visuals such as HUD.
 
 * `chimera_af [true/false]` - Get or set whether or not to enable anisotropic filtering.
+* `chimera_block_firing_particles [true/false]` - Get or set whether or not to block firing particles.
 * `chimera_block_gametype_indicator [true/false]` - Get or set whether or not to turn off the gametype indicator.
 * `chimera_block_vsync [true/false]` - Get or set whether or not to turn vSync off startup.
 * `chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]` - Change Halo's resolution. Width and height can be either resolution in pixels or an aspect ratio.

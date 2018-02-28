@@ -226,12 +226,6 @@ void initialize_client() noexcept {
         "  - chimera_auto_center [0-2]"
     , 0, 1, find_auto_center_signature(), true);
 
-    (*commands).emplace_back("chimera_block_firing_particles", block_firing_particles_command, "enhancements",
-        "Get or set whether or not to block firing particles.\n\n"
-        "Syntax:\n"
-        "  - chimera_block_firing_particles [true/false]"
-    , 0, 1, true, true);
-
     (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "enhancements",
         "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
         "Syntax:\n"
@@ -377,6 +371,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_af [true/false]"
     , 0, 1, find_anisotropic_filtering_signature(), true);
+
+    (*commands).emplace_back("chimera_block_firing_particles", block_firing_particles_command, "visuals",
+        "Get or set whether or not to block firing particles.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_firing_particles [true/false]"
+    , 0, 1, true, true);
 
     (*commands).emplace_back("chimera_block_gametype_indicator", block_gametype_indicator_command, "visuals",
         "Get or set whether or not to turn off the gametype indicator.\n\n"
