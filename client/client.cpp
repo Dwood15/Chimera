@@ -60,6 +60,7 @@
 
 #include "visuals/anisotropic_filtering.h"
 #include "visuals/letterbox.h"
+#include "visuals/server_ip.h"
 #include "visuals/vertical_field_of_view.h"
 
 #include "xbox/hud_kill_feed.h"
@@ -384,6 +385,12 @@ void initialize_client() noexcept {
         "Syntax:\n"
         "  - chimera_block_gametype_indicator [true/false]"
     , 0, 1, find_gametype_indicator_sig(), true);
+
+    (*commands).emplace_back("chimera_block_server_ip", block_server_ip_command, "visuals",
+        "Get or set whether or not to hide the server IP. This may be useful for streamers.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_server_ip [true/false]"
+    , 0, 1, find_hide_server_ip_sigs(), true);
 
     (*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
         "Get or set whether or not to turn vSync off startup.\n\n"

@@ -120,6 +120,7 @@ g++ -c client/startup/fast_startup.cpp %ARGS% -o bin/client__startup__fast_start
 g++ -c client/visuals/anisotropic_filtering.cpp %ARGS% -o bin/client__visuals__af.o
 g++ -c client/visuals/gametype_indicator.cpp %ARGS% -o bin/client__visuals__gametype_indicator.o
 g++ -c client/visuals/letterbox.cpp %ARGS% -o bin/client__visuals__letterbox.o
+g++ -c client/visuals/server_ip.cpp %ARGS% -o bin/client__visuals__server_ip.o
 g++ -c client/visuals/vertical_field_of_view.cpp %ARGS% -o bin/client__visuals__vertical_fov.o
 
 g++ -c client/xbox/hud_kill_feed.cpp %ARGS% -o bin/client__xbox__hud_kill_feed.o
