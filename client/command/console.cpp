@@ -5,7 +5,7 @@
 #include "../hooks/frame.h"
 #include "../halo_data/table.h"
 
-static char *console_text = NULL;
+char *console_text = NULL;
 
 static void block_error() noexcept {
     auto *push_req = get_signature("console_block_error_sig").address();
