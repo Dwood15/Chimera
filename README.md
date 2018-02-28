@@ -171,6 +171,7 @@ These features offer some modifications for visuals such as HUD.
 * `chimera_af [true/false]` - Get or set whether or not to enable anisotropic filtering.
 * `chimera_block_firing_particles [true/false]` - Get or set whether or not to block firing particles.
 * `chimera_block_gametype_indicator [true/false]` - Get or set whether or not to turn off the gametype indicator.
+* `chimera_block_server_ip [true/false]` - Get or set whether or not to hide the server IP. This may be useful for streamers.
 * `chimera_block_vsync [true/false]` - Get or set whether or not to turn vSync off startup.
 * `chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]` - Change Halo's resolution. Width and height can be either resolution in pixels or an aspect ratio.
 * `chimera_throttle_fps [max FPS]` - Throttle Halo's framerate.
