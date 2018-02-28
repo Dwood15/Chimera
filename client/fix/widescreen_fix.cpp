@@ -112,6 +112,10 @@ static void set_mod(bool force) noexcept {
             offset_sig(get_signature("team_icon_oddball_sig"));
             offset_sig(get_signature("team_icon_background_sig"));
 
+            int16_t right_f1_offset = 0x27B - 320 + 320 * new_width_scale;
+            write_code_any_value(get_signature("f1_halo_text_sig").address() + 7 + 5, right_f1_offset);
+            write_code_any_value(get_signature("f1_server_ip_text_sig").address() + 7 + 5, right_f1_offset);
+
             destroy_offsetter(index);
             index = create_offsetter(320.0 - 320.0 * width_scale, 0, true);
         }
@@ -228,6 +232,8 @@ ChimeraCommandError widescreen_fix_command(size_t argc, const char **argv) noexc
             get_signature("hud_menu_sig").undo();
             get_signature("console_text_fix_1_sig").undo();
             get_signature("console_text_fix_2_sig").undo();
+            get_signature("f1_halo_text_sig").undo();
+            get_signature("f1_server_ip_text_sig").undo();
 
             switch(new_value) {
                 case 0: {
