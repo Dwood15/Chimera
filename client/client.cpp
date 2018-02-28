@@ -323,7 +323,7 @@ void initialize_client() noexcept {
         "Get or set whether or not to fix the FOV. This will make FOV mods more accurate.\n\n"
         "Syntax:\n"
         "  - chimera_fov_fix [true/false]"
-    , 0, 1, find_fov_fix_sigs(), true);
+    , 0, 1, find_fov_fix_sigs() && find_simple_score_screen_sigs(), true);
 
     (*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
         "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
