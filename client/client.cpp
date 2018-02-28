@@ -414,9 +414,8 @@ void initialize_client() noexcept {
 
     (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
         "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
-        "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.\n\n"
-        "FOVs:\n"
-        "55.41 - Stock FOV\n"
+        "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV. 1\n"
+        "defaults to 55.41 degrees, or Halo’s standard FOV.\n\n"
         "Syntax:\n"
         "  - chimera_vfov [VFOV]"
     , 0, 1, find_interpolation_signatures(), true);

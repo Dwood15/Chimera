@@ -175,7 +175,7 @@ These features offer some modifications for visuals such as HUD.
 * `chimera_block_vsync [true/false]` - Get or set whether or not to turn vSync off startup.
 * `chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]` - Change Halo's resolution. Width and height can be either resolution in pixels or an aspect ratio.
 * `chimera_throttle_fps [max FPS]` - Throttle Halo's framerate.
-* `chimera_vfov [VFOV]` - Get or change your FOV by attempting to lock to a specific vertical FOV. This will distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV.
+* `chimera_vfov [VFOV]` - Get or change your FOV by attempting to lock to a specific vertical FOV. This will distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV. 1 defaults to 55.41 degrees, or Halo’s standard FOV.
 
 ## Xbox
 
