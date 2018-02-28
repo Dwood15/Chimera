@@ -7,6 +7,7 @@
 #include "../hooks/frame.h"
 #include "../hooks/tick.h"
 #include "../halo_data/tag_data.h"
+#include "../halo_data/server.h"
 #include "../halo_data/table.h"
 #include "light.h"
 #include "interpolation.h"
@@ -159,6 +160,8 @@ static void do_interpolation(uint32_t i) noexcept {
 
 extern void buffer_cam() noexcept;
 
+static event_no_args nav_point_address;
+
 static void interpolate_objects() noexcept {
     if(tick_count() == 0) return;
 
@@ -174,6 +177,8 @@ static void interpolate_objects() noexcept {
     if(chimera_interpolate_setting >= 1) do_antenna_interpolation();
     if(chimera_interpolate_setting >= 3) do_flag_interpolation();
     if(chimera_interpolate_setting >= 8) light_before();
+
+    if(server_type() != SERVER_NONE) nav_point_address();
 
     nuked = false;
 }
@@ -222,7 +227,7 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
         auto &camera_tick_rate_s = get_signature("camera_tick_rate_sig");
         auto &fp_interp_s = get_signature("fp_interp_sig");
         auto &do_reset_particle_s = get_signature("do_reset_particle_sig");
-        auto *nav_point_address = reinterpret_cast<event_no_args>(get_signature("nav_point_sig").address());
+        nav_point_address = reinterpret_cast<event_no_args>(get_signature("nav_point_sig").address());
 
         static bool initialized = false;
 
@@ -272,7 +277,6 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
             remove_camera_event(interpolate_all_cam_after);
             remove_preframe_event(interpolate_objects);
             remove_frame_event(rollback_interpolation);
-            remove_preframe_event(nav_point_address);
             initialized = false;
         }
         else if(!initialized && new_setting != 0) {
@@ -292,7 +296,6 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
             add_camera_event(interpolate_all_cam_after);
             add_preframe_event(interpolate_objects);
             add_frame_event(rollback_interpolation);
-            add_preframe_event(nav_point_address, EVENT_PRIORITY_AFTER);
             initialized = true;
         }
         chimera_interpolate_setting = new_setting;
