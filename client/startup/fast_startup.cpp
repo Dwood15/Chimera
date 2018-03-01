@@ -131,6 +131,8 @@ static uint32_t stock_crc32(const std::string &name) {
         return 0x0E7F7FE7;
     else if(name == "timberland")
         return 0x54446470;
+    else if(name == "icefields")
+        return 0x5EC1DEB7;
     else
         return 0xFFFFFFFF;
 }
