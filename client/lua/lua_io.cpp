@@ -154,6 +154,8 @@ void set_io_functions(lua_State *state) noexcept {
     lua_register_read_write_int(short);
     lua_register_read_write_int(int);
     lua_register_read_write_int(long);
+    lua_register_read_write_float_named("f32", float);
+    lua_register_read_write_float_named("f64", double);
     lua_register_read_write_float(float);
     lua_register_read_write_float(double);
     lua_register(state,"read_bit",lua_read_bit);
