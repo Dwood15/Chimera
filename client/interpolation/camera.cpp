@@ -69,7 +69,8 @@ void interpolate_all_cam_before() noexcept {
 void interpolate_all_cam_after() noexcept {
     if(cam_interped) {
         auto &camera = camera_data();
-        camera = camera_rollback;
+        camera.position = camera_rollback.position;
+        memcpy(camera.orientation, camera_rollback.orientation, sizeof(camera.orientation));
     }
 }
 
