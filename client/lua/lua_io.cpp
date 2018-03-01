@@ -125,8 +125,10 @@ static int lua_write_bit(lua_State *state) {
             switch((address_ptr >> bit) & 1) {
                 case 0:
                     address_ptr += (1 << bit);
+                    break;
                 case 1:
                     address_ptr -= (1 << bit);
+                    break;
             }
         }
         return 0;
