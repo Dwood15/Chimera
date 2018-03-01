@@ -9,33 +9,47 @@ bool uncap_cutscenes = false;
 
 static CameraData camera_coords_buffer_0 = {};
 static CameraData camera_coords_buffer_1 = {};
+static CameraData camera_rollback = {};
 static bool cam_interped = false;
+
+int halo_changed_camera_this_tick = 0;
 
 CameraData &camera_data() noexcept {
     static auto *camera_coord_addr = *reinterpret_cast<CameraData **>(get_signature("camera_coord_sig").address() + 2);
     return *camera_coord_addr;
 }
 
+void on_camera_change() noexcept {
+    halo_changed_camera_this_tick = 1;
+}
+
+void unset_camera_change() noexcept {
+    if(halo_changed_camera_this_tick-- == 0) halo_changed_camera_this_tick = 0;
+}
+
 void interpolate_all_cam_before() noexcept {
-    static bool skip_interpolation;
     extern float interpolation_tick_progress;
     interpolation_tick_progress = tick_progress();
     static int32_t tick_before = 0;
+    static bool distance_too_high = false;
     auto tick_now = tick_count();
 
     auto &data = camera_data();
+
+    camera_rollback = data;
 
     if(tick_now != tick_before) {
         tick_before = tick_now;
         auto &data = camera_data();
         memcpy(&camera_coords_buffer_1,&camera_coords_buffer_0,sizeof(camera_coords_buffer_1));
         memcpy(&camera_coords_buffer_0,&data,sizeof(camera_coords_buffer_0));
-        skip_interpolation = distance_squared(camera_coords_buffer_0.position, camera_coords_buffer_1.position) > (1.5*1.5);
+        distance_too_high = distance_squared(camera_coords_buffer_0.position, camera_coords_buffer_1.position) > 1.5;
     }
     cam_interped = false;
 
-    if(skip_interpolation) return;
     auto ct = get_camera_type();
+
+    if((halo_changed_camera_this_tick && ct == CAMERA_CINEMATIC) || distance_too_high) return;
     float etr = effective_tick_rate();
 
     extern char chimera_interpolate_predict;
@@ -55,8 +69,7 @@ void interpolate_all_cam_before() noexcept {
 void interpolate_all_cam_after() noexcept {
     if(cam_interped) {
         auto &camera = camera_data();
-        camera.position = camera_coords_buffer_0.position;
-        memcpy(&camera.orientation, &camera_coords_buffer_0.orientation, sizeof(camera_coords_buffer_0.orientation));
+        camera = camera_rollback;
     }
 }
 

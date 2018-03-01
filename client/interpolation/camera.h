@@ -13,5 +13,7 @@ CameraData &camera_data() noexcept;
 
 void interpolate_all_cam_before() noexcept;
 void interpolate_all_cam_after() noexcept;
+void on_camera_change() noexcept;
+void unset_camera_change() noexcept;
 
 float zoom_scale() noexcept;

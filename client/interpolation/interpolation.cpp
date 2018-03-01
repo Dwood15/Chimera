@@ -6,6 +6,7 @@
 #include "../hooks/camera.h"
 #include "../hooks/frame.h"
 #include "../hooks/tick.h"
+#include "../halo_data/map.h"
 #include "../halo_data/tag_data.h"
 #include "../halo_data/server.h"
 #include "../halo_data/table.h"
@@ -178,7 +179,7 @@ static void interpolate_objects() noexcept {
     if(chimera_interpolate_setting >= 3) do_flag_interpolation();
     if(chimera_interpolate_setting >= 8) light_before();
 
-    if(server_type() != SERVER_NONE) nav_point_address();
+    if(server_type() != SERVER_NONE && get_map_header().game_type == 1) nav_point_address();
 
     nuked = false;
 }
@@ -225,6 +226,7 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
     if(argc != 0) {
         auto &camera_coord_s = get_signature("camera_coord_sig");
         auto &camera_tick_rate_s = get_signature("camera_tick_rate_sig");
+        auto &camera_change_s = get_signature("camera_change_sig");
         auto &fp_interp_s = get_signature("fp_interp_sig");
         auto &do_reset_particle_s = get_signature("do_reset_particle_sig");
         nav_point_address = reinterpret_cast<event_no_args>(get_signature("nav_point_sig").address());
@@ -272,6 +274,8 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
             camera_tick_rate_s.undo();
             fp_interp_s.undo();
             do_reset_particle_s.undo();
+            camera_change_s.undo();
+            remove_pretick_event(unset_camera_change);
             remove_tick_event(reset);
             remove_precamera_event(interpolate_all_cam_before);
             remove_camera_event(interpolate_all_cam_after);
@@ -291,11 +295,26 @@ ChimeraCommandError interpolate_command(size_t argc, const char **argv) noexcept
             static BasicCodecave fp_code;
             write_jmp_call(fp_interp_s.address(), reinterpret_cast<void *>(fp_before), reinterpret_cast<void *>(fp_after), fp_code);
 
+            add_pretick_event(unset_camera_change);
             add_tick_event(reset);
             add_precamera_event(interpolate_all_cam_before);
             add_camera_event(interpolate_all_cam_after);
             add_preframe_event(interpolate_objects);
             add_frame_event(rollback_interpolation);
+
+            size_t offset = camera_change_s.size();
+            static BasicCodecave on_camera_change_code(camera_change_s.signature(), offset);
+            on_camera_change_code.data[offset++] = 0x60;
+            on_camera_change_code.data[offset + 0] = 0xE8;
+            write_code_any_value(on_camera_change_code.data + offset + 1, reinterpret_cast<int>(on_camera_change) - reinterpret_cast<int>(on_camera_change_code.data + offset + 5));
+            offset += 5;
+            on_camera_change_code.data[offset++] = 0x61;
+            on_camera_change_code.data[offset + 0] = 0xE9;
+            write_code_any_value(on_camera_change_code.data + offset + 1, reinterpret_cast<int>(camera_change_s.address() + 5) - reinterpret_cast<int>(on_camera_change_code.data + offset + 5));
+            unsigned char nop[] = { 0xE9, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
+            write_code_c(camera_change_s.address(), nop);
+            write_code_any_value(camera_change_s.address() + 1, reinterpret_cast<int>(on_camera_change_code.data) - reinterpret_cast<int>(camera_change_s.address() + 5));
+
             initialized = true;
         }
         chimera_interpolate_setting = new_setting;
