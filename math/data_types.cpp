@@ -248,11 +248,11 @@ void interpolate_vector_predict(const Vector3D &before, const Vector3D &after, V
 }
 
 float distance(float x1, float y1, float z1, float x2, float y2, float z2) noexcept {
-    return sqrt(distance_squared(x1,y2,z1,x2,y2,z2));
+    return sqrt(distance_squared(x1,y1,z1,x2,y2,z2));
 }
 
 float distance(float x1, float y1, float x2, float y2) noexcept {
-    return sqrt(distance_squared(x1,y2,x2,y2));
+    return sqrt(distance_squared(x1,y1,x2,y2));
 }
 
 float distance(const Vector3D &a, const Vector3D &b) noexcept {
