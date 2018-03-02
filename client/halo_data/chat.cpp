@@ -2,29 +2,42 @@
 
 #include "../client_signature.h"
 #include "../command/console.h"
+#include "../halo_data/server.h"
 #include "../halo_data/table.h"
 #include "../messaging/messaging.h"
 
 void chat_out(const char *message, uint32_t channel) noexcept {
-    typedef void *(*send_chat_fn)(uint32_t, const short *, const short *);
-    extern ChimeraSignature chat_out_s;
-    static send_chat_fn send_chat = (send_chat_fn)get_signature("chat_out_sig").address();
-    #define BLEN 256
-    short *bullshit = new short[BLEN+1]();
-    short *bullshit2 = new short[BLEN+1]();
+    if(server_type() == SERVER_NONE) return;
+    uintptr_t chat_out = reinterpret_cast<uintptr_t>(get_signature("chat_out_sig").address());
     size_t x = strlen(message);
+    #define BLEN 256
     if(x > BLEN) {
         return;
     }
+    short *unicode = new short[BLEN+1]();
+    short *unicode2 = new short[BLEN+1]();
 
     for(int i=0;i<x;i++) {
-        bullshit[i] = (short)message[i];
-        bullshit2[i] = (short)message[i];
+        unicode[i] = (short)message[i];
+        unicode2[i] = (short)message[i];
     }
 
-    send_chat(channel, bullshit, bullshit2);
-    delete[] bullshit;
-    delete[] bullshit2;
+    asm (
+        "pushad;"
+        "mov eax, %0;"
+        "push ebx;"
+        "mov edx, %1;"
+        "mov esi, %2;"
+        "push esp;"
+        "call %3;"
+        "add esp, 8;"
+        "popad;"
+        :
+        : "r" (channel), "r" (unicode), "r" (unicode2), "r" (chat_out)
+    );
+
+    delete[] unicode;
+    delete[] unicode2;
 }
 
 bool player_can_use_vehicle_chat() noexcept {
