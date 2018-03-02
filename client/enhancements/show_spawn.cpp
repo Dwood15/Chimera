@@ -232,6 +232,36 @@ static void show_spawns() noexcept {
         int friend_influenced = 0;
         auto ctf = gametype() == GAMETYPE_CTF;
 
+        struct NoSpawnSphere {
+            Vector3D position;
+            float radius;
+        };
+
+        std::vector<NoSpawnSphere> nope;
+
+        for(size_t i=0;i<2048;i++) {
+            bool skip = false;
+            for(size_t s=0;s<total_spawns;s++) {
+                if((objects[s].object_id & 0xFFFF) == i) {
+                    skip = true;
+                    break;
+                }
+            }
+            if(skip) continue;
+            HaloObject o(i);
+            char *odata = o.object_data();
+            if(odata) {
+                BaseHaloObject &bho = *reinterpret_cast<BaseHaloObject *>(odata);
+                char *tag_data = HaloTag::from_id(bho.tag_id).data;
+                if(*tag_data == 1 || *tag_data == 0) {
+                    NoSpawnSphere nss;
+                    nss.position = bho.position_script;
+                    nss.radius = *reinterpret_cast<float *>(tag_data + 0x04);
+                    nope.push_back(nss);
+                }
+            }
+        }
+
         for(size_t i=0;i<total_spawns;i++) {
             auto &stored_spawn = objects[i];
             auto &spawn_data = player_spawn_data[stored_spawn.spawn_id];
@@ -239,6 +269,14 @@ static void show_spawns() noexcept {
                 blocked[i] = true;
                 continue;
             }
+            for(size_t n=0;n<nope.size();n++) {
+                auto &sphere = nope[n];
+                if(distance_squared(sphere.position, spawn_data.position) < sphere.radius*sphere.radius) {
+                    blocked[i] = true;
+                    break;
+                }
+            }
+            if(blocked[i]) continue;
             HaloObject obj(stored_spawn.object_id);
             auto *odata = obj.object_data();
             if(odata) {
