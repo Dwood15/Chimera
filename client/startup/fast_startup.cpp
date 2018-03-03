@@ -19,6 +19,16 @@ std::vector<CacheEntry> cache;
 static bool use_cache = false;
 static bool modded_stock_maps = false;
 
+static bool same_string_case_insensitive(const char *a, const char *b) {
+    if(a == b) return true;
+    while(tolower(*a) == tolower(*b)) {
+        if(*a == 0) return true;
+        a++;
+        b++;
+    }
+    return false;
+}
+
 static bool save_cache() noexcept {
     char path[MAX_PATH] = {};
     sprintf(path, "%s\\chimera\\cache.bin", halo_path());
@@ -141,14 +151,14 @@ static void do_crc_things() noexcept {
     static char *loading_map = *reinterpret_cast<char **>(get_signature("loading_map_sig").address() + 1);
     auto *indices = map_indices();
     for(size_t i=0;i<maps_count();i++) {
-        if(strcmp(indices[i].file_name, loading_map) == 0) {
+        if(same_string_case_insensitive(indices[i].file_name, loading_map)) {
             if(indices[i].crc32 == 0xFFFFFFFF && modded_stock_maps) {
                 indices[i].crc32 = stock_crc32(indices[i].file_name);
             }
 
             if(indices[i].crc32 == 0xFFFFFFFF && use_cache) {
                 for(size_t c=0;c<cache.size();c++) {
-                    if(strcmp(indices[i].file_name, cache[c].name) == 0) {
+                    if(same_string_case_insensitive(indices[i].file_name, cache[c].name)) {
                         indices[i].crc32 = cache[c].crc32;
                     }
                 }
