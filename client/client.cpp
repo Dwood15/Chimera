@@ -54,6 +54,7 @@
 
 #include "lua/lua.h"
 
+
 #include "messaging/messaging.h"
 
 #include "startup/fast_startup.h"
@@ -87,7 +88,7 @@ static void init() {
     settings_read_only(1);
     char z[512] = {};
     sprintf(z,"%s\\chimera", halo_path());
-    CreateDirectory(z, nullptr);
+    CreateDirectory(reinterpret_cast<LPCWSTR>(z), nullptr);
     read_init_file("chimerainit.txt", "chimerainit.txt");
     sprintf(z,"%s\\chimera\\chimerainit.txt", halo_path());
     auto *f = fopen(z, "r");
@@ -124,7 +125,7 @@ void initialize_client() noexcept {
         for(size_t i=0;i<(*missing_signatures).size();i++) {
             char message[256] = {};
             sprintf(message, "Could not find %s signature. Make sure you're using Halo Custom Edition version 1.10.", (*missing_signatures)[i].data());
-            MessageBox(NULL, message, "Chimera cannot load", MB_OK);
+            MessageBox(nullptr, reinterpret_cast<LPCWSTR>(message), reinterpret_cast<LPCWSTR>("Chimera cannot load"), MB_OK);
         }
         return;
     }

@@ -204,7 +204,7 @@ ChimeraCommandError budget_command(size_t argc, const char **argv) noexcept {
 template <class T>
 static std::string int_to_hex(T i) {
     char buff[2 + sizeof(i) + 1];
-    sprintf(buff, "0x%X", reinterpret_cast<uintptr_t>(i));
+    sprintf(buff, "0x%X", i);
     return std::string(buff);
 }
 

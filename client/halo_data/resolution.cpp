@@ -4,6 +4,11 @@
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
 
+#ifdef _MSC_VER
+    #pragma once
+    #define static_assert //static_assert
+#endif
+
 struct ChangeResolutionStructA {
     uint32_t width;
     uint32_t height;
@@ -53,6 +58,7 @@ static void set_resolution(int width, int height, int refresh_rate=1000, int vsy
     z.refresh_rate = refresh_rate;
     ChangeResolutionStructB r;
 
+#ifdef __GNUC__
     asm (
         "pushad;"
         "push %0;"
@@ -85,6 +91,7 @@ static void set_resolution(int width, int height, int refresh_rate=1000, int vsy
         :
         : "m" (height), "m" (width), "m" (change_window_size)
     );
+#endif
 
     auto *block_resolution_change = get_signature("block_auto_resolution_change_sig").address();
     const short nope[] = {0x90, 0x90, 0x90, 0x90, 0x90};

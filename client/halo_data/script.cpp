@@ -4,6 +4,7 @@
 
 void execute_script(const char *script) noexcept {
     static auto *execute_script_address = get_signature("execute_script_sig").address();
+#ifdef __GNUC__
     asm (
         "pushad;"
         "push %0;"
@@ -13,4 +14,13 @@ void execute_script(const char *script) noexcept {
         :
         : "r" (script), "r" (execute_script_address)
     );
+#elif _MSC_VER
+	__asm {
+	    pushad
+        push script
+        call execute_script_address
+        add esp, 4
+        popad
+	}
+#endif
 }

@@ -21,14 +21,15 @@ bool settings_do_not_save(int new_value) noexcept {
 }
 
 const char *startup_path() {
-    static std::string startup_path_s;
+    static char * startup_path_s;
     static bool set = false;
     if(!set) {
-        char p[MAX_PATH] = {};
+        LPWSTR p = {};
         GetTempPath(MAX_PATH, p);
-        startup_path_s = std::string(p) + "\\chimerastartup.bin";
+
+        sprintf(startup_path_s, "%s\\%s", reinterpret_cast<char *>(p), "chimerastartup.bin");
     }
-    return startup_path_s.data();
+    return startup_path_s;
 }
 
 static std::vector<std::vector<std::string>> save_data;

@@ -8,20 +8,21 @@
 
 void chat_out(const char *message, uint32_t channel) noexcept {
     if(server_type() == SERVER_NONE) return;
-    uintptr_t chat_out = reinterpret_cast<uintptr_t>(get_signature("chat_out_sig").address());
+    auto chat_out = reinterpret_cast<uintptr_t>(get_signature("chat_out_sig").address());
     size_t x = strlen(message);
     #define BLEN 256
     if(x > BLEN) {
         return;
     }
-    short *unicode = new short[BLEN+1]();
-    short *unicode2 = new short[BLEN+1]();
+    auto *unicode = new short[BLEN+1]();
+    auto *unicode2 = new short[BLEN+1]();
 
     for(int i=0;i<x;i++) {
         unicode[i] = (short)message[i];
         unicode2[i] = (short)message[i];
     }
 
+#ifdef __GNUC__
     asm (
         "pushad;"
         "mov eax, %0;"
@@ -35,6 +36,19 @@ void chat_out(const char *message, uint32_t channel) noexcept {
         :
         : "r" (channel), "r" (unicode), "r" (unicode2), "r" (chat_out)
     );
+#elif _MSC_VER
+    __asm {
+        pushad
+        mov eax, channel
+        push ebx
+        mov edx, unicode
+        mov esi, unicode2
+        push esp
+        call chat_out
+        add esp, 8
+        popad
+    }
+#endif
 
     delete[] unicode;
     delete[] unicode2;

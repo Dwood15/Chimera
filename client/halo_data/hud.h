@@ -1,5 +1,11 @@
 #pragma once
 
+
+//because even with std
+
+
+
+
 #include "tag_data.h"
 #include "../../math/data_types.h"
 
@@ -87,7 +93,7 @@ struct HUDMeterColors {
     ColorByte disabled_color;
 };
 
-static_assert(sizeof(HUDMeterColors) == 0x24);
+//static_assert(sizeof(HUDMeterColors) == 0x24);
 
 struct HUDNumberElementFlags {
     uint8_t show_leading_zeros : 1;
@@ -115,7 +121,7 @@ struct HUDOverlay {
     PAD_CHARS(0x38);
 };
 
-static_assert(sizeof(HUDOverlay) == 0x88);
+//static_assert(sizeof(HUDOverlay) == 0x88);
 
 enum HUDMultitextureOverlayAnchor : uint16_t {
     MULTITEXTURE_OVERLAY_ANCHOR_TEXTURE = 0,
@@ -195,7 +201,7 @@ struct HUDMultitextureOverlay {
     PAD_CHARS(0x80);
 };
 
-static_assert(sizeof(HUDMultitextureOverlay) == 0x1E0);
+//static_assert(sizeof(HUDMultitextureOverlay) == 0x1E0);
 
 struct GrenadeHUDInterfaceS {
     HUDElementPosition position;
@@ -255,8 +261,8 @@ struct GrenadeHUDInterface {
     } messaging_information;
 };
 
-static_assert(sizeof(GrenadeHUDInterface) == 0x1C8);
-static_assert(sizeof(HUDInterfaceWarningSound<GrenadeHUDInterfaceWarningSoundLatchedTo>) == 0x38);
+//static_assert(sizeof(GrenadeHUDInterface) == 0x1C8);
+//static_assert(sizeof(HUDInterfaceWarningSound<GrenadeHUDInterfaceWarningSoundLatchedTo>) == 0x38);
 
 enum WeaponHUDInterfaceStateAttachedTo : uint16_t {
     STATE_ATTACHED_TO_TOTAL_AMMO = 0,
@@ -279,7 +285,7 @@ struct WeaponHUDInterfaceElementPrelude {
     HUDElementPosition position;
 };
 
-static_assert(sizeof(WeaponHUDInterfaceElementPrelude) == 0x48);
+//static_assert(sizeof(WeaponHUDInterfaceElementPrelude) == 0x48);
 
 struct WeaponHUDInterfaceStaticElement : WeaponHUDInterfaceElementPrelude {
     HaloTagDependency interface_bitmap;
@@ -292,7 +298,7 @@ struct WeaponHUDInterfaceStaticElement : WeaponHUDInterfaceElementPrelude {
     PAD_CHARS(0x2C);
 };
 
-static_assert(sizeof(WeaponHUDInterfaceStaticElement) == 0xB4);
+//static_assert(sizeof(WeaponHUDInterfaceStaticElement) == 0xB4);
 
 struct WeaponHUDInterfaceMeterElement : WeaponHUDInterfaceElementPrelude {
     HaloTagDependency meter_bitmap;
@@ -300,7 +306,7 @@ struct WeaponHUDInterfaceMeterElement : WeaponHUDInterfaceElementPrelude {
     PAD_CHARS(0x38);
 };
 
-static_assert(sizeof(WeaponHUDInterfaceMeterElement) == 0xB4);
+//static_assert(sizeof(WeaponHUDInterfaceMeterElement) == 0xB4);
 
 struct WeaponHUDInterfaceNumberElement : WeaponHUDInterfaceElementPrelude {
     HUDElementColors colors;
@@ -312,7 +318,7 @@ struct WeaponHUDInterfaceNumberElement : WeaponHUDInterfaceElementPrelude {
     PAD_CHARS(0x27);
 };
 
-static_assert(sizeof(WeaponHUDInterfaceNumberElement) == 0xA0);
+//static_assert(sizeof(WeaponHUDInterfaceNumberElement) == 0xA0);
 
 struct WeaponHUDInterfaceCrosshairOverlay {
     HUDElementPosition position;
@@ -333,7 +339,7 @@ struct WeaponHUDInterfaceCrosshairOverlay {
     PAD_CHARS(0x20);
 };
 
-static_assert(sizeof(WeaponHUDInterfaceCrosshairOverlay) == 0x6C);
+//static_assert(sizeof(WeaponHUDInterfaceCrosshairOverlay) == 0x6C);
 
 struct WeaponHUDInterfaceOverlayElement {
     WeaponHUDInterfaceStateAttachedTo state_attached_to;
@@ -348,7 +354,7 @@ struct WeaponHUDInterfaceOverlayElement {
     PAD_CHARS(0x28);
 };
 
-static_assert(sizeof(WeaponHUDInterfaceOverlayElement) == 0x68);
+//static_assert(sizeof(WeaponHUDInterfaceOverlayElement) == 0x68);
 
 struct WeaponHUDInterfaceCrosshair {
     enum : uint16_t {
@@ -383,7 +389,7 @@ struct WeaponHUDInterfaceCrosshair {
     PAD_CHARS(0x28);
 };
 
-static_assert(sizeof(WeaponHUDInterfaceCrosshair) == 0x68);
+//static_assert(sizeof(WeaponHUDInterfaceCrosshair) == 0x68);
 
 struct WeaponHUDInterface {
     HaloTagDependency child;
@@ -429,7 +435,7 @@ struct WeaponHUDInterface {
     PAD_CHARS(0x4);
 };
 
-static_assert(sizeof(WeaponHUDInterface) == 0xB8);
+//static_assert(sizeof(WeaponHUDInterface) == 0xB8);
 
 struct UnitHUDInterfaceBackground {
     HUDElementPosition position;
@@ -443,7 +449,7 @@ struct UnitHUDInterfaceBackground {
     PAD_CHARS(4);
 };
 
-static_assert(sizeof(UnitHUDInterfaceBackground) == 0x68);
+//static_assert(sizeof(UnitHUDInterfaceBackground) == 0x68);
 
 struct UnitHUDInterfaceMeterPrelude {
     HUDElementPosition position;
@@ -452,7 +458,7 @@ struct UnitHUDInterfaceMeterPrelude {
     PAD_CHARS(0x10);
 };
 
-static_assert(sizeof(UnitHUDInterfaceMeterPrelude) == 0x68);
+//static_assert(sizeof(UnitHUDInterfaceMeterPrelude) == 0x68);
 
 struct UnitHUDInterfaceWarningSoundLatchedTo {
     uint32_t shield_recharging : 1;
@@ -481,7 +487,7 @@ struct UnitHUDInterfaceAuxiliaryHUDMeter {
     PAD_CHARS(0x58);
 };
 
-static_assert(sizeof(UnitHUDInterfaceAuxiliaryHUDMeter) == 0x144);
+//static_assert(sizeof(UnitHUDInterfaceAuxiliaryHUDMeter) == 0x144);
 
 struct UnitHUDInterface {
     HUDAnchor anchor;
@@ -522,4 +528,4 @@ struct UnitHUDInterface {
     PAD_CHARS(4);
 };
 
-static_assert(sizeof(UnitHUDInterface) == 0x3D8);
+//static_assert(sizeof(UnitHUDInterface) == 0x3D8);

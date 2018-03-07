@@ -8,7 +8,7 @@ PIMAGE_SECTION_HEADER CodeFinder::GetSection(HANDLE module) {
 	dosHeader = (PIMAGE_DOS_HEADER)module;
 
 	if(dosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
-		return NULL;
+		return nullptr;
 	}
 
 	IMAGE_NT_HEADERS* NtHeader = (IMAGE_NT_HEADERS*)((std::uintptr_t)module+dosHeader->e_lfanew);
@@ -21,13 +21,13 @@ PIMAGE_SECTION_HEADER CodeFinder::GetSection(HANDLE module) {
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void CodeFinder::findCode(HANDLE module, const short *signature, size_t size, bool fastFind) {
     PIMAGE_SECTION_HEADER CodeSection = GetSection(module);
 
-    if(CodeSection == NULL) {
+    if(CodeSection == nullptr) {
 		return;
 	}
 
@@ -67,7 +67,7 @@ std::vector<std::uintptr_t> CodeFinder::find() {
 		if(signature[i] == -1) {
 			fastFind = false;
 		} else if(signature[i] < 0 || signature[i] > 0xFF) {
-			MessageBox(NULL, "Invalid signature", 0, 0);
+			MessageBox(nullptr, reinterpret_cast<LPCWSTR>("Invalid signature"), 0, 0);
 		}
 	}
 

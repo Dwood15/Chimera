@@ -127,7 +127,9 @@ static void load_lua_script(const char *script_name, const char *lua_script_data
     scripts.push_back(std::make_unique<LuaScript>(state, script_name, global, unlocked));
 
     if(luaL_loadbuffer(state, lua_script_data, lua_script_data_size, script_name) != LUA_OK || lua_pcall(state, 0, 0, 0) != LUA_OK) {
-        console_out_error(std::string("Failed to load ") + script_name + ".");
+        char * errMsg = {};
+        std::sprintf(errMsg, "Failed to load %s.", script_name);
+        console_out_error(errMsg);
         print_error(state);
         lua_close(state);
         scripts.erase(scripts.begin() + scripts.size() - 1);
@@ -158,10 +160,14 @@ static void load_lua_script(const char *script_name, const char *lua_script_data
     script_from_state(state).loaded = true;
 }
 
+static auto haloPath = halo_path();
+
 void load_map_script() noexcept {
-    auto path = std::string(halo_path()) + "\\chimera\\lua\\map\\" + get_map_header().name + ".lua";
+	char file[512] = {};
+
+    std::sprintf(file, "%s\\%s\\%s.lua", haloPath, "chimera\\lua\\map", get_map_header().name);
     auto map = std::string(get_map_header().name) + ".map";
-    FILE *f = fopen(path.data(), "rb+");
+    FILE *f = fopen(file, "rb+");
     if(f) {
         fseek(f, 0, SEEK_END);
         size_t size = ftell(f);
@@ -183,30 +189,41 @@ void load_map_script() noexcept {
 
 static void setup_lua_folder() {
     char z[512] = {};
-    sprintf(z,"%s\\chimera\\lua", halo_path());
-    CreateDirectory(z, nullptr);
-    sprintf(z,"%s\\chimera\\lua\\map", halo_path());
-    CreateDirectory(z, nullptr);
-    sprintf(z,"%s\\chimera\\lua\\global", halo_path());
-    CreateDirectory(z, nullptr);
+	char * haloPath = halo_path();
+
+	sprintf(z, "%s\\chimera\\lua", haloPath);
+    CreateDirectory(reinterpret_cast<LPCWSTR>(z), nullptr);
+    sprintf(z,"%s\\map", z);
+    CreateDirectory(reinterpret_cast<LPCWSTR>(z), nullptr);
+
+    sprintf(z,"%s\\chimera\\lua\\global", haloPath);
+    CreateDirectory(reinterpret_cast<LPCWSTR>(z), nullptr);
 }
 
 static void open_lua_scripts() {
-    auto folder = std::string(halo_path()) + "\\chimera\\lua\\global\\";
-    auto query = folder + "*.lua";
+	char * luaFolder = {};
+	std::sprintf(luaFolder, "%s\\%s", haloPath, R"(\chimera\lua\global\)");
+
+    auto folder = luaFolder;
+    char * query = {};
+    std::sprintf(query, "%s\\%s", folder, "*.lua");
     WIN32_FIND_DATA find_file_data;
-    auto handle = FindFirstFile(query.data(), &find_file_data);
+    auto handle = FindFirstFile(reinterpret_cast<LPCWSTR>(query), &find_file_data);
     bool ok = handle != INVALID_HANDLE_VALUE;
     while(ok) {
-        auto path = folder + find_file_data.cFileName;
-        FILE *f = fopen(path.data(), "rb+");
+        char * path = {};
+
+        std::sprintf(path, "%s\\%s", folder, find_file_data.cFileName);
+
+
+        FILE *f = fopen(path, "rb+");
         if(f) {
             fseek(f, 0, SEEK_END);
             size_t size = ftell(f);
             fseek(f, 0, SEEK_SET);
             auto d = std::make_unique<char[]>(size);
             fread(d.get(), size, 1, f);
-            load_lua_script(find_file_data.cFileName, d.get(), size, true, true);
+            load_lua_script(reinterpret_cast<const char *>(find_file_data.cFileName), d.get(), size, true, true);
             fclose(f);
         }
         ok = FindNextFile(handle, &find_file_data);
