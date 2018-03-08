@@ -1,5 +1,4 @@
 #include "lua_io.h"
-#include "lua/lauxlib.h"
 #include <string.h>
 #include <windows.h>
 

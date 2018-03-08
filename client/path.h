@@ -1,3 +1,3 @@
 #pragma once
 
-char *halo_path() noexcept;
+const char *halo_path() noexcept;
