@@ -52,9 +52,8 @@
 
 #include "interpolation/interpolation.h"
 
-#ifndef NO_LUA
 #include "lua/lua.h"
-#endif
+
 //Clion says messaging.h is unused. hmm.
 #include "messaging/messaging.h"
 
@@ -79,282 +78,293 @@ std::vector<ChimeraCommand> *commands;
 LARGE_INTEGER performance_frequency;
 
 static void init() {
-	extern bool already_set;
-	auto &enabled = **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1);
-	already_set = enabled != 0;
-	if (!already_set)
-		enabled = 1;
-	remove_tick_event(init);
+    extern bool already_set;
+    auto &enabled = **reinterpret_cast<char **>(get_signature("enable_console_sig").address() + 1);
+    already_set = enabled != 0;
+    if(!already_set)
+        enabled = 1;
+    remove_tick_event(init);
 
-	settings_read_only(1);
-	char z[512] = {};
-	sprintf(z, "%s\\chimera", halo_path());
-	CreateDirectory(reinterpret_cast<LPCWSTR>(z), nullptr);
-	read_init_file("chimerainit.txt", "chimerainit.txt");
-	sprintf(z, "%s\\chimera\\chimerainit.txt", halo_path());
-	auto *f = fopen(z, "r");
-	if (f) {
-		fclose(f);
-		read_init_file(z, "[-path]/chimerainit.txt");
-	} else {
-		std::ofstream init(z);
-		init << "###" << std::endl;
-		init << "### chimerainit.txt" << std::endl;
-		init << "###" << std::endl;
-		init << "### This file can be used for configuring Chimera commands that are not saved" << std::endl;
-		init << "### automatically such as chimera_set_resolution." << std::endl;
-		init << "###" << std::endl;
-		init << std::endl;
-	}
-	settings_read_only(0);
+    settings_read_only(1);
+    char z[512] = {};
+    sprintf(z,"%s\\chimera", halo_path());
+    CreateDirectory(z, nullptr);
+    read_init_file("chimerainit.txt", "chimerainit.txt");
+    sprintf(z,"%s\\chimera\\chimerainit.txt", halo_path());
+    auto *f = fopen(z, "r");
+    if(f) {
+        fclose(f);
+        read_init_file(z, "[-path]/chimerainit.txt");
+    }
+    else {
+        std::ofstream init(z);
+        init << "###" << std::endl;
+        init << "### chimerainit.txt" << std::endl;
+        init << "###" << std::endl;
+        init << "### This file can be used for configuring Chimera commands that are not saved" << std::endl;
+        init << "### automatically such as chimera_set_resolution." << std::endl;
+        init << "###" << std::endl;
+        init << std::endl;
+    }
+    settings_read_only(0);
 
-	settings_do_not_save(1);
-	sprintf(z, "%s\\chimera\\chimerasave.txt", halo_path());
-	read_init_file(z, "[-path]/chimerasave.txt");
-	settings_do_not_save(0);
+    settings_do_not_save(1);
+    sprintf(z,"%s\\chimera\\chimerasave.txt", halo_path());
+    read_init_file(z, "[-path]/chimerasave.txt");
+    settings_do_not_save(0);
 
-	save_all_changes();
-#ifndef NO_LUA
-	setup_lua();
-#endif
+    save_all_changes();
+    setup_lua();
 }
 
 void initialize_client() noexcept {
-	commands = new std::vector<ChimeraCommand>;
-	signatures = new std::vector<ChimeraSignature>;
-	missing_signatures = new std::vector<std::string>;
-	if (!find_required_signatures()) {
-		for (size_t i = 0; i < (*missing_signatures).size(); i++) {
-			char message[256] = {};
-			sprintf(message, "Could not find %s signature. Make sure you're using Halo Custom Edition version 1.10.",
-					(*missing_signatures)[i].data());
-			MessageBox(nullptr, reinterpret_cast<LPCWSTR>(message), reinterpret_cast<LPCWSTR>("Chimera cannot load"),
-					   MB_OK);
-		}
-		return;
-	}
-	initialize_console();
-	initialize_rcon_message();
-	add_tick_event(init);
-	add_tick_event(camo_fix);
-	dart_fix();
+    commands = new std::vector<ChimeraCommand>;
+    signatures = new std::vector<ChimeraSignature>;
+    missing_signatures = new std::vector<std::string>;
+    if(!find_required_signatures()) {
+        for(size_t i=0;i<(*missing_signatures).size();i++) {
+            char message[256] = {};
+            sprintf(message, "Could not find %s signature. Make sure you're using Halo Custom Edition version 1.10.", (*missing_signatures)[i].data());
+            MessageBox(NULL, message, "Chimera cannot load", MB_OK);
+        }
+        return;
+    }
+    initialize_console();
+    initialize_rcon_message();
+    add_tick_event(init);
+    add_tick_event(camo_fix);
+    dart_fix();
 
-	enable_descope_fix();
+    enable_descope_fix();
 
-	QueryPerformanceFrequency(&performance_frequency);
+    QueryPerformanceFrequency(&performance_frequency);
 
-	//add_tick_event(set_contributors);
+    //add_tick_event(set_contributors);
 
-	if (find_magnetism_signatures()) {
-		fix_magnetism();
-	}
+    if(find_magnetism_signatures()) {
+        fix_magnetism();
+    }
 
-	(*commands).emplace_back("chimera", chimera_command, nullptr,
-							 "This command is the commands directory for Chimera.\n\n"
-									 "Syntax:\n"
-									 "  - chimera - Display version and a list of command categories.\n"
-									 "  - chimera <category> - Display a list of commands in category.\n"
-									 "  - chimera <command> - Display help for a command.", 0, 1, true);
+    (*commands).emplace_back("chimera", chimera_command, nullptr,
+        "This command is the commands directory for Chimera.\n\n"
+        "Syntax:\n"
+        "  - chimera - Display version and a list of command categories.\n"
+        "  - chimera <category> - Display a list of commands in category.\n"
+        "  - chimera <command> - Display help for a command."
+    , 0, 1, true);
 
-	(*commands).emplace_back("chimera_chat", chat_command, nullptr,
-							 "Send a chat message.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_chat all <message> - Send a message to all players.\n"
-									 "  - chimera_chat team <message> - Send a message to your team.\n"
-									 "  - chimera_chat vehicle <message> - Send a message to your vehicle.", 1, 1000,
-							 true, false);
+    (*commands).emplace_back("chimera_chat", chat_command, nullptr,
+        "Send a chat message.\n\n"
+        "Syntax:\n"
+        "  - chimera_chat all <message> - Send a message to all players.\n"
+        "  - chimera_chat team <message> - Send a message to your team.\n"
+        "  - chimera_chat vehicle <message> - Send a message to your vehicle."
+    , 1, 1000, true, false);
 
-	(*commands).emplace_back("chimera_rcon_recovery", eep_command, nullptr,
-							 "Obtain the rcon password of the currently connected server. This may take a while\n"
-									 "depending on the complexity of the password. It only works with SAPP servers, though.\n\n"
-									 "Disclaimer: DO NOT USE THIS ON SERVERS YOU DO NOT OWN! HACKING IS A FELONY!\n\n"
-									 "Syntax:\n"
-									 "  - chimera_rcon_recover [true/false]", 0, 1, true, true);
+    (*commands).emplace_back("chimera_rcon_recovery", eep_command, nullptr,
+        "Obtain the rcon password of the currently connected server. This may take a while\n"
+        "depending on the complexity of the password. It only works with SAPP servers, though.\n\n"
+        "Disclaimer: DO NOT USE THIS ON SERVERS YOU DO NOT OWN! HACKING IS A FELONY!\n\n"
+        "Syntax:\n"
+        "  - chimera_rcon_recover [true/false]"
+    , 0, 1, true, true);
 
-#ifndef NO_LUA
-	(*commands).emplace_back("chimera_reload_lua", reload_lua_command, "lua",
-							 "Reload all Lua scripts.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_reload_lua", 0, 0, true);
-#endif
-	(*commands).emplace_back("chimera_verbose_init", verbose_init_command, nullptr,
-							 "Get or set whethe chimerainit.txt or chimeraname.txt commands should output messages.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_verbose_init", 0, 1, true);
+    (*commands).emplace_back("chimera_reload_lua", reload_lua_command, "lua",
+        "Reload all Lua scripts.\n\n"
+        "Syntax:\n"
+        "  - chimera_reload_lua"
+    , 0, 0, true);
 
-	// Debug
+    (*commands).emplace_back("chimera_verbose_init", verbose_init_command, nullptr,
+        "Get or set whethe chimerainit.txt or chimeraname.txt commands should output messages.\n\n"
+        "Syntax:\n"
+        "  - chimera_verbose_init"
+    , 0, 1, true);
 
-	(*commands).emplace_back("chimera_budget", budget_command, "debug",
-							 "Get or set whether or show or hide various budgets.\n"
-									 "Options:\n"
-									 "  0: Off\n"
-									 "  1: On (Modded budgets if a mod is installed such as HAC2)\n"
-									 "  2: On (Stock budgets)\n\n"
-									 "Syntax:\n"
-									 "  - chimera_budget [0-2]", 0, 1, find_debug_signatures(), false);
+    // Debug
 
-	(*commands).emplace_back("chimera_player_info", player_info_command, "debug",
-							 "Show player information.\n\n", 0, 0, true, false);
+    (*commands).emplace_back("chimera_budget", budget_command, "debug",
+        "Get or set whether or show or hide various budgets.\n"
+        "Options:\n"
+        "  0: Off\n"
+        "  1: On (Modded budgets if a mod is installed such as HAC2)\n"
+        "  2: On (Stock budgets)\n\n"
+        "Syntax:\n"
+        "  - chimera_budget [0-2]"
+    , 0, 1, find_debug_signatures(), false);
 
-	(*commands).emplace_back("chimera_devmode", devmode_command, "debug",
-							 "Get or set whether or not to enable Halo's developer commands.\n\n"
-									 "\n"
-									 "Syntax:\n"
-									 "  - chimera_devmode [true/false]", 0, 1, find_devmode_sig(), true);
+    (*commands).emplace_back("chimera_player_info", player_info_command, "debug",
+        "Show player information.\n\n"
+    , 0, 0, true, false);
 
-	(*commands).emplace_back("chimera_tps", tps_command, "debug",
-							 "Get or set tick rate. This value cannot be set below 0.01.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_tps [ticks per second]", 0, 1, find_debug_signatures(), false);
+    (*commands).emplace_back("chimera_devmode", devmode_command, "debug",
+        "Get or set whether or not to enable Halo's developer commands.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_devmode [true/false]"
+    , 0, 1, find_devmode_sig(), true);
 
-	(*commands).emplace_back("chimera_wireframe", wireframe_command, "debug",
-							 "Get or set whether to enable or disable wireframe mode. This will not work while in a server.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_wireframe [true/false]", 0, 1, find_debug_signatures(), false);
+    (*commands).emplace_back("chimera_tps", tps_command, "debug",
+        "Get or set tick rate. This value cannot be set below 0.01.\n\n"
+        "Syntax:\n"
+        "  - chimera_tps [ticks per second]"
+    , 0, 1, find_debug_signatures(), false);
 
-	// Enhancements
+    (*commands).emplace_back("chimera_wireframe", wireframe_command, "debug",
+        "Get or set whether to enable or disable wireframe mode. This will not work while in a server.\n\n"
+        "Syntax:\n"
+        "  - chimera_wireframe [true/false]"
+    , 0, 1, find_debug_signatures(), false);
 
-	(*commands).emplace_back("chimera_auto_center", auto_center_command, "enhancements",
-							 "Get or set how auto centering of vehicle cameras should behave.\n"
-									 "Options:\n"
-									 "  0: Broken stock behavior\n"
-									 "  1: Fixed behavior\n"
-									 "  2: Disable automatic centering\n\n"
-									 "Syntax:\n"
-									 "  - chimera_auto_center [0-2]", 0, 1, find_auto_center_signature(), true);
+    // Enhancements
 
-	(*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "enhancements",
-							 "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_letterbox [true/false]", 0, 1,
-							 find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
+    (*commands).emplace_back("chimera_auto_center", auto_center_command, "enhancements",
+        "Get or set how auto centering of vehicle cameras should behave.\n"
+        "Options:\n"
+        "  0: Broken stock behavior\n"
+        "  1: Fixed behavior\n"
+        "  2: Disable automatic centering\n\n"
+        "Syntax:\n"
+        "  - chimera_auto_center [0-2]"
+    , 0, 1, find_auto_center_signature(), true);
 
-	(*commands).emplace_back("chimera_block_mo", block_mo_command, "enhancements",
-							 "Get or set whether or not to disable multitexture overlays. This feature is intended to fix the\n"
-									 "buggy HUD on the stock sniper rifle, but multitexture overlays may be used correctly on\n"
-									 "some maps.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_mo [true/false]", 0, 1, find_multitexture_overlay_signature(),
-							 true);
+    (*commands).emplace_back("chimera_block_letterbox", block_letterbox_command, "enhancements",
+        "Get or set whether or not to block the letterbox effect in cinematics.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_letterbox [true/false]"
+    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
-	(*commands).emplace_back("chimera_block_mouse_acceleration", block_mouse_acceleration_command, "enhancements",
-							 "Get or set whether or not to block mouse acceleration. Note that some mice may still\n"
-									 "exhibit some mouse acceleration.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_mouse_acceleration [true/false]", 0, 1, find_mouse_sigs(),
-							 true);
+    (*commands).emplace_back("chimera_block_mo", block_mo_command, "enhancements",
+        "Get or set whether or not to disable multitexture overlays. This feature is intended to fix the\n"
+        "buggy HUD on the stock sniper rifle, but multitexture overlays may be used correctly on\n"
+        "some maps.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_mo [true/false]"
+    , 0, 1, find_multitexture_overlay_signature(), true);
 
-	(*commands).emplace_back("chimera_block_server_messages", block_server_messages_command, "enhancements",
-							 "Get or set whether or not to block inbound server messages.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_server_messages [true/false]", 0, 1, find_server_message_sig(),
-							 true);
+    (*commands).emplace_back("chimera_block_mouse_acceleration", block_mouse_acceleration_command, "enhancements",
+        "Get or set whether or not to block mouse acceleration. Note that some mice may still\n"
+        "exhibit some mouse acceleration.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_mouse_acceleration [true/false]"
+    , 0, 1, find_mouse_sigs(), true);
 
-	(*commands).emplace_back("chimera_block_zoom_blur", block_zoom_blur_command, "enhancements",
-							 "Get or set whether or not to disable the zoom blur.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_zoom_blur [true/false]", 0, 1, find_zoom_blur_signatures(),
-							 true);
+    (*commands).emplace_back("chimera_block_server_messages", block_server_messages_command, "enhancements",
+        "Get or set whether or not to block inbound server messages.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_server_messages [true/false]"
+    , 0, 1, find_server_message_sig(), true);
 
-	(*commands).emplace_back("chimera_disable_buffering", disable_buffering_command, "enhancements",
-							 "Get or set whether or not to disable buffering. This may improve input latency.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_disable_buffering [true/false]", 0, 1, find_disable_buffering_sig(),
-							 true);
+    (*commands).emplace_back("chimera_block_zoom_blur", block_zoom_blur_command, "enhancements",
+        "Get or set whether or not to disable the zoom blur.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_zoom_blur [true/false]"
+    , 0, 1, find_zoom_blur_signatures(), true);
 
-	(*commands).emplace_back("chimera_enable_console", enable_console_command, "enhancements",
-							 "Get or set whether or not to automatically enable the console.\n"
-									 "Unlike most other features, this feature is enabled by default.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_enable_console [true/false]", 0, 1, true, true);
+    (*commands).emplace_back("chimera_disable_buffering", disable_buffering_command, "enhancements",
+        "Get or set whether or not to disable buffering. This may improve input latency.\n\n"
+        "Syntax:\n"
+        "  - chimera_disable_buffering [true/false]"
+    , 0, 1, find_disable_buffering_sig(), true);
 
-	(*commands).emplace_back("chimera_gamepad_vertical_scale", gamepad_vertical_scale_command, "enhancements",
-							 "Get or set whether or not to scale gamepad vertical sensitivity.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_gamepad_vertical_scale [value]", 0, 1,
-							 find_gamepad_vertical_scale_signatures(), true);
+    (*commands).emplace_back("chimera_enable_console", enable_console_command, "enhancements",
+        "Get or set whether or not to automatically enable the console.\n"
+        "Unlike most other features, this feature is enabled by default.\n\n"
+        "Syntax:\n"
+        "  - chimera_enable_console [true/false]"
+    , 0, 1, true, true);
 
-	(*commands).emplace_back("chimera_mouse_sensitivity", mouse_sensitivity_command, "enhancements",
-							 "Set the horizontal and vertical mouse sensitivities.\n\n"
-									 "Values less than 1 do not work properly if mouse acceleration is enabled.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_mouse_sensitivity [<vertical> <horizontal>]"
-									 "  - chimera_mouse_sensitivity <false>", 0, 2, find_mouse_sigs(), true);
+    (*commands).emplace_back("chimera_gamepad_vertical_scale", gamepad_vertical_scale_command, "enhancements",
+        "Get or set whether or not to scale gamepad vertical sensitivity.\n\n"
+        "Syntax:\n"
+        "  - chimera_gamepad_vertical_scale [value]"
+    , 0, 1, find_gamepad_vertical_scale_signatures(), true);
 
-	(*commands).emplace_back("chimera_show_spawns", show_spawns_command, "enhancements",
-							 "Get or set whether or not to show spawns.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_show_spawns [true/false]", 0, 1, true, true);
+    (*commands).emplace_back("chimera_mouse_sensitivity", mouse_sensitivity_command, "enhancements",
+        "Set the horizontal and vertical mouse sensitivities.\n\n"
+        "Values less than 1 do not work properly if mouse acceleration is enabled.\n\n"
+        "Syntax:\n"
+        "  - chimera_mouse_sensitivity [<vertical> <horizontal>]"
+        "  - chimera_mouse_sensitivity <false>"
+    , 0, 2, find_mouse_sigs(), true);
 
-	(*commands).emplace_back("chimera_skip_loading", skip_loading_command, "enhancements",
-							 "Get or set whether or not to skip the multiplayer loading screen.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_skip_loading [true/false]", 0, 1, find_loading_screen_signatures(),
-							 true);
+    (*commands).emplace_back("chimera_show_spawns", show_spawns_command, "enhancements",
+        "Get or set whether or not to show spawns.\n\n"
+        "Syntax:\n"
+        "  - chimera_show_spawns [true/false]"
+    , 0, 1, true, true);
 
-	(*commands).emplace_back("chimera_uncap_cinematic", uncap_cinematic_command, "enhancements",
-							 "Get or set whether or not to remove the 30 FPS framerate cap in cinematics. This may result\n"
-									 "in objects jittering during cutscenes if chimera_interpolate is not enabled.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_uncap_cinematic [true/false]", 0, 1,
-							 find_uncap_cinematic_signatures(), true);
+    (*commands).emplace_back("chimera_skip_loading", skip_loading_command, "enhancements",
+        "Get or set whether or not to skip the multiplayer loading screen.\n\n"
+        "Syntax:\n"
+        "  - chimera_skip_loading [true/false]"
+    , 0, 1, find_loading_screen_signatures(), true);
 
-	// Fixes
+    (*commands).emplace_back("chimera_uncap_cinematic", uncap_cinematic_command, "enhancements",
+        "Get or set whether or not to remove the 30 FPS framerate cap in cinematics. This may result\n"
+        "in objects jittering during cutscenes if chimera_interpolate is not enabled.\n\n"
+        "Syntax:\n"
+        "  - chimera_uncap_cinematic [true/false]"
+    , 0, 1, find_uncap_cinematic_signatures(), true);
 
-	(*commands).emplace_back("chimera_aim_assist", aim_assist_command, "fixes",
-							 "Get or set whether or not fix aim assist for gamepads. This feature is on by default.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_aim_assist [true/false]", 0, 1, true, true);
+    // Fixes
 
-	(*commands).emplace_back("chimera_fov_fix", fov_fix_command, "fixes",
-							 "Get or set whether or not to fix the FOV. This will make FOV mods more accurate.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_fov_fix [true/false]", 0, 1,
-							 find_fov_fix_sigs() && find_simple_score_screen_sigs(), true);
+    (*commands).emplace_back("chimera_aim_assist", aim_assist_command, "fixes",
+        "Get or set whether or not fix aim assist for gamepads. This feature is on by default.\n\n"
+        "Syntax:\n"
+        "  - chimera_aim_assist [true/false]"
+    , 0, 1, true, true);
 
-	(*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
-							 "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_sniper_hud_fix [true/false]", 0, 1, true, true);
+    (*commands).emplace_back("chimera_fov_fix", fov_fix_command, "fixes",
+        "Get or set whether or not to fix the FOV. This will make FOV mods more accurate.\n\n"
+        "Syntax:\n"
+        "  - chimera_fov_fix [true/false]"
+    , 0, 1, find_fov_fix_sigs() && find_simple_score_screen_sigs(), true);
 
-	(*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
-							 "Get or set whether or not to (mostly) fix the HUD.\n\n"
-									 "Note that this will break the HUD if you are using any other widescreen fix.\n\n"
-									 "Settings:\n"
-									 "  0: Off\n"
-									 "  1: On\n"
-									 "  2: On (center HUD)\n\n"
-									 "Syntax:\n"
-									 "  - chimera_widescreen_fix [0-2]", 0, 1,
-							 find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
+    (*commands).emplace_back("chimera_sniper_hud_fix", sniper_hud_fix_command, "fixes",
+        "Get or set whether or not to fix the sniper HUD. This may not work on protected maps.\n\n"
+        "Syntax:\n"
+        "  - chimera_sniper_hud_fix [true/false]"
+    , 0, 1, true, true);
 
-	(*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "fixes",
-							 "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_widescreen_scope_fix [true/false]", 0, 1,
-							 find_widescreen_scope_signature(), true);
+    (*commands).emplace_back("chimera_widescreen_fix", widescreen_fix_command, "fixes",
+        "Get or set whether or not to (mostly) fix the HUD.\n\n"
+        "Note that this will break the HUD if you are using any other widescreen fix.\n\n"
+        "Settings:\n"
+        "  0: Off\n"
+        "  1: On\n"
+        "  2: On (center HUD)\n\n"
+        "Syntax:\n"
+        "  - chimera_widescreen_fix [0-2]"
+    , 0, 1, find_widescreen_fix_signatures() && find_widescreen_scope_signature(), true);
 
-	// Interpolation
+    (*commands).emplace_back("chimera_widescreen_scope_fix", widescreen_scope_fix_command, "fixes",
+        "Enhance an existing widescreen fix by also fixing the scope mask if it's not fixed.\n\n"
+        "Syntax:\n"
+        "  - chimera_widescreen_scope_fix [true/false]"
+    , 0, 1, find_widescreen_scope_signature(), true);
 
-	(*commands).emplace_back("chimera_interpolate", interpolate_command, "interpolation",
-							 "Get or set the interpolation level. Interpolation smoothes out object movement between\n"
-									 "ticks, providing a substantial visual improvement. Higher levels incur greater CPU usage and\n"
-									 "may impact framerate on slower CPUs.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_interpolate [off/low/medium/high/ultra]", 0, 1,
-							 find_interpolation_signatures(), true);
+    // Interpolation
 
-	(*commands).emplace_back("chimera_interpolate_predict", interpolate_predict_command, "interpolation",
-							 "Get or set whether the next tick should be predicted when interpolating. This will prevent\n"
-									 "objects from appearing as if they are one tick behind, but sudden object movement may\n"
-									 "cause jitteriness.\n\n"
-									 "Settings:\n"
-									 "  0: Off\n"
-									 "  1: On\n"
-									 "  2: On - Do not interpolate first person camera (may make riding elevators juddery)\n\n"
-									 "Syntax:\n"
-									 "  - chimera_interpolate_predict [0-2]", 0, 1, find_interpolation_signatures(),
-							 true);
+    (*commands).emplace_back("chimera_interpolate", interpolate_command, "interpolation",
+        "Get or set the interpolation level. Interpolation smoothes out object movement between\n"
+        "ticks, providing a substantial visual improvement. Higher levels incur greater CPU usage and\n"
+        "may impact framerate on slower CPUs.\n\n"
+        "Syntax:\n"
+        "  - chimera_interpolate [off/low/medium/high/ultra]"
+    , 0, 1, find_interpolation_signatures(), true);
+
+    (*commands).emplace_back("chimera_interpolate_predict", interpolate_predict_command, "interpolation",
+        "Get or set whether the next tick should be predicted when interpolating. This will prevent\n"
+        "objects from appearing as if they are one tick behind, but sudden object movement may\n"
+        "cause jitteriness.\n\n"
+        "Settings:\n"
+        "  0: Off\n"
+        "  1: On\n"
+        "  2: On - Do not interpolate first person camera (may make riding elevators juddery)\n\n"
+        "Syntax:\n"
+        "  - chimera_interpolate_predict [0-2]"
+    , 0, 1, find_interpolation_signatures(), true);
 
 	// Visuals
 
@@ -464,9 +474,8 @@ void initialize_client() noexcept {
 }
 
 void uninitialize_client() noexcept {
-#ifndef NO_LUA
+
 	destroy_lua();
-#endif
 
 	for (size_t i = 0; i < signatures->size(); i++) {
 		(*signatures)[i].undo();

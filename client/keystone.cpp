@@ -7,7 +7,7 @@
 bool custom_keystone_in_use() noexcept {
     static int found = -1;
     if(found == -1) {
-        auto *module = GetModuleHandle(reinterpret_cast<LPCWSTR>("keystone.dll"));
+        auto *module = GetModuleHandle("keystone.dll");
         if(!module) return false;
         auto **bird = reinterpret_cast<const char **>(GetProcAddress(module, "bird"));
         found = (bird != 0 && strcmp(*bird, "(^)>") == 0);

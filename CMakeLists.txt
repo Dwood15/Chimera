@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
-set(PROJECT_NAME Chimera)
+set(PROJECT_NAME chimera)
 project(${PROJECT_NAME} CXX C)
 
 ## Folders files
@@ -13,10 +13,7 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 add_definitions(-D_WINDOWS
 		-D_USRDLL
-		-DUNICODE
-		-D_UNICODE
 		)
-
 #check for msvc -> not currently supported.
 if (MSVC)
 	if ($ENV{CLION_IDE})
@@ -113,7 +110,7 @@ elseif (NOT MSVC)
 	message(AUTHOR_WARNING "MSVC warning hack for CLion b/c CLion is dumb.")
 	#set(DTA_CLIENT STATIC ${DTA_CLIENT_G})
 endif ()
-
+set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS} "-lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -static -ladvapi32")
 #some weirdness surrounding version.h and version.rc, so I'm gonna be leaving them out until further notice.
 add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 		${CLIENT_G}
@@ -137,5 +134,6 @@ add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 		${LUA_OW_LUA_H}
 		)
 
-set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS} CACHE STRING "-lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32")
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME chimera.dll )
+
 target_link_libraries(${PROJECT_NAME} LUA_LIB)

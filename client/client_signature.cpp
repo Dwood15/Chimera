@@ -89,7 +89,7 @@ ChimeraSignature &get_signature(const char *name) noexcept {
     }
     char message[256] = {};
     sprintf(message, "Could not find %s signature. There may be a bug with Chimera. Halo must close, now.", name);
-    MessageBox(NULL, reinterpret_cast<LPCWSTR>(message), reinterpret_cast<LPCWSTR>("Missing required signature"), MB_OK);
+    MessageBox(NULL, message, "Missing required signature", MB_OK);
     std::terminate();
 }
 

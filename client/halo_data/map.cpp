@@ -78,7 +78,7 @@ uint32_t open_or_create(const char *chimera_path, const char *pc_path, const cha
                     fseek(sce, 0, SEEK_SET);
                     fseek(spc, 0, SEEK_SET);
                     size_t buff_size = sce_size + spc_size + sizeof(uint32_t);
-                    auto buffer = new char[buff_size];
+                    char *buffer = new char[buff_size];
                     fread(buffer, sce_size, 1, sce);
                     fread(buffer + sce_size, spc_size, 1, spc);
                     *reinterpret_cast<uint32_t *>(buffer + sce_size + spc_size) = sce_size;
@@ -87,7 +87,7 @@ uint32_t open_or_create(const char *chimera_path, const char *pc_path, const cha
                     fclose(sce);
                     fclose(spc);
                     fclose(sch);
-                    DeleteFile(reinterpret_cast<LPCWSTR>(pc_path));
+                    DeleteFile(pc_path);
                     return sce_size;
                 }
                 fclose(spc);
