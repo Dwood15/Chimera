@@ -90,7 +90,6 @@ set(DTA_CLIENT_G ./client/halo_data/chat.cpp
 file(GLOB LUA_INCLUDE ./client/lua/lua.hpp)
 file(GLOB CLI_OW_LUA_G ./client/lua/*.cpp)
 file(GLOB LUA_OW_LUA_H ./client/lua/*.hpp ./client/lua/*.h)
-
 file(GLOB TIA_CLIENT_G ./client/halo_data/tiarace/hce_tag_class_int.cpp)
 file(GLOB HAC_INJECT_G ./code_injection/hacclient/codefinder.cpp)
 file(GLOB POL_CLIENT_G ./client/interpolation/*.cpp)
@@ -134,15 +133,9 @@ add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 		${VIS_CLIENT_G}
 		${XBX_CLIENT_G}
 		${HAC_INJECT_G}
-		${HKS_CLIENT}
-		${HUD_CLIENT}
-		${POL_CLIENT}
-		${MSG_CLIENT}
-		${STT_CLIENT}
-		${VIS_CLIENT}
-		${XBX_CLIENT}
 		${CLI_OW_LUA_G}
 		${LUA_OW_LUA_H}
 		)
 
+set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS} CACHE STRING "-lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -lpthread -static -ladvapi32")
 target_link_libraries(${PROJECT_NAME} LUA_LIB)
