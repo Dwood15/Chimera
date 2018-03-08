@@ -11,37 +11,36 @@ if (NOT CMAKE_BUILD_TYPE)
 	message(STATUS "Build type not specified: Using Release by default.")
 endif (NOT CMAKE_BUILD_TYPE)
 
-add_definitions(-D_WINDOWS
-		-D_USRDLL
-		)
+add_definitions(-D_WINDOWS -D_USRDLL)
 #check for msvc -> not currently supported.
-if (MSVC)
-	if ($ENV{CLION_IDE})
-		message(STATUS "convenience exit function for CLion building")
-		return()
-	endif ()
-
-	message(WARNING "Building Chimera with ${CMAKE_CXX_COMPILER_ID} is untested. Use at your own risk!")
-
-	set(COMPILER_REL_FLDR msvc)
-	#Microsoft's c++17 implementation isn't complete, so we need to ensure using latest
-	set(CMAKE_CXX_FLAGS /std:c++latest)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W3 /Od /Zi /EHsc")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W3 /GL /Od /Oi /Gy /Zi /EHsc")
-elseif (MINGW)
-	message(STATUS "Mingw detected. ")
-
+if (MINGW)
+	message(STATUS "Mingw detected.")
 	set(COMPILER_REL_FLDR mingw)
 	set(CMAKE_CXX_FLAGS -std=c++14)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -m32 -masm=intel")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -g -m32 -masm=intel")
-else (MSVC)
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ /permissive")
-		message(FATAL_ERROR "Chimera does not yet support clang, if it ever will.")
+elseif (MSVC)
+	message(STATUS "MSVC detected.")
+	if ($ENV{CLION_IDE})
+		#convenience function for CLion
+		return()
 	endif ()
+
+	message(AUTHOR_WARNING "Building Chimera with ${CMAKE_CXX_COMPILER_ID} is incomplete. Use at your own risk!")
+
+	set(COMPILER_REL_FLDR msvc)
+	#Microsoft's c++17 implementation isn't complete, so we need to ensure using latest
+	#For example: static_assert calls without messages are not (yet?) supported in vs 2017.
+	set(CMAKE_CXX_FLAGS /std:c++latest)
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W3 /Od /Zi /EHsc")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W3 /GL /Od /Oi /Gy /Zi /EHsc")
+
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ /permissive")
+	message(FATAL_ERROR "Chimera does not yet support clang, if it ever will.")
+else ()
 	message(FATAL_ERROR "Unrecognized compiler/suite: ${CMAKE_CXX_COMPILER_ID}")
-endif (MSVC)
+endif ()
 
 # Output Variables
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -60,16 +59,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}/ar")
 set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY "${OUTPUT_DIR}/exe")
 
-#set(LUA_TMP_OUT "./client/lua/lua/lua")
-#file(GLOB)
-#file(TO_CMAKE_PATH "client/lua/lua/bin/lua.a" LUA_LIBRARIES )
-#set(LUA_INCLUDE_DIR ./client/lua/lua)
-file(GLOB LUA_CPP "./client/lua/lua/*.c")
 
 #add_library (lualib STATIC lapi.c lcode.c lctype.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c lbitlib.c lcorolib.c ldblib.c liolib.c lmathlib.c loslib.c lstrlib.c ltablib.c loadlib.c linit.c)
+file(GLOB LUA_C "./client/lua/lua/*.c")
 
 #add_definitions(-DLUA -D_CRT_SECURE_NO_WARNINGS)
-add_library(LUA_LIB STATIC ${LUA_CPP})
+
+add_library(LUA_LIB STATIC ${LUA_C})
 set_target_properties(LUA_LIB PROPERTIES OUTPUT_NAME "lua")
 
 set(DTA_CLIENT_G ./client/halo_data/chat.cpp
@@ -82,7 +78,6 @@ set(DTA_CLIENT_G ./client/halo_data/chat.cpp
 		./client/halo_data/script.cpp
 		./client/halo_data/table.cpp
 		./client/halo_data/tag_data.cpp)
-
 
 file(GLOB LUA_INCLUDE ./client/lua/lua.hpp)
 file(GLOB CLI_OW_LUA_G ./client/lua/*.cpp)
@@ -133,7 +128,7 @@ add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 		${CLI_OW_LUA_G}
 		${LUA_OW_LUA_H}
 		)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME chimera.dll )
-
 target_link_libraries(${PROJECT_NAME} LUA_LIB)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME chimera)
+
