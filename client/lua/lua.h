@@ -3,7 +3,6 @@
 #include "../command/command.h"
 
 void setup_lua();
-
 void destroy_lua();
 
 /// Function for command chimera_reload_lua

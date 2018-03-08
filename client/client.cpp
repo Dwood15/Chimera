@@ -366,124 +366,129 @@ void initialize_client() noexcept {
         "  - chimera_interpolate_predict [0-2]"
     , 0, 1, find_interpolation_signatures(), true);
 
-	// Visuals
+    // Visuals
 
-	(*commands).emplace_back("chimera_af", af_command, "visuals",
-							 "Get or set whether or not to enable anisotropic filtering.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_af [true/false]", 0, 1, find_anisotropic_filtering_signature(), true);
+    (*commands).emplace_back("chimera_af", af_command, "visuals",
+        "Get or set whether or not to enable anisotropic filtering.\n\n"
+        "Syntax:\n"
+        "  - chimera_af [true/false]"
+    , 0, 1, find_anisotropic_filtering_signature(), true);
 
-	(*commands).emplace_back("chimera_block_firing_particles", block_firing_particles_command, "visuals",
-							 "Get or set whether or not to block firing particles.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_firing_particles [true/false]", 0, 1, true, true);
+    (*commands).emplace_back("chimera_block_firing_particles", block_firing_particles_command, "visuals",
+        "Get or set whether or not to block firing particles.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_firing_particles [true/false]"
+    , 0, 1, true, true);
 
-	(*commands).emplace_back("chimera_block_gametype_indicator", block_gametype_indicator_command, "visuals",
-							 "Get or set whether or not to turn off the gametype indicator.\n\n"
-									 "\n"
-									 "Syntax:\n"
-									 "  - chimera_block_gametype_indicator [true/false]", 0, 1,
-							 find_gametype_indicator_sig(), true);
+    (*commands).emplace_back("chimera_block_gametype_indicator", block_gametype_indicator_command, "visuals",
+        "Get or set whether or not to turn off the gametype indicator.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_block_gametype_indicator [true/false]"
+    , 0, 1, find_gametype_indicator_sig(), true);
 
-	(*commands).emplace_back("chimera_block_server_ip", block_server_ip_command, "visuals",
-							 "Get or set whether or not to hide the server IP. This may be useful for streamers.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_block_server_ip [true/false]", 0, 1, find_hide_server_ip_sigs(),
-							 true);
+    (*commands).emplace_back("chimera_block_server_ip", block_server_ip_command, "visuals",
+        "Get or set whether or not to hide the server IP. This may be useful for streamers.\n\n"
+        "Syntax:\n"
+        "  - chimera_block_server_ip [true/false]"
+    , 0, 1, find_hide_server_ip_sigs(), true);
 
-	(*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
-							 "Get or set whether or not to turn vSync off startup.\n\n"
-									 "\n"
-									 "Syntax:\n"
-									 "  - chimera_block_vsync [true/false]", 0, 1, find_set_resolution_signatures(),
-							 true);
+    (*commands).emplace_back("chimera_block_vsync", block_vsync_command, "visuals",
+        "Get or set whether or not to turn vSync off startup.\n\n"
+        "\n"
+        "Syntax:\n"
+        "  - chimera_block_vsync [true/false]"
+    , 0, 1, find_set_resolution_signatures(), true);
 
-	(*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
-							 "Change Halo's resolution. Width and height can be either resolution in pixels or an aspect\n"
-									 "ratio.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]", 2,
-							 5, find_set_resolution_signatures(), false);
+    (*commands).emplace_back("chimera_set_resolution", set_resolution_command, "visuals",
+        "Change Halo's resolution. Width and height can be either resolution in pixels or an aspect\n"
+        "ratio.\n\n"
+        "Syntax:\n"
+        "  - chimera_set_resolution <width> <height> [refresh rate] [vsync] [windowed]"
+    , 2, 5, find_set_resolution_signatures(), false);
 
-	(*commands).emplace_back("chimera_throttle_fps", throttle_fps_command, "visuals",
-							 "Throttle Halo's framerate.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_throttle_fps [max FPS]", 0, 1, find_uncap_cinematic_signatures(),
-							 true);
+    (*commands).emplace_back("chimera_throttle_fps", throttle_fps_command, "visuals",
+        "Throttle Halo's framerate.\n\n"
+        "Syntax:\n"
+        "  - chimera_throttle_fps [max FPS]"
+    , 0, 1, find_uncap_cinematic_signatures(), true);
 
-	(*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
-							 "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
-									 "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV. 1\n"
-									 "defaults to 55.41 degrees, or Halo’s standard FOV.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_vfov [VFOV]", 0, 1, find_interpolation_signatures(), true);
+    (*commands).emplace_back("chimera_vfov", vfov_command, "visuals",
+        "Get or change your FOV by attempting to lock to a specific vertical FOV. This will\n"
+        "distort your FOV if HAC2, Open Sauce, etc. are modifying your horizontal FOV. 1\n"
+        "defaults to 55.41 degrees, or Halo’s standard FOV.\n\n"
+        "Syntax:\n"
+        "  - chimera_vfov [VFOV]"
+    , 0, 1, find_interpolation_signatures(), true);
 
-	// Xbox
+    // Xbox
 
-	(*commands).emplace_back("chimera_hud_kill_feed", hud_kill_feed_command, "xbox",
-							 "Get or set whether or not to emit kills and deaths messages as HUD text.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_hud_kill_feed [true/false]", 0, 1, find_hud_kill_feed_sig(), true);
+    (*commands).emplace_back("chimera_hud_kill_feed", hud_kill_feed_command, "xbox",
+        "Get or set whether or not to emit kills and deaths messages as HUD text.\n\n"
+        "Syntax:\n"
+        "  - chimera_hud_kill_feed [true/false]"
+    , 0, 1, find_hud_kill_feed_sig(), true);
 
-	(*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
-							 "Get or set whether or not to emulate Xbox safe zones.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_safe_zones [true/false]", 0, 1, true, true);
+    (*commands).emplace_back("chimera_safe_zones", safe_zones_command, "xbox",
+        "Get or set whether or not to emulate Xbox safe zones.\n\n"
+        "Syntax:\n"
+        "  - chimera_safe_zones [true/false]"
+    , 0, 1, true, true);
 
-	(*commands).emplace_back("chimera_simple_score_screen", simple_score_screen_command, "xbox",
-							 "Get or set whether or not to use a simplified in-game score screen.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_simple_score_screen [true/false]", 0, 1,
-							 find_simple_score_screen_sigs(), true);
+    (*commands).emplace_back("chimera_simple_score_screen", simple_score_screen_command, "xbox",
+        "Get or set whether or not to use a simplified in-game score screen.\n\n"
+        "Syntax:\n"
+        "  - chimera_simple_score_screen [true/false]"
+    , 0, 1, find_simple_score_screen_sigs(), true);
 
-	(*commands).emplace_back("chimera_split_screen_hud", split_screen_hud_command, "xbox",
-							 "Get or set whether or not to use Halo's split screen HUD.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_simple_score_screen [true/false]", 0, 1, find_split_screen_hud_sigs(),
-							 true);
+    (*commands).emplace_back("chimera_split_screen_hud", split_screen_hud_command, "xbox",
+        "Get or set whether or not to use Halo's split screen HUD.\n\n"
+        "Syntax:\n"
+        "  - chimera_simple_score_screen [true/false]"
+    , 0, 1, find_split_screen_hud_sigs(), true);
 
-	// Startup
+    // Startup
 
-	(*commands).emplace_back("chimera_cache", cache_command, "startup",
-							 "Get or set whether or not to use a cache for fast startup.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_cache [true/false]", 0, 1, find_fast_startup_sigs(), true);
+    (*commands).emplace_back("chimera_cache", cache_command, "startup",
+        "Get or set whether or not to use a cache for fast startup.\n\n"
+        "Syntax:\n"
+        "  - chimera_cache [true/false]"
+    , 0, 1, find_fast_startup_sigs(), true);
 
-	(*commands).emplace_back("chimera_cache_clear", cache_clear_command, "startup",
-							 "Clear the cache.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_cache_clear", 0, 0, find_fast_startup_sigs(), false);
+    (*commands).emplace_back("chimera_cache_clear", cache_clear_command, "startup",
+        "Clear the cache.\n\n"
+        "Syntax:\n"
+        "  - chimera_cache_clear"
+    , 0, 0, find_fast_startup_sigs(), false);
 
-	(*commands).emplace_back("chimera_modded_stock_maps", modded_stock_maps_command, "startup",
-							 "Get or set whether or not stock maps will use hardcoded CRC32s. This may be required for\n"
-									 "some maps to work.\n\n"
-									 "Syntax:\n"
-									 "  - chimera_modded_stock_maps [true/false]", 0, 1, find_fast_startup_sigs(),
-							 true);
+    (*commands).emplace_back("chimera_modded_stock_maps", modded_stock_maps_command, "startup",
+        "Get or set whether or not stock maps will use hardcoded CRC32s. This may be required for\n"
+        "some maps to work.\n\n"
+        "Syntax:\n"
+        "  - chimera_modded_stock_maps [true/false]"
+    , 0, 1, find_fast_startup_sigs(), true);
 
-	if (find_fast_startup_sigs()) setup_fast_startup();
+    if(find_fast_startup_sigs()) setup_fast_startup();
 
-	if (custom_keystone_in_use()) {
-		if (find_pc_map_compat_sigs()) setup_pc_map_compatibility();
-		if (find_keystone_sigs()) setup_keystone_override();
-	}
-	if (find_console_fade_fix_sig()) setup_console_text_fix();
+    if(custom_keystone_in_use()) {
+        if(find_pc_map_compat_sigs()) setup_pc_map_compatibility();
+        if(find_keystone_sigs()) setup_keystone_override();
+    }
+    if(find_console_fade_fix_sig()) setup_console_text_fix();
 
 
-	add_frame_event(check_keys);
+    add_frame_event(check_keys);
 }
 
 void uninitialize_client() noexcept {
-
-	destroy_lua();
-
-	for (size_t i = 0; i < signatures->size(); i++) {
-		(*signatures)[i].undo();
-	}
-	delete signatures;
-	signatures = nullptr;
-	delete missing_signatures;
-	missing_signatures = nullptr;
-	delete commands;
-	commands = nullptr;
+    destroy_lua();
+    for(size_t i=0;i<signatures->size();i++) {
+        (*signatures)[i].undo();
+    }
+    delete signatures;
+    signatures = nullptr;
+    delete missing_signatures;
+    missing_signatures = nullptr;
+    delete commands;
+    commands = nullptr;
 }

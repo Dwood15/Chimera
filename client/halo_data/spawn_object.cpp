@@ -4,13 +4,13 @@
 #include "../halo_data/table.h"
 
 struct s_object_creation_disposition {
-	uint32_t tag_id;
-	uint32_t unknown0; // can fuck up the shit apparently
-	uint32_t player_ident;
-	uint32_t parent;
-	char unknown1[4];
-	char unknown2[4];
-	float pos[3];
+    uint32_t tag_id;
+    uint32_t unknown0; // can fuck up the shit apparently
+    uint32_t player_ident;
+    uint32_t parent;
+    char unknown1[4];
+    char unknown2[4];
+    float pos[3];
 };
 
 uint32_t spawn_object(const HaloTagID &tag_id, float x, float y, float z, uint32_t parent) noexcept {

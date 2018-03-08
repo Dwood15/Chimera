@@ -4,10 +4,6 @@
 #include "../messaging/messaging.h"
 #include "../client_signature.h"
 
-#ifdef _MSC_VER
-    #pragma once
-    #define static_assert //static_assert
-#endif
 
 struct ChangeResolutionStructA {
     uint32_t width;
