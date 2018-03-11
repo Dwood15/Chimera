@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
 set(PROJECT_NAME chimera)
+set(INSTALL_DRIVE C:)
 project(${PROJECT_NAME} CXX C)
+
+unset(CMAKE_SHARED_LIBRARY_PREFIX)
+#this file is currently heavily inconsistent. 
+
+unset(CMAKE_SHARED_LIBRARY_PREFIX)
 
 ## Folders files
 #set(CMAKE_CXX_STANDARD 17)
@@ -14,26 +20,30 @@ endif (NOT CMAKE_BUILD_TYPE)
 add_definitions(-D_WINDOWS -D_USRDLL)
 #check for msvc -> not currently supported.
 if (MINGW)
-	message(STATUS "Mingw detected.")
-	set(COMPILER_REL_FLDR mingw)
-	set(CMAKE_CXX_FLAGS -std=c++14)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -g -m32 -masm=intel")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -g -m32 -masm=intel")
-elseif (MSVC)
-	message(STATUS "MSVC detected.")
 	if ($ENV{CLION_IDE})
 		#convenience function for CLion
 		return()
 	endif ()
 
+	message(STATUS "Mingw detected.")
+	set(COMPILER_REL_FLDR mingw)
+	set(CMAKE_CXX_FLAGS "-std=c++17\ -fpermissive")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS}\ -g\ -m32\ -masm=intel")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -g -m32 -masm=intel")
+elseif(MSVC)
 	message(AUTHOR_WARNING "Building Chimera with ${CMAKE_CXX_COMPILER_ID} is incomplete. Use at your own risk!")
-
+	
+	#vc++ 2017 toolset. Available from microsoft here: http://landinghub.visualstudio.com/visual-cpp-build-tools
+	if(NOT CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION OR NOT "${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}" STREQUAL "10.0.16299.0")
+		message(WARNING "CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION is empty! Could not find applicable windows 10 sdk. ${CMAKE_GENERATOR_TOOLSET} ${CMAKE_HOST_WIN32}")
+		#set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.16299.0) 
+		#include_directories(<somekeyword?> "C:/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/10.0.16299.0")
+		#TODO: CHECK IF THI
+	endif()
+	
 	set(COMPILER_REL_FLDR msvc)
-	#Microsoft's c++17 implementation isn't complete, so we need to ensure using latest
-	#For example: static_assert calls without messages are not (yet?) supported in vs 2017.
 	set(CMAKE_CXX_FLAGS /std:c++latest)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W3 /Od /Zi /EHsc")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W3 /GL /Od /Oi /Gy /Zi /EHsc")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /permissive- /Gy- /W3 /Od /Zi /EHsc /fp:fast /arch:SSE2 /D\ \"WIN32\" /D \"_WINDOWS\" /D \"_USRDLL\" /D \"_WINDLL\"\ /D_CRT_SECURE_NO_WARNINGS")
 
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ /permissive")
@@ -67,6 +77,8 @@ file(GLOB LUA_C "./client/lua/lua/*.c")
 
 add_library(LUA_LIB STATIC ${LUA_C})
 set_target_properties(LUA_LIB PROPERTIES OUTPUT_NAME "lua")
+#Lua needs to be linked before the linker flags are set because some of we use are _not_ compatible with building it.
+#TODO: find out why//what flags, and fix them. 
 
 set(DTA_CLIENT_G ./client/halo_data/chat.cpp
 		./client/halo_data/resolution.cpp
@@ -79,6 +91,10 @@ set(DTA_CLIENT_G ./client/halo_data/chat.cpp
 		./client/halo_data/table.cpp
 		./client/halo_data/tag_data.cpp)
 
+		
+#A lot of this was just trying random crap to see what works and what won't. 
+#The trick here was literally just trying things and figuring out what worked and what didn't.
+#
 file(GLOB LUA_INCLUDE ./client/lua/lua.hpp)
 file(GLOB CLI_OW_LUA_G ./client/lua/*.cpp)
 file(GLOB LUA_OW_LUA_H ./client/lua/*.hpp ./client/lua/*.h)
@@ -99,13 +115,14 @@ file(GLOB CLIENT_G ./client/*.cpp main.cpp)
 file(GLOB MATH_G ./math/data_types.cpp)
 
 if (MSVC)
-	message(STATUS "Using mvc, so we're ignoring the resolution.cpp file.")
-	#add_library(DTA_CLIENT STATIC ${DTA_CLIENT_G})
+	set(LINKER_FLAGS "/MANIFEST\ /NXCOMPAT\ /DEBUG\ /MACHINE:X86\ /OPT:REF\ /SAFESEH:NO\ /INCREMENTAL:NO\ /SUBSYSTEM:WINDOWS\ /MANIFESTUAC:NO\ /OPT:NOICF\ /NOLOGO")#\ /ALIGN:1") rip alignment on win32
+	set(CMAKE_SHARED_LINKER_FLAGS ${LINKER_FLAGS})
+
 elseif (NOT MSVC)
-	message(AUTHOR_WARNING "MSVC warning hack for CLion b/c CLion is dumb.")
+	set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS} "-lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -static -ladvapi32")
+	#message(AUTHOR_WARNING "MSVC warning hack b/c CLion is dumb.")
 	#set(DTA_CLIENT STATIC ${DTA_CLIENT_G})
 endif ()
-set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS} "-lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -static -ladvapi32")
 #some weirdness surrounding version.h and version.rc, so I'm gonna be leaving them out until further notice.
 add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 		${CLIENT_G}
