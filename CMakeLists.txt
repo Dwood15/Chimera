@@ -7,8 +7,6 @@ project(${PROJECT_NAME} CXX C)
 unset(CMAKE_SHARED_LIBRARY_PREFIX)
 #this file is currently heavily inconsistent. 
 
-unset(CMAKE_SHARED_LIBRARY_PREFIX)
-
 ## Folders files
 #set(CMAKE_CXX_STANDARD 17)
 # Define Release by default.
