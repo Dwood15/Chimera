@@ -1,13 +1,40 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+#Ensure we get the library//dll name we want 
+unset(CMAKE_SHARED_LIBRARY_PREFIX)
+unset(CMAKE_CL_64)
+
+
 set(PROJECT_NAME chimera)
+#cmake might ignore this for building. TODO: Double check this is used/unused.
 set(INSTALL_DRIVE C:)
 project(${PROJECT_NAME} CXX C)
 
+#this file is currently heavily inconsistent - feel free to rework!
 
-#this file is currently heavily inconsistent.
+message(STATUS "BINARY OUT DIR --- ${PROJECT_BINARY_DIR}")
 
-## Folders files
+#	*****DIRECTX FINDER*****
+#Searches known paths/locations for directx library. Uncomment to automatically find directx sdk
+##find_path(DX_PATH FindDirectX.cmake PATHS ${PROJECT_SOURCE_DIR}/cmake REQUIRED)
+##find_package(DirectX REQUIRED)
+
+#	*****HALOCE FINDER*****
+#Searches the registry for haloce so we can automatically put in the Controls folder.
+#Uncomment if you like amazing things. :P
+##find_path(HCE_PATH FindHaloCE.cmake PATHS ${PROJECT_SOURCE_DIR}/cmake REQUIRED)
+##find_package(HaloCE REQUIRED)
+
+#This does literally nothing if neither of the above are uncommented.
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${DX_PATH} ${HCE_PATH})
+
+#	*****DIRECTX stuff*****
+if($DirectX_INCLUDE_DIRS) 
+include_directories(BEFORE ${DirectX_INCLUDE_DIRS})
+message(STATUS "DX include Dirs: ${DirectX_INCLUDE_DIRS}")
+endif()
+
+## C++ 17.
 #set(CMAKE_CXX_STANDARD 17)
 # Define Release by default.
 if (NOT CMAKE_BUILD_TYPE)
@@ -29,12 +56,13 @@ if (MINGW)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS}\ -g\ -m32\ -masm=intel")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -g -m32 -masm=intel")
 elseif(MSVC)
+	message(STATUS "MSVC VERSION --- ${MSVC_VERSION}")
 	message(AUTHOR_WARNING "Building Chimera with ${CMAKE_CXX_COMPILER_ID} is incomplete. Use at your own risk!")
-
 	#vc++ 2017 toolset. Available from microsoft here: http://landinghub.visualstudio.com/visual-cpp-build-tools
 	if(NOT CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION OR NOT "${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}" STREQUAL "10.0.16299.0")
-		message(WARNING "CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION is empty! Could not find applicable windows 10 sdk. ${CMAKE_GENERATOR_TOOLSET} ${CMAKE_HOST_WIN32}")
-		#set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.16299.0)
+		message(STATUS "CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION is empty! Could not find applicable windows 10 sdk. This might not cause any issues, but who knows?")
+		message(STATUS "CMAKE_GENERATOR_TOOLSET: ${CMAKE_GENERATOR_TOOLSET}  -Is cmake host system win32? ${CMAKE_HOST_WIN32}")
+		set(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION 10.0.16299.0)
 		#include_directories(<somekeyword?> "C:/Program\ Files\ \(x86\)/Windows\ Kits/10/Include/10.0.16299.0")
 		#TODO: CHECK FOR AVAILABLE SDK VERSIONS IF NONE SET
 	endif()
@@ -52,30 +80,30 @@ endif ()
 
 # Output Variables
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+#DO DEBUG STUFF HERE
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "./bin/${COMPILER_REL_FLDR}-debug")
+#TODO: Remove this GLOB and use replace with: set(DBG_CLIENT_G <debug files list here>
 	file(GLOB DBG_CLIENT_G ./client/debug/*.cpp)
-	set(OUTPUT_DIR ./bin/${COMPILER_REL_FLDR}-debug)
 elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-	if ($ENV{CLION_IDE})
-		message(STATUS "convenience exit function for CLion building")
-		return()
-	endif ()
+	#put this little section in whichever version you want to _not_ target - release or debug.
+	##if ($ENV{CLION_IDE})
+		##message(STATUS "convenience hack for making CLion less annoying")
+		##return()
+	##endif ()
 
 	set(OUTPUT_DIR ./bin/${COMPILER_REL_FLDR}-Release)
 endif ()
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}/ar")
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY "${OUTPUT_DIR}/exe")
-
-
-#add_library (lualib STATIC lapi.c lcode.c lctype.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c lbitlib.c lcorolib.c ldblib.c liolib.c lmathlib.c loslib.c lstrlib.c ltablib.c loadlib.c linit.c)
+# el oh el - but seriously though, this is _technically_ better than a file glob, but since the issues with globs only occur if we're changing/modifying lua it doesn't matter.
+#set (LUA_C lapi.c lcode.c lctype.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c lparser.c lstate.c lstring.c 
+#		ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c lbitlib.c lcorolib.c ldblib.c liolib.c lmathlib.c loslib.c lstrlib.c ltablib.c loadlib.c linit.c)
 file(GLOB LUA_C "./client/lua/lua/*.c")
 
 #add_definitions(-DLUA -D_CRT_SECURE_NO_WARNINGS)
-
 add_library(LUA_LIB STATIC ${LUA_C})
 set_target_properties(LUA_LIB PROPERTIES OUTPUT_NAME "lua")
-#Lua needs to be linked before the linker flags are set because some of we use are _not_ compatible with building it.
+#Lua needs to be linked before the linker flags are set because some we use _are not_ compatible with building/linking lua.
 #TODO: find out why//what flags, and fix them.
 
 set(DTA_CLIENT_G ./client/halo_data/chat.cpp
@@ -89,8 +117,7 @@ set(DTA_CLIENT_G ./client/halo_data/chat.cpp
 		./client/halo_data/table.cpp
 		./client/halo_data/tag_data.cpp)
 
-
-#A lot of this was just trying random crap to see what works and what won't.
+#A lot of this was just trying random crap to see what works and what won't. The above 
 #The trick here was literally just trying things and figuring out what worked and what didn't.
 #
 file(GLOB LUA_INCLUDE ./client/lua/lua.hpp)
@@ -118,7 +145,8 @@ if (MSVC)
 
 elseif (NOT MSVC)
 	set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS_INIT} $ENV{LDFLAGS} "-lws2_32 -static-libgcc -static-libstdc++ -static -luserenv -static -static -ladvapi32")
-	#message(AUTHOR_WARNING "MSVC warning hack b/c CLion is dumb.")
+	##Uncomment the below line/move it to the mvc section so that CLion will focus the platform you're currently building on. 
+	###message(AUTHOR_WARNING "MSVC warning hack b/c CLion is dumb.")
 	#set(DTA_CLIENT STATIC ${DTA_CLIENT_G})
 endif ()
 #some weirdness surrounding version.h and version.rc, so I'm gonna be leaving them out until further notice.
@@ -146,5 +174,11 @@ add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 
 target_link_libraries(${PROJECT_NAME} LUA_LIB)
 
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME chimera)
+if(HaloCE_ROOT_DIR) 
+	SET(CMAKE_PDB_OUTPUT_DIRECTORY  "${HaloCE_ROOT_DIR}/controls")
+	#SET(EXECUTABLE_OUTPUT_PATH   "${HaloCE_ROOT_DIR}/controls")
+	SET(LIBRARY_OUTPUT_PATH   "${HaloCE_ROOT_DIR}/controls")
+endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "chimera")
 
