@@ -29,7 +29,7 @@ message(STATUS "BINARY OUT DIR --- ${PROJECT_BINARY_DIR}")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${DX_PATH} ${HCE_PATH})
 
 #	*****DIRECTX stuff*****
-if($DirectX_INCLUDE_DIRS) 
+if($DirectX_FOUND) 
 include_directories(BEFORE ${DirectX_INCLUDE_DIRS})
 message(STATUS "DX include Dirs: ${DirectX_INCLUDE_DIRS}")
 endif()
@@ -174,7 +174,7 @@ add_library(${PROJECT_NAME} SHARED ${LUA_INCLUDE}
 
 target_link_libraries(${PROJECT_NAME} LUA_LIB)
 
-if(HaloCE_ROOT_DIR) 
+if(HaloCE_FOUND) 
 	SET(CMAKE_PDB_OUTPUT_DIRECTORY  "${HaloCE_ROOT_DIR}/controls")
 	#SET(EXECUTABLE_OUTPUT_PATH   "${HaloCE_ROOT_DIR}/controls")
 	SET(LIBRARY_OUTPUT_PATH   "${HaloCE_ROOT_DIR}/controls")
